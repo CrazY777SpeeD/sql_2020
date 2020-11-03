@@ -7,7 +7,7 @@ DROP TYPE GRUSHEVSKAYA_SINGER_TAB;
 DROP TABLE "GRUSHEVSKAYA_DICTIONARY_STYLE";
 DROP TABLE "GRUSHEVSKAYA_SINGER";
 
--- SINGER
+-- SINGER - исполнители
 
 CREATE TABLE "GRUSHEVSKAYA_SINGER"(
     "NAME" VARCHAR2(100 BYTE),
@@ -22,7 +22,7 @@ ALTER TABLE "GRUSHEVSKAYA_SINGER" ADD CONSTRAINT "GRUSHEVSKAYA_SINGER_UK" UNIQUE
 
 ALTER TABLE "GRUSHEVSKAYA_SINGER" MODIFY ("COUNTRY" NOT NULL ENABLE);
 
--- STYLE
+-- STYLE - вспомогательная таблица, содержащая словарь стилей
 
 CREATE TABLE "GRUSHEVSKAYA_DICTIONARY_STYLE"(
     "NAME" VARCHAR2(100 BYTE)
@@ -30,11 +30,10 @@ CREATE TABLE "GRUSHEVSKAYA_DICTIONARY_STYLE"(
         NOT NULL
 );
 
--- RECORD
+-- RECORD - записи 
 
 CREATE TYPE GRUSHEVSKAYA_SINGER_TAB AS TABLE OF VARCHAR2(1);
 /
-
 CREATE TABLE "GRUSHEVSKAYA_RECORD"(
     "ID" NUMBER(10,0),
     "NAME" VARCHAR2(100 BYTE),
@@ -54,11 +53,10 @@ ALTER TABLE "GRUSHEVSKAYA_RECORD" MODIFY ("TIME" NOT NULL ENABLE);
 ALTER TABLE "GRUSHEVSKAYA_RECORD" ADD CONSTRAINT "GRUSHEVSKAYA_RECORD_FK" FOREIGN KEY ("STYLE")
     REFERENCES "GRUSHEVSKAYA_DICTIONARY_STYLE" ("NAME") ON DELETE SET NULL ENABLE;
     
--- ALBUM
+-- ALBUM - альбомы
 
 CREATE TYPE GRUSHEVSKAYA_RECORD_ARR AS VARRAY(30) OF NUMBER(10,0);
 /
-
 CREATE TABLE "GRUSHEVSKAYA_ALBUM"(
     "ID" NUMBER(10, 0),
     "NAME" VARCHAR2(100 BYTE),
@@ -84,8 +82,12 @@ ALTER TABLE "GRUSHEVSKAYA_ALBUM" ADD CONSTRAINT "GRUSHEVSKAYA_ALBUM_CHK3" CHECK 
 
 ALTER TABLE "GRUSHEVSKAYA_ALBUM" MODIFY ("RECORD_ARRAY" NOT NULL ENABLE);
 
--------------------- связь «многие-ко-многим»
+--Связь «многие-ко-многим» SINGER-RECORD
 
+--Перед вставкой или обновлением записи
+--удалить NULL-значения исполнителей и уплотнить список исполнителей.
+--Если подмножество исполнителей не соответствует таблице исполнителей,
+--то отменить вставку или откатить обновление
 CREATE OR REPLACE TRIGGER GRUSHEVSKAYA_TR_ON_RECORDS
 BEFORE INSERT OR UPDATE ON GRUSHEVSKAYA_RECORD
 FOR EACH ROW
@@ -115,6 +117,9 @@ BEGIN
         END IF;
     END IF;
 END;
+--Перед удалением исполнителя
+--нужно проверить нет ли его треков (записей).
+--Если есть, то удалять нельзя.
 /
 CREATE OR REPLACE TRIGGER GRUSHEVSKAYA_TR_ON_SINGERS_DEL
 BEFORE DELETE ON GRUSHEVSKAYA_SINGER
@@ -133,6 +138,9 @@ BEGIN
         END LOOP;
     END LOOP;
 END;
+--После обновления исполнителя
+--нужно обновить его имя для всех записей
+--и обновить саму запись
 /
 CREATE OR REPLACE TRIGGER GRUSHEVSKAYA_TR_ON_SINGERS_UDP
 FOR UPDATE OF NAME ON GRUSHEVSKAYA_SINGER
@@ -166,6 +174,99 @@ COMPOUND TRIGGER
         END LOOP;
     END AFTER STATEMENT;
 END;
+
+--Связь «многие-ко-многим» RECORD-ALBUM
+
+--Перед вставкой или обновлением альбома
+--проверить, что все записи существуют.
+--Если нет, то либо отменить втавку, 
+--либо откатить обновление
+CREATE OR REPLACE TRIGGER GRUSHEVSKAYA_TR_ON_ALBUM
+BEFORE INSERT OR UPDATE ON GRUSHEVSKAYA_ALBUM
+FOR EACH ROW
+DECLARE
+    TYPE GRUSHEVSKAYA_RECORD_TAB IS TABLE OF NUMBER(10, 0);
+    LIST_ID GRUSHEVSKAYA_RECORD_TAB;
+    ERROR_ALBUM EXCEPTION;
+BEGIN
+    SELECT ID BULK COLLECT INTO LIST_ID FROM GRUSHEVSKAYA_RECORD;
+    FOR i IN 1..:NEW.RECORD_ARRAY.COUNT
+    LOOP
+        IF NOT LIST_ID.EXISTS(:NEW.RECORD_ARRAY(i)) THEN
+            IF INSERTING THEN
+                DBMS_OUTPUT.PUT_LINE('Некорректный список записей.');
+                RAISE ERROR_ALBUM;
+            ELSE
+                :NEW.ID := :OLD.ID;
+                :NEW.NAME := :OLD.NAME;
+                :NEW.PRICE := :OLD.PRICE;
+                :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
+                :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
+                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;
+                DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' || :OLD.ID || ' не был обновлен из-за нарушения внешнего ключа.');
+                RETURN;
+            END IF;
+        END IF;
+    END LOOP;    
+END;
+--Перед удалением записи проверить нет ли ее в альбомах.
+--Если есть, то удалять нельзя.
+/
+CREATE OR REPLACE TRIGGER GRUSHEVSKAYA_TR_ON_RECORD_DEL
+BEFORE DELETE ON GRUSHEVSKAYA_RECORD
+FOR EACH ROW
+DECLARE    
+    ERROR_RECORD_DEL EXCEPTION;
+BEGIN
+    FOR ALBUM_ROW IN (SELECT * FROM GRUSHEVSKAYA_ALBUM)
+    LOOP
+        FOR i IN 1..ALBUM_ROW.RECORD_ARRAY.COUNT
+        LOOP
+            IF ALBUM_ROW.RECORD_ARRAY(i) = :OLD.ID THEN
+                DBMS_OUTPUT.PUT_LINE('Запиь с идентификатором ' || :OLD.ID || ' удалять нельзя - она есть в альбоме.');
+                RAISE ERROR_RECORD_DEL;
+            END IF;
+        END LOOP;
+    END LOOP;
+END;
+--После обновления записи 
+--нужно обновить все ее id во всех альбомах
+--и обновить сами альбомы
+/
+CREATE OR REPLACE TRIGGER GRUSHEVSKAYA_TR_ON_RECORD_UDP
+FOR UPDATE OF ID ON GRUSHEVSKAYA_RECORD
+COMPOUND TRIGGER
+    TYPE CHANGES_ARR IS TABLE OF NUMBER(10,0) INDEX BY PLS_INTEGER;
+    RECORD_CHANGES CHANGES_ARR;
+    AFTER EACH ROW IS
+    BEGIN
+        RECORD_CHANGES(:OLD.ID) := :NEW.ID;
+    END AFTER EACH ROW;
+    AFTER STATEMENT IS
+        ID_ARR GRUSHEVSKAYA_RECORD_ARR;
+        FLAG BOOLEAN := FALSE;
+    BEGIN
+        FOR ALBUM_ROW IN (SELECT * FROM GRUSHEVSKAYA_ALBUM)
+        LOOP
+            FLAG := FALSE;
+            ID_ARR := ALBUM_ROW.RECORD_ARRAY;
+            FOR i IN 1..ID_ARR.COUNT 
+            LOOP
+                IF RECORD_CHANGES.EXISTS(ID_ARR(i)) THEN
+                    ID_ARR(i) := RECORD_CHANGES(ID_ARR(i));
+                    FLAG := TRUE;
+                END IF;
+            END LOOP;
+            IF FLAG = TRUE THEN
+                UPDATE GRUSHEVSKAYA_ALBUM
+                    SET RECORD_ARRAY = ID_ARR
+                    WHERE ID = ALBUM_ROW.ID;
+            END IF;
+        END LOOP;
+    END AFTER STATEMENT;
+END;
+
+
 
 
 

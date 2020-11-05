@@ -311,7 +311,8 @@ BEGIN
     SELECT ID BULK COLLECT INTO LIST_ID FROM GRUSHEVSKAYA_RECORD;
     FOR i IN 1..:NEW.RECORD_ARRAY.COUNT
     LOOP
-        IF NOT LIST_ID.EXISTS(:NEW.RECORD_ARRAY(i)) THEN
+       IF NOT :NEW.RECORD_ARRAY(i) IS NULL
+          AND NOT LIST_ID.EXISTS(:NEW.RECORD_ARRAY(i)) THEN
             IF INSERTING THEN
                 DBMS_OUTPUT.PUT_LINE('Некорректный список записей.');
                 RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM;
@@ -417,6 +418,22 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
         NICKNAME VARCHAR2, 
         COUNTRY VARCHAR2
     );
+    PROCEDURE ADD_ALBUM (
+        ID VARCHAR2,
+        NAME VARCHAR2,
+        PRICE NUMBER,
+        QUANTITY_IN_STOCK NUMBER,
+        QUANTITY_OF_SOLD NUMBER, 
+        RECORD_ID NUMBER,
+        RECORD_SERIAL_NUMBER NUMBER
+    );
+    PROCEDURE ADD_ALBUM (
+        ID VARCHAR2,
+        NAME VARCHAR2,
+        PRICE NUMBER,
+        QUANTITY_IN_STOCK NUMBER,
+        QUANTITY_OF_SOLD NUMBER
+    );
 --    FUNCTION disc_hours RETURN NUMBER;
 END;
 /
@@ -505,6 +522,7 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         UPDATE GRUSHEVSKAYA_RECORD
             SET SINGER_LIST = OLD_SINGER_LIST
             WHERE ID = RECORD_ID;
+        COMMIT;
     EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_SINGER_IN_RECORD');
@@ -535,6 +553,89 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             PRINT_MSG_EX(SQLCODE);
         END IF;
     END ADD_SINGER;
+        
+    PROCEDURE ADD_ALBUM (
+        ID VARCHAR2,
+        NAME VARCHAR2,
+        PRICE NUMBER,
+        QUANTITY_IN_STOCK NUMBER,
+        QUANTITY_OF_SOLD NUMBER, 
+        RECORD_ID NUMBER,
+        RECORD_SERIAL_NUMBER NUMBER
+    ) IS
+        RECORD_ARR GRUSHEVSKAYA_RECORD_ARR := GRUSHEVSKAYA_RECORD_ARR();
+    BEGIN
+        RECORD_ARR.EXTEND(30);
+        RECORD_ARR(RECORD_SERIAL_NUMBER) := RECORD_ID;
+        INSERT INTO GRUSHEVSKAYA_ALBUM (
+            ID, 
+            NAME, 
+            PRICE, 
+            QUANTITY_IN_STOCK,
+            QUANTITY_OF_SOLD,
+            RECORD_ARRAY
+        ) VALUES (
+            ID, 
+            NAME, 
+            PRICE, 
+            QUANTITY_IN_STOCK,
+            QUANTITY_OF_SOLD,
+            RECORD_ARR
+        );
+        COMMIT;
+    EXCEPTION
+    WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
+        RETURN;
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUM');
+        IF SQLCODE = -12899 THEN
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+        ELSIF SQLCODE = -6532 THEN
+            DBMS_OUTPUT.PUT_LINE('Индекс превышает пределы');
+        ELSE
+            PRINT_MSG_EX(SQLCODE);
+        END IF;
+    END ADD_ALBUM;
+        
+    PROCEDURE ADD_ALBUM (
+        ID VARCHAR2,
+        NAME VARCHAR2,
+        PRICE NUMBER,
+        QUANTITY_IN_STOCK NUMBER,
+        QUANTITY_OF_SOLD NUMBER
+    ) IS
+        RECORD_ARR GRUSHEVSKAYA_RECORD_ARR := GRUSHEVSKAYA_RECORD_ARR();
+    BEGIN
+        RECORD_ARR.EXTEND(30);
+        INSERT INTO GRUSHEVSKAYA_ALBUM (
+            ID, 
+            NAME, 
+            PRICE, 
+            QUANTITY_IN_STOCK,
+            QUANTITY_OF_SOLD,
+            RECORD_ARRAY
+        ) VALUES (
+            ID, 
+            NAME, 
+            PRICE, 
+            QUANTITY_IN_STOCK,
+            QUANTITY_OF_SOLD,
+            RECORD_ARR
+        );
+        COMMIT;
+    EXCEPTION
+    WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
+        RETURN;
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUM');
+        IF SQLCODE = -12899 THEN
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+        ELSIF SQLCODE = -6532 THEN
+            DBMS_OUTPUT.PUT_LINE('Индекс превышает пределы');
+        ELSE
+            PRINT_MSG_EX(SQLCODE);
+        END IF;
+    END ADD_ALBUM;
 END;
 /
 DECLARE 
@@ -545,6 +646,15 @@ BEGIN
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD(1, 'song_1', 0, 1, 10, 'style_1', 'singer_1');
     GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_2', 'nick_2', 'country_1');
     GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(1, 'singer_2');
+    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
+        ID => 1, 
+        NAME => 'album_1', 
+        PRICE => 100.50, 
+        QUANTITY_IN_STOCK => 10, 
+        QUANTITY_OF_SOLD => 0, 
+        RECORD_ID => 1, 
+        RECORD_SERIAL_NUMBER => 10
+    );
 END;
 
 

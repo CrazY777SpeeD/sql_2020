@@ -457,7 +457,7 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
         COUNTRY VARCHAR2
     );
     PROCEDURE ADD_ALBUM (
-        ID VARCHAR2,
+        ID NUMBER,
         NAME VARCHAR2,
         PRICE NUMBER,
         QUANTITY_IN_STOCK NUMBER,
@@ -466,11 +466,16 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
         RECORD_SERIAL_NUMBER NUMBER
     );
     PROCEDURE ADD_ALBUM (
-        ID VARCHAR2,
+        ID NUMBER,
         NAME VARCHAR2,
         PRICE NUMBER,
         QUANTITY_IN_STOCK NUMBER,
         QUANTITY_OF_SOLD NUMBER
+    );
+    PROCEDURE ADD_RECORD_IN_ALBUM (
+        ALBUM_ID NUMBER, 
+        RECORD_ID NUMBER,
+        RECORD_SERIAL_NUMBER NUMBER
     );
 --    FUNCTION disc_hours RETURN NUMBER;
 END;
@@ -495,6 +500,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_IN_DICT_COUNTRY');
         IF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+        ELSIF SQLCODE = -1 THEN
+            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
@@ -511,6 +518,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_IN_DICT_STYLE');
         IF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+        ELSIF SQLCODE = -1 THEN
+            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
@@ -540,6 +549,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             DBMS_OUTPUT.PUT_LINE('Нет такого стиля в словаре');
         ELSIF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+        ELSIF SQLCODE = -1 THEN
+            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
@@ -550,15 +561,15 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         RECORD_ID NUMBER,
         SINGER_NAME VARCHAR2
     ) IS
-        OLD_SINGER_LIST GRUSHEVSKAYA_SINGER_TAB;
+        TMP_SINGER_LIST GRUSHEVSKAYA_SINGER_TAB;
     BEGIN
-        SELECT SINGER_LIST INTO OLD_SINGER_LIST 
+        SELECT SINGER_LIST INTO TMP_SINGER_LIST 
             FROM GRUSHEVSKAYA_RECORD
             WHERE ID = RECORD_ID;
-        OLD_SINGER_LIST.EXTEND;
-        OLD_SINGER_LIST(OLD_SINGER_LIST.LAST) := SINGER_NAME;
+        TMP_SINGER_LIST.EXTEND;
+        TMP_SINGER_LIST(TMP_SINGER_LIST.LAST) := SINGER_NAME;
         UPDATE GRUSHEVSKAYA_RECORD
-            SET SINGER_LIST = OLD_SINGER_LIST
+            SET SINGER_LIST = TMP_SINGER_LIST
             WHERE ID = RECORD_ID;
         COMMIT;
     EXCEPTION
@@ -587,13 +598,15 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             DBMS_OUTPUT.PUT_LINE('Нет такой страны в словаре');
         ELSIF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+        ELSIF SQLCODE = -1 THEN
+            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
     END ADD_SINGER;
         
     PROCEDURE ADD_ALBUM (
-        ID VARCHAR2,
+        ID NUMBER,
         NAME VARCHAR2,
         PRICE NUMBER,
         QUANTITY_IN_STOCK NUMBER,
@@ -630,13 +643,15 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
         ELSIF SQLCODE = -6532 THEN
             DBMS_OUTPUT.PUT_LINE('Индекс превышает пределы');
+        ELSIF SQLCODE = -1 THEN
+            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
     END ADD_ALBUM;
         
     PROCEDURE ADD_ALBUM (
-        ID VARCHAR2,
+        ID NUMBER,
         NAME VARCHAR2,
         PRICE NUMBER,
         QUANTITY_IN_STOCK NUMBER,
@@ -670,10 +685,41 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
         ELSIF SQLCODE = -6532 THEN
             DBMS_OUTPUT.PUT_LINE('Индекс превышает пределы');
+        ELSIF SQLCODE = -1 THEN
+            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_ALBUM;
+    END ADD_ALBUM;    
+    
+    PROCEDURE ADD_RECORD_IN_ALBUM (
+        ALBUM_ID NUMBER, 
+        RECORD_ID NUMBER,
+        RECORD_SERIAL_NUMBER NUMBER
+    )IS
+        TMP_RECORD_ARR GRUSHEVSKAYA_RECORD_ARR;
+    BEGIN
+        SELECT RECORD_ARRAY INTO TMP_RECORD_ARR
+            FROM GRUSHEVSKAYA_ALBUM
+            WHERE ID = ALBUM_ID;
+        TMP_RECORD_ARR(RECORD_SERIAL_NUMBER) := RECORD_ID;
+        UPDATE GRUSHEVSKAYA_ALBUM
+            SET RECORD_ARRAY = TMP_RECORD_ARR
+            WHERE ID = ALBUM_ID;            
+        COMMIT;
+    EXCEPTION
+    WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
+        RETURN;
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_RECORD_IN_ALBUM');
+        IF SQLCODE = -12899 THEN
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+        ELSIF SQLCODE = -6532 THEN
+            DBMS_OUTPUT.PUT_LINE('Индекс превышает пределы');
+        ELSE
+            PRINT_MSG_EX(SQLCODE);
+        END IF;
+    END ADD_RECORD_IN_ALBUM;
 END;
 /
 DECLARE 
@@ -692,6 +738,19 @@ BEGIN
         QUANTITY_OF_SOLD => 0, 
         RECORD_ID => 1, 
         RECORD_SERIAL_NUMBER => 10
+    );
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(2, 'song_2', 0, 2, 50, 'style_1', 'singer_2');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+        ALBUM_ID => 1,
+        RECORD_ID => 2, 
+        RECORD_SERIAL_NUMBER => 3
+    );
+    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
+        ID => 2, 
+        NAME => 'album_2', 
+        PRICE => 100.50, 
+        QUANTITY_IN_STOCK => 5, 
+        QUANTITY_OF_SOLD => 0
     );
 END;
 

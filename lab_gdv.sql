@@ -230,7 +230,7 @@ BEGIN
             :NEW.SINGER_LIST := :OLD.SINGER_LIST;
             DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
                 || :OLD.ID 
-                || ' не была обновлена из-за нарушения внешнего ключа.');
+                || ' не была обновлена из-за нарушения внешнего ключа (исполнители).');
         END IF;
     END IF;
 END;
@@ -408,6 +408,10 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
         STYLE VARCHAR2,
         SINGER VARCHAR2
     );
+    PROCEDURE ADD_SINGER_IN_RECORD (
+        RECORD_ID NUMBER,
+        SINGER_NAME VARCHAR2
+    );
     PROCEDURE ADD_SINGER (
         NAME VARCHAR2, 
         NICKNAME VARCHAR2, 
@@ -486,6 +490,31 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         END IF;
     END ADD_RECORD;
     
+    
+    PROCEDURE ADD_SINGER_IN_RECORD (
+        RECORD_ID NUMBER,
+        SINGER_NAME VARCHAR2
+    ) IS
+        OLD_SINGER_LIST GRUSHEVSKAYA_SINGER_TAB;
+    BEGIN
+        SELECT SINGER_LIST INTO OLD_SINGER_LIST 
+            FROM GRUSHEVSKAYA_RECORD
+            WHERE ID = RECORD_ID;
+        OLD_SINGER_LIST.EXTEND;
+        OLD_SINGER_LIST(OLD_SINGER_LIST.LAST) := SINGER_NAME;
+        UPDATE GRUSHEVSKAYA_RECORD
+            SET SINGER_LIST = OLD_SINGER_LIST
+            WHERE ID = RECORD_ID;
+    EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_SINGER_IN_RECORD');
+        IF SQLCODE = -12899 THEN
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+        ELSE
+            PRINT_MSG_EX(SQLCODE);
+        END IF;
+    END ADD_SINGER_IN_RECORD;
+    
     PROCEDURE ADD_SINGER (
         NAME VARCHAR2, 
         NICKNAME VARCHAR2, 
@@ -496,8 +525,6 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             VALUES (NAME, NICKNAME, COUNTRY);
         COMMIT;
     EXCEPTION
---    WHEN GRUSHEVSKAYA_EXCEPTIONS.LONG_VARCHAR2 THEN
---        DBMS_OUTPUT.PUT_LINE('Один из параметров слишком длинный');
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_SINGER');
         IF SQLCODE = -02291 THEN
@@ -516,6 +543,8 @@ BEGIN
     GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_1', 'nick_1', 'country_1');
     GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_1');
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD(1, 'song_1', 0, 1, 10, 'style_1', 'singer_1');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_2', 'nick_2', 'country_1');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(1, 'singer_2');
 END;
 
 

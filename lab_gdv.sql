@@ -315,22 +315,21 @@ BEGIN
     IF UPDATING('RECORD_ARRAY') AND :OLD.QUANTITY_OF_SOLD > 0 THEN
         FOR j IN 1..:OLD.RECORD_ARRAY.COUNT
         LOOP
-        DBMS_OUTPUT.PUT_LINE('TEST');
---            IF :NEW.RECORD_ARRAY(j) IS NULL AND :OLD.RECORD_ARRAY(j) IS NULL THEN
---                CONTINUE;
---            END IF;
---            IF :NEW.RECORD_ARRAY(j) IS NULL OR :OLD.RECORD_ARRAY(j) IS NULL THEN
---                :NEW.ID := :OLD.ID;
---                :NEW.NAME := :OLD.NAME;
---                :NEW.PRICE := :OLD.PRICE;
---                :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
---                :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
---                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;
---                DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
---                    || :OLD.ID 
---                    || ' не был обновлен. Нельзя добавлять треки, если альбом продан');
---                RETURN;
---            END IF;
+            IF :NEW.RECORD_ARRAY(j) IS NULL AND :OLD.RECORD_ARRAY(j) IS NULL THEN
+                CONTINUE;
+            END IF;
+            IF :NEW.RECORD_ARRAY(j) IS NULL OR :OLD.RECORD_ARRAY(j) IS NULL THEN
+                :NEW.ID := :OLD.ID;
+                :NEW.NAME := :OLD.NAME;
+                :NEW.PRICE := :OLD.PRICE;
+                :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
+                :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
+                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;
+                DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
+                    || :OLD.ID 
+                    || ' не был обновлен. Нельзя добавлять треки, если альбом продан');
+                RETURN;
+            END IF;
             IF :NEW.RECORD_ARRAY(j) <> :OLD.RECORD_ARRAY(j) THEN
                 :NEW.ID := :OLD.ID;
                 :NEW.NAME := :OLD.NAME;
@@ -735,7 +734,7 @@ BEGIN
         NAME => 'album_1', 
         PRICE => 100.50, 
         QUANTITY_IN_STOCK => 10, 
-        QUANTITY_OF_SOLD => 0, 
+        QUANTITY_OF_SOLD => 2, 
         RECORD_ID => 1, 
         RECORD_SERIAL_NUMBER => 10
     );

@@ -205,7 +205,7 @@ BEGIN
             END IF;
         END LOOP;
     END LOOP;
-    IF INSERTING 
+    IF UPDATING 
         AND NOT FLAG_RECORD_USES
         AND NOT (SET(:NEW.SINGER_LIST) = SET(:OLD.SINGER_LIST)) THEN
             :NEW.ID := :OLD.ID;
@@ -308,11 +308,26 @@ DECLARE
     TYPE GRUSHEVSKAYA_RECORD_TAB IS TABLE OF NUMBER(10, 0);
     LIST_ID GRUSHEVSKAYA_RECORD_TAB;
 BEGIN
-    IF UPDATING
-       AND :OLD.QUANTITY_OF_SOLD > 0 THEN
-        FOR i IN 1..:OLD.RECORD_ARRAY.COUNT
+    IF UPDATING AND :OLD.QUANTITY_OF_SOLD > 0 THEN
+        FOR j IN 1..:OLD.RECORD_ARRAY.COUNT
         LOOP
-            IF :NEW.RECORD_ARRAY(i) = :OLD.RECORD_ARRAY(i) THEN
+        DBMS_OUTPUT.PUT_LINE('TEST');
+--            IF :NEW.RECORD_ARRAY(j) IS NULL AND :OLD.RECORD_ARRAY(j) IS NULL THEN
+--                CONTINUE;
+--            END IF;
+--            IF :NEW.RECORD_ARRAY(j) IS NULL OR :OLD.RECORD_ARRAY(j) IS NULL THEN
+--                :NEW.ID := :OLD.ID;
+--                :NEW.NAME := :OLD.NAME;
+--                :NEW.PRICE := :OLD.PRICE;
+--                :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
+--                :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
+--                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;
+--                DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
+--                    || :OLD.ID 
+--                    || ' не был обновлен. Нельзя добавлять треки, если альбом продан');
+--                RETURN;
+--            END IF;
+            IF :NEW.RECORD_ARRAY(j) <> :OLD.RECORD_ARRAY(j) THEN
                 :NEW.ID := :OLD.ID;
                 :NEW.NAME := :OLD.NAME;
                 :NEW.PRICE := :OLD.PRICE;
@@ -322,7 +337,7 @@ BEGIN
                 DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
                     || :OLD.ID 
                     || ' не был обновлен. Нельзя добавлять треки, если альбом продан');
-                RETURN;
+                RETURN;          
             END IF;
         END LOOP;
     END IF;

@@ -308,6 +308,24 @@ DECLARE
     TYPE GRUSHEVSKAYA_RECORD_TAB IS TABLE OF NUMBER(10, 0);
     LIST_ID GRUSHEVSKAYA_RECORD_TAB;
 BEGIN
+    IF UPDATING
+       AND :OLD.QUANTITY_OF_SOLD > 0 THEN
+        FOR i IN 1..:OLD.RECORD_ARRAY.COUNT
+        LOOP
+            IF :NEW.RECORD_ARRAY(i) = :OLD.RECORD_ARRAY(i) THEN
+                :NEW.ID := :OLD.ID;
+                :NEW.NAME := :OLD.NAME;
+                :NEW.PRICE := :OLD.PRICE;
+                :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
+                :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
+                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;
+                DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
+                    || :OLD.ID 
+                    || ' не был обновлен. Нельзя добавлять треки, если альбом продан');
+                RETURN;
+            END IF;
+        END LOOP;
+    END IF;
     SELECT ID BULK COLLECT INTO LIST_ID FROM GRUSHEVSKAYA_RECORD;
     FOR i IN 1..:NEW.RECORD_ARRAY.COUNT
     LOOP

@@ -184,6 +184,7 @@ BEFORE INSERT OR UPDATE ON GRUSHEVSKAYA_RECORD
 FOR EACH ROW
 DECLARE
     LIST_NAME GRUSHEVSKAYA_SINGER_TAB;
+    ALBUMS_AMOUNT_WITH_RECORD NUMBER;
 BEGIN
     FOR i IN 1..:NEW.SINGER_LIST.COUNT
     LOOP
@@ -193,6 +194,23 @@ BEGIN
     END LOOP;
     :NEW.SINGER_LIST := SET(:NEW.SINGER_LIST);
     SELECT NAME BULK COLLECT INTO LIST_NAME FROM GRUSHEVSKAYA_SINGER;
+    SELECT ID.COUNT INTO ALBUMS_AMOUNT_WITH_RECORD
+            FROM GRUSHEVSKAYA_ALBUM 
+            WHERE :OLD.ID IN GRUSHEVSKAYA_ALBUM.RECORD_LIST;
+    IF INSERTING 
+        AND NOT AMOUNT_ALBUM_WITH_RECORD = 0
+        AND NOT (SET(:NEW.SINGER_LIST) SUBMULTISET SET(:OLD.SINGER_LIST) 
+        AND SET(:OLD.SINGER_LIST) SUBMULTISET SET(:NEW.SINGER_LIST)) THEN
+            :NEW.ID := :OLD.ID;
+            :NEW.NAME := :OLD.NAME;
+            :NEW.TIME := :OLD.TIME;
+            :NEW.STYLE := :OLD.STYLE;
+            :NEW.SINGER_LIST := :OLD.SINGER_LIST;
+            DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
+                || :OLD.ID 
+                || ' не была обновлена. Список исполнителей обновлять нельзя,' 
+                || ' так как запись уже содержится в одном из альбомов');        
+    END IF;
     IF :NEW.SINGER_LIST NOT SUBMULTISET OF LIST_NAME THEN
         IF INSERTING THEN
             DBMS_OUTPUT.PUT_LINE('Некорректный список исполнителей.');

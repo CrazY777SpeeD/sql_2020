@@ -187,6 +187,7 @@ DECLARE
     FLAG_RECORD_USES BOOLEAN := FALSE;
     ID_ARR GRUSHEVSKAYA_RECORD_ARR;
 BEGIN
+    -- Удаление пустот во вл.таб.
     FOR i IN 1..:NEW.SINGER_LIST.COUNT
     LOOP
         IF :NEW.SINGER_LIST(i) IS NULL THEN 
@@ -194,7 +195,7 @@ BEGIN
         END IF;
     END LOOP;
     :NEW.SINGER_LIST := SET(:NEW.SINGER_LIST);
-    SELECT NAME BULK COLLECT INTO LIST_NAME FROM GRUSHEVSKAYA_SINGER;
+    -- Запись уже содержится в одном из альбомов => обновлять исп. нельзя
     FOR ALBUM_ROW IN (SELECT * FROM GRUSHEVSKAYA_ALBUM)
     LOOP
         ID_ARR := ALBUM_ROW.RECORD_ARRAY;
@@ -205,7 +206,7 @@ BEGIN
             END IF;
         END LOOP;
     END LOOP;
-    IF UPDATING 
+    IF UPDATING('SINGER_LIST')
         AND NOT FLAG_RECORD_USES
         AND NOT (SET(:NEW.SINGER_LIST) = SET(:OLD.SINGER_LIST)) THEN
             :NEW.ID := :OLD.ID;
@@ -218,6 +219,8 @@ BEGIN
                 || ' не была обновлена. Список исполнителей обновлять нельзя,' 
                 || ' так как запись уже содержится в одном из альбомов');        
     END IF;
+    -- Проверка внеш.кл.
+    SELECT NAME BULK COLLECT INTO LIST_NAME FROM GRUSHEVSKAYA_SINGER;
     IF :NEW.SINGER_LIST NOT SUBMULTISET OF LIST_NAME THEN
         IF INSERTING THEN
             DBMS_OUTPUT.PUT_LINE('Некорректный список исполнителей.');
@@ -308,7 +311,8 @@ DECLARE
     TYPE GRUSHEVSKAYA_RECORD_TAB IS TABLE OF NUMBER(10, 0);
     LIST_ID GRUSHEVSKAYA_RECORD_TAB;
 BEGIN
-    IF UPDATING AND :OLD.QUANTITY_OF_SOLD > 0 THEN
+    -- Если альбом продан, то добавлять треки нельзя.
+    IF UPDATING('RECORD_ARRAY') AND :OLD.QUANTITY_OF_SOLD > 0 THEN
         FOR j IN 1..:OLD.RECORD_ARRAY.COUNT
         LOOP
         DBMS_OUTPUT.PUT_LINE('TEST');
@@ -341,6 +345,7 @@ BEGIN
             END IF;
         END LOOP;
     END IF;
+    -- Проверка внеш.кл.
     SELECT ID BULK COLLECT INTO LIST_ID FROM GRUSHEVSKAYA_RECORD;
     FOR i IN 1..:NEW.RECORD_ARRAY.COUNT
     LOOP
@@ -358,7 +363,7 @@ BEGIN
                 :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;
                 DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
                     || :OLD.ID 
-                    || ' не был обновлен из-за нарушения внешнего ключа.');
+                    || ' не был обновлен из-за нарушения внешнего ключа (записи).');
                 RETURN;
             END IF;
         END IF;

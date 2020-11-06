@@ -77,7 +77,7 @@ TYPE GRUSHEVSKAYA_TIME AS OBJECT(
         MINUTES IN NUMBER DEFAULT 0,
         SECONDS IN NUMBER DEFAULT 0
     ) RETURN SELF AS RESULT,
-    MEMBER FUNCTION SUM(
+    MEMBER FUNCTION ACCUMULATE(
         TIME GRUSHEVSKAYA_TIME
     ) RETURN GRUSHEVSKAYA_TIME,
     MEMBER FUNCTION PRINT RETURN VARCHAR2
@@ -103,7 +103,7 @@ TYPE BODY GRUSHEVSKAYA_TIME AS
         RETURN;
     END GRUSHEVSKAYA_TIME;    
     
-    MEMBER FUNCTION SUM(
+    MEMBER FUNCTION ACCUMULATE(
         TIME GRUSHEVSKAYA_TIME
     ) RETURN GRUSHEVSKAYA_TIME
     IS
@@ -134,12 +134,12 @@ TYPE BODY GRUSHEVSKAYA_TIME AS
             RESULT_SECONDS
         );
         RETURN RESULT_TIME;
-    END SUM;
+    END ACCUMULATE;
     
     MEMBER FUNCTION PRINT RETURN VARCHAR2
     IS
     BEGIN
-        RETURN SELF.HOURS || ':' || SELF.MINUTES || ':' || SELF.SECONDS;
+        RETURN LPAD(SELF.HOURS, 2, '0') || ':' || LPAD(SELF.MINUTES, 2, '0') || ':' ||  LPAD(SELF.SECONDS, 2, '0');
     END PRINT;
 END;
 /
@@ -901,18 +901,40 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         ALBUM_ID NUMBER
     ) IS
         RECORD_ARR GRUSHEVSKAYA_RECORD_ARR;
---        RECORD GRUSHEVSKAYA_RECORD%ROWTYPE;
+        RECORD GRUSHEVSKAYA_RECORD%ROWTYPE;
+        TIME GRUSHEVSKAYA_TIME := GRUSHEVSKAYA_TIME(0, 0, 0);
+        SINGERS VARCHAR2(300) := '';
     BEGIN
+        DBMS_OUTPUT.PUT_LINE('Альбом №' || ALBUM_ID);
         SELECT RECORD_ARRAY INTO RECORD_ARR
             FROM GRUSHEVSKAYA_ALBUM
             WHERE ID = ALBUM_ID;
-        FOR RECORD IN (
-                SELECT * FROM GRUSHEVSKAYA_RECORD 
-                WHERE ID IN (SELECT * FROM TABLE(RECORD_ARR))
-            )
+        FOR i IN 1..RECORD_ARR.COUNT
         LOOP
-            DBMS_OUTPUT.PUT_LINE(RECORD.ID || ' ' || RECORD.NAME);
+            IF NOT RECORD_ARR(i) IS NULL THEN
+                SELECT * INTO RECORD FROM GRUSHEVSKAYA_RECORD 
+                    WHERE ID = RECORD_ARR(i);
+                SINGERS := '-';
+                FOR j IN 1..RECORD.SINGER_LIST.COUNT
+                LOOP
+                    SINGERS := SINGERS || ' ' || RECORD.SINGER_LIST(j);
+                END LOOP;
+                DBMS_OUTPUT.PUT_LINE(
+                    '№' 
+                    || LPAD(i, 2, '0')
+                    || ' ' 
+                    || RECORD.STYLE
+                    || ', ' 
+                    || RECORD.TIME.PRINT
+                    || ' ' 
+                    || RECORD.NAME
+                    || ' ' 
+                    || SINGERS
+                );
+                TIME := RECORD.TIME.ACCUMULATE(TIME);
+            END IF;
         END LOOP;
+        DBMS_OUTPUT.PUT_LINE('Общее время звучания: ' || TIME.PRINT);
     END PRINT_ALBUM_RECORDS;
 END;
 /

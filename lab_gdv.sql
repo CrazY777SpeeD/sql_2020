@@ -476,7 +476,7 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
         RECORD_ID NUMBER,
         RECORD_SERIAL_NUMBER NUMBER
     );
---    FUNCTION disc_hours RETURN NUMBER;
+    PROCEDURE PRINT_ALBUMS_IN_STOCK;
 END;
 /
 CREATE OR REPLACE
@@ -719,6 +719,19 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             PRINT_MSG_EX(SQLCODE);
         END IF;
     END ADD_RECORD_IN_ALBUM;
+    
+    PROCEDURE PRINT_ALBUMS_IN_STOCK 
+    IS
+        QUANTITY NUMBER := 0;
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Альбомы в продаже:');
+        FOR ALBUM IN (SELECT * FROM GRUSHEVSKAYA_ALBUM WHERE QUANTITY_IN_STOCK > 0)
+        LOOP
+            DBMS_OUTPUT.PUT_LINE(ALBUM.NAME);
+            QUANTITY := QUANTITY + 1;
+        END LOOP;
+        DBMS_OUTPUT.PUT_LINE('Всего альбомов в продаже: ' || QUANTITY);
+    END PRINT_ALBUMS_IN_STOCK;
 END;
 /
 DECLARE 
@@ -734,7 +747,7 @@ BEGIN
         NAME => 'album_1', 
         PRICE => 100.50, 
         QUANTITY_IN_STOCK => 10, 
-        QUANTITY_OF_SOLD => 2, 
+        QUANTITY_OF_SOLD => 0, 
         RECORD_ID => 1, 
         RECORD_SERIAL_NUMBER => 10
     );
@@ -751,6 +764,34 @@ BEGIN
         QUANTITY_IN_STOCK => 5, 
         QUANTITY_OF_SOLD => 0
     );
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(3, 'song_3', 0, 1, 37, 'style_1', 'singer_1');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(4, 'song_4', 0, 2, 12, 'style_1', 'singer_1');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(5, 'song_5', 0, 1, 42, 'style_1', 'singer_2');    
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+        ALBUM_ID => 2,
+        RECORD_ID => 3, 
+        RECORD_SERIAL_NUMBER => 1
+    );
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+        ALBUM_ID => 2,
+        RECORD_ID => 4, 
+        RECORD_SERIAL_NUMBER => 8
+    );
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+        ALBUM_ID => 2,
+        RECORD_ID => 5, 
+        RECORD_SERIAL_NUMBER => 4
+    );
+    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
+        ID => 3, 
+        NAME => 'album_3', 
+        PRICE => 100.50, 
+        QUANTITY_IN_STOCK => 0, 
+        QUANTITY_OF_SOLD => 10, 
+        RECORD_ID => 1, 
+        RECORD_SERIAL_NUMBER => 1
+    );
+    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUMS_IN_STOCK;
 END;
 
 

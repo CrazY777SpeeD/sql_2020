@@ -776,8 +776,23 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         ALBUM_ID NUMBER,
         QUANTITY NUMBER
     ) IS
+        RECORD_ARR GRUSHEVSKAYA_RECORD_ARR;
+        FLAG_ONE_RECORD BOOLEAN := FALSE;
         MAX_QUANTITY NUMBER;
     BEGIN
+        SELECT RECORD_ARRAY INTO RECORD_ARR 
+            FROM GRUSHEVSKAYA_ALBUM
+            WHERE ID = ALBUM_ID;
+        FOR i IN 1..RECORD_ARR.COUNT
+        LOOP
+            IF NOT RECORD_ARR(i) IS NULL THEN
+                FLAG_ONE_RECORD := TRUE;
+            END IF;
+        END LOOP;
+        IF NOT FLAG_ONE_RECORD THEN
+            DBMS_OUTPUT.PUT_LINE('Продать альбом нельзя. В альбоме нет треков');
+            RETURN;
+        END IF;
         SELECT QUANTITY_IN_STOCK INTO MAX_QUANTITY 
             FROM GRUSHEVSKAYA_ALBUM
             WHERE ID = ALBUM_ID;

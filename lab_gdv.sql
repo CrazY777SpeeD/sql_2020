@@ -531,6 +531,7 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
     );
     PROCEDURE DELETE_SINGERS_WITHOUT_RECORDS;
     PROCEDURE PRINT_ALBUM_RECORDS(ALBUM_ID NUMBER);
+    PROCEDURE PRINT_INCOME;
 END;
 /
 CREATE OR REPLACE
@@ -936,6 +937,26 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         END LOOP;
         DBMS_OUTPUT.PUT_LINE('Общее время звучания: ' || TIME.PRINT);
     END PRINT_ALBUM_RECORDS;
+    
+    PROCEDURE PRINT_INCOME
+    IS
+        TOTAL_INCOME NUMBER := 0;
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('Выручка магазина');
+        FOR ALBUM IN (SELECT * FROM GRUSHEVSKAYA_ALBUM)
+        LOOP
+            DBMS_OUTPUT.PUT_LINE(
+                'Альбомов №' 
+                || ALBUM.ID 
+                || ' с именем ' 
+                || ALBUM.NAME
+                || ' продано на сумму: '
+                || ALBUM.PRICE * ALBUM.QUANTITY_OF_SOLD
+            );
+            TOTAL_INCOME := TOTAL_INCOME + ALBUM.PRICE * ALBUM.QUANTITY_OF_SOLD;
+        END LOOP;
+        DBMS_OUTPUT.PUT_LINE('Выручка магазина в целом: ' || TOTAL_INCOME);
+    END PRINT_INCOME;
 END;
 /
 DECLARE 
@@ -1003,6 +1024,7 @@ BEGIN
     GRUSHEVSKAYA_PACKAGE.DELETE_SINGERS_WITHOUT_RECORDS;   
     GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_4', 'nick_4', 'country_1');
     GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 2);
+    GRUSHEVSKAYA_PACKAGE.PRINT_INCOME;
 END;
 
 

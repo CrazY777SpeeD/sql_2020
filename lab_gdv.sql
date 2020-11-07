@@ -15,6 +15,7 @@ CREATE OR REPLACE
 PACKAGE GRUSHEVSKAYA_EXCEPTIONS AS
     INVALIDE_TYPE_FIELDS EXCEPTION;
     ERROR_RECORD EXCEPTION;
+    ERROR_UPDATE_SINGER_IN_RECORD EXCEPTION;
     ERROR_SINGER_DEL EXCEPTION;
     ERROR_ALBUM EXCEPTION;
     ERROR_RECORD_DEL EXCEPTION;
@@ -228,7 +229,6 @@ FOR EACH ROW
 DECLARE
     LIST_NAME GRUSHEVSKAYA_SINGER_TAB;
     FLAG_RECORD_USES BOOLEAN := FALSE;
-    ID_ARR GRUSHEVSKAYA_RECORD_ARR;
 BEGIN
     -- Удаление пустот во вл.таб.
     FOR i IN 1..:NEW.SINGER_LIST.COUNT
@@ -238,19 +238,31 @@ BEGIN
         END IF;
     END LOOP;
     :NEW.SINGER_LIST := SET(:NEW.SINGER_LIST);
+    IF UPDATING
+       AND :NEW.SINGER_LIST IS EMPTY THEN
+        :NEW.ID := :OLD.ID;
+            :NEW.NAME := :OLD.NAME;
+            :NEW.TIME := :OLD.TIME;
+            :NEW.STYLE := :OLD.STYLE;
+            :NEW.SINGER_LIST := :OLD.SINGER_LIST;
+            DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
+                || :OLD.ID 
+                || ' не была обновлена. Список исполнителей обновлять нельзя,' 
+                || ' так как исполнитель хотя бы один должен быть');
+            RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_UPDATE_SINGER_IN_RECORD;
+    END IF;
     -- Запись уже содержится в одном из альбомов => обновлять исп. нельзя
     FOR ALBUM_ROW IN (SELECT * FROM GRUSHEVSKAYA_ALBUM)
     LOOP
-        ID_ARR := ALBUM_ROW.RECORD_ARRAY;
-        FOR i IN 1..ID_ARR.COUNT
+        FOR i IN 1..ALBUM_ROW.RECORD_ARRAY.COUNT
         LOOP
-            IF ID_ARR(i) = :OLD.ID THEN
+            IF ALBUM_ROW.RECORD_ARRAY(i) = :OLD.ID THEN
                 FLAG_RECORD_USES := TRUE;
             END IF;
         END LOOP;
     END LOOP;
-    IF UPDATING('SINGER_LIST')
-        AND NOT FLAG_RECORD_USES
+    IF UPDATING
+        AND FLAG_RECORD_USES
         AND NOT (SET(:NEW.SINGER_LIST) = SET(:OLD.SINGER_LIST)) THEN
             :NEW.ID := :OLD.ID;
             :NEW.NAME := :OLD.NAME;
@@ -260,7 +272,8 @@ BEGIN
             DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
                 || :OLD.ID 
                 || ' не была обновлена. Список исполнителей обновлять нельзя,' 
-                || ' так как запись уже содержится в одном из альбомов');        
+                || ' так как запись уже содержится в одном из альбомов'); 
+            RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_UPDATE_SINGER_IN_RECORD;
     END IF;
     -- Проверка внеш.кл.
     SELECT NAME BULK COLLECT INTO LIST_NAME FROM GRUSHEVSKAYA_SINGER;
@@ -535,6 +548,10 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
     PROCEDURE DELETE_RECORD_FROM_ALBUM(
         ALBUM_ID NUMBER,
         RECORD_NUMBER NUMBER
+    );
+    PROCEDURE DELETE_SINGER_FROM_RECORD(
+        RECORD_ID NUMBER,
+        SINGER_NUMBER NUMBER
     );
 END;
 /
@@ -1001,7 +1018,37 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;    
-    END DELETE_RECORD_FROM_ALBUM;
+    END DELETE_RECORD_FROM_ALBUM;    
+    
+    PROCEDURE DELETE_SINGER_FROM_RECORD(
+        RECORD_ID NUMBER,
+        SINGER_NUMBER NUMBER
+    ) IS
+        TMP_SINGER_LIST GRUSHEVSKAYA_SINGER_TAB;
+    BEGIN
+        SELECT SINGER_LIST INTO TMP_SINGER_LIST 
+            FROM GRUSHEVSKAYA_RECORD
+            WHERE ID = RECORD_ID;            
+        TMP_SINGER_LIST.DELETE(SINGER_NUMBER);        
+        UPDATE GRUSHEVSKAYA_RECORD
+            SET SINGER_LIST = TMP_SINGER_LIST
+            WHERE ID = RECORD_ID;
+        COMMIT;
+        DBMS_OUTPUT.PUT_LINE('Исполнитель №' || SINGER_NUMBER || ' удален');
+    EXCEPTION
+    WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_UPDATE_SINGER_IN_RECORD THEN
+        RETURN;
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_SINGER_IN_RECORD');
+        IF SQLCODE = -12899 THEN
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+        ELSE
+            PRINT_MSG_EX(SQLCODE);
+        END IF;
+        
+    END DELETE_SINGER_FROM_RECORD;
+    
+    
 END;
 /
 DECLARE 
@@ -1036,7 +1083,10 @@ BEGIN
     );
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD(3, 'song_3', 0, 1, 37, 'style_1', 'singer_1');
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD(4, 'song_4', 0, 2, 12, 'style_1', 'singer_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(5, 'song_5', 0, 1, 42, 'style_1', 'singer_2');    
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(4, 'singer_2');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(5, 'song_5', 0, 1, 42, 'style_1', 'singer_2');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(5, 'singer_2');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(5, 'singer_2');    
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
         ALBUM_ID => 2,
         RECORD_ID => 3, 
@@ -1076,6 +1126,20 @@ BEGIN
         RECORD_NUMBER => 3
     );
     GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 1);
+    GRUSHEVSKAYA_PACKAGE.DELETE_SINGER_FROM_RECORD(
+        RECORD_ID => 1,
+        SINGER_NUMBER => 1
+    );
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(6, 'song_6', 0, 5, 15, 'style_1', 'singer_1');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(6, 'singer_2');
+    GRUSHEVSKAYA_PACKAGE.DELETE_SINGER_FROM_RECORD(
+        RECORD_ID => 6,
+        SINGER_NUMBER => 1
+    );
+    GRUSHEVSKAYA_PACKAGE.DELETE_SINGER_FROM_RECORD(
+        RECORD_ID => 5,
+        SINGER_NUMBER => 1
+    );
 END;
 
 

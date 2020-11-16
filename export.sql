@@ -4,12 +4,12 @@
 DROP TYPE "GRUSHEVSKAYA_RECORD_ARR";
 DROP TYPE "GRUSHEVSKAYA_SINGER_TAB";
 DROP TYPE "GRUSHEVSKAYA_TIME";
-DROP TABLE "GRUSHEVSKAYA_ALBUM";
-DROP TABLE "GRUSHEVSKAYA_DICT_COUNTRY";
-DROP TABLE "GRUSHEVSKAYA_DICT_STYLE";
-DROP TABLE "GRUSHEVSKAYA_RECORD";
-DROP TABLE "GRUSHEVSKAYA_SINGER";
-DROP TABLE "GRUSHEVSKAYA_SINGER_LIST";
+DROP TABLE "GRUSHEVSKAYA_ALBUM" cascade constraints;
+DROP TABLE "GRUSHEVSKAYA_DICT_COUNTRY" cascade constraints;
+DROP TABLE "GRUSHEVSKAYA_DICT_STYLE" cascade constraints;
+DROP TABLE "GRUSHEVSKAYA_RECORD" cascade constraints;
+DROP TABLE "GRUSHEVSKAYA_SINGER" cascade constraints;
+DROP TABLE "GRUSHEVSKAYA_SINGER_LIST" cascade constraints;
 DROP PACKAGE "GRUSHEVSKAYA_EXCEPTIONS";
 DROP PACKAGE "GRUSHEVSKAYA_PACKAGE";
 --------------------------------------------------------
@@ -155,6 +155,68 @@ END;
 	"NICKNAME" VARCHAR2(100 BYTE), 
 	"COUNTRY" VARCHAR2(100 BYTE)
    ) ;
+REM INSERTING into GRUSHEVSKAYA_ALBUM
+SET DEFINE OFF;
+Insert into GRUSHEVSKAYA_ALBUM (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) values ('1','album_1','100,5','0','25',gdv.GRUSHEVSKAYA_RECORD_ARR(1, 2, 3, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+Insert into GRUSHEVSKAYA_ALBUM (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) values ('2','album_2','123,55','188','37',gdv.GRUSHEVSKAYA_RECORD_ARR(23, 2, 3, 4, 5, 25, 7, 8, 10, 9, 12, 13, 11, 14, 15, 16, 17, 18, 19, 20, 21, 24, 1, 22, null, null, null, null, null, null));
+Insert into GRUSHEVSKAYA_ALBUM (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) values ('3','album_3','293,41','62','11',gdv.GRUSHEVSKAYA_RECORD_ARR(7, 15, 17, 16, 8, 14, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+Insert into GRUSHEVSKAYA_ALBUM (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) values ('4','album_4','24,41','89','0',gdv.GRUSHEVSKAYA_RECORD_ARR(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+Insert into GRUSHEVSKAYA_ALBUM (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) values ('5','album_5','65,71','19','0',gdv.GRUSHEVSKAYA_RECORD_ARR(24, 23, 25, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+REM INSERTING into GRUSHEVSKAYA_DICT_COUNTRY
+SET DEFINE OFF;
+Insert into GRUSHEVSKAYA_DICT_COUNTRY (NAME) values ('country_1');
+Insert into GRUSHEVSKAYA_DICT_COUNTRY (NAME) values ('country_2');
+Insert into GRUSHEVSKAYA_DICT_COUNTRY (NAME) values ('country_3');
+Insert into GRUSHEVSKAYA_DICT_COUNTRY (NAME) values ('country_4');
+Insert into GRUSHEVSKAYA_DICT_COUNTRY (NAME) values ('country_5');
+Insert into GRUSHEVSKAYA_DICT_COUNTRY (NAME) values ('country_6');
+REM INSERTING into GRUSHEVSKAYA_DICT_STYLE
+SET DEFINE OFF;
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('style_1');
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('style_2');
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('style_3');
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('style_4');
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('style_5');
+REM INSERTING into GRUSHEVSKAYA_RECORD
+SET DEFINE OFF;
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('1','song_1',gdv.GRUSHEVSKAYA_TIME(0, 1, 1),'style_1',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_1', 'singer_2'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('2','song_2',gdv.GRUSHEVSKAYA_TIME(0, 1, 2),'style_1',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_1', 'singer_2'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('3','song_3',gdv.GRUSHEVSKAYA_TIME(0, 1, 3),'style_1',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_1', 'singer_2'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('4','song_4',gdv.GRUSHEVSKAYA_TIME(0, 1, 4),'style_2',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_2', 'singer_3'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('5','song_5',gdv.GRUSHEVSKAYA_TIME(0, 1, 5),'style_2',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_3', 'singer_4'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('6','song_6',gdv.GRUSHEVSKAYA_TIME(0, 1, 6),'style_3',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_5', 'singer_7'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('7','song_7',gdv.GRUSHEVSKAYA_TIME(0, 1, 7),'style_4',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_11'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('8','song_8',gdv.GRUSHEVSKAYA_TIME(0, 1, 7),'style_5',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_11', 'singer_7'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('9','song_9',gdv.GRUSHEVSKAYA_TIME(0, 1, 9),'style_5',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_9', 'singer_13'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('10','song_10',gdv.GRUSHEVSKAYA_TIME(0, 1, 10),'style_4',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_4', 'singer_9', 'singer_11', 'singer_13', 'singer_14', 'singer_15'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('11','song_11',gdv.GRUSHEVSKAYA_TIME(0, 1, 11),'style_3',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_9'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('12','song_12',gdv.GRUSHEVSKAYA_TIME(0, 1, 12),'style_3',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_9'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('13','song_13',gdv.GRUSHEVSKAYA_TIME(0, 1, 13),'style_1',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_7'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('14','song_14',gdv.GRUSHEVSKAYA_TIME(0, 1, 14),'style_5',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_11'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('15','song_15',gdv.GRUSHEVSKAYA_TIME(0, 1, 15),'style_2',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_11'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('16','song_16',gdv.GRUSHEVSKAYA_TIME(0, 1, 16),'style_2',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_11'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('17','song_17',gdv.GRUSHEVSKAYA_TIME(0, 1, 17),'style_2',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_11'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('18','song_18',gdv.GRUSHEVSKAYA_TIME(0, 1, 18),'style_1',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_13'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('19','song_19',gdv.GRUSHEVSKAYA_TIME(0, 1, 19),'style_3',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_13'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('20','song_20',gdv.GRUSHEVSKAYA_TIME(0, 1, 20),'style_4',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_13', 'singer_7'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('21','song_21',gdv.GRUSHEVSKAYA_TIME(0, 1, 21),'style_4',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_13', 'singer_7'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('22','song_22',gdv.GRUSHEVSKAYA_TIME(0, 1, 22),'style_3',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_14'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('23','song_23',gdv.GRUSHEVSKAYA_TIME(0, 1, 23),'style_5',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_15'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('24','song_24',gdv.GRUSHEVSKAYA_TIME(0, 1, 24),'style_3',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_15'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('25','song_25',gdv.GRUSHEVSKAYA_TIME(0, 1, 25),'style_3',gdv.GRUSHEVSKAYA_SINGER_TAB('singer_15'));
+REM INSERTING into GRUSHEVSKAYA_SINGER
+SET DEFINE OFF;
+Insert into GRUSHEVSKAYA_SINGER (NAME,NICKNAME,COUNTRY) values ('singer_1','nick_1','country_1');
+Insert into GRUSHEVSKAYA_SINGER (NAME,NICKNAME,COUNTRY) values ('singer_2','nick_2','country_2');
+Insert into GRUSHEVSKAYA_SINGER (NAME,NICKNAME,COUNTRY) values ('singer_3','nick_3','country_3');
+Insert into GRUSHEVSKAYA_SINGER (NAME,NICKNAME,COUNTRY) values ('singer_4','nick_4','country_4');
+Insert into GRUSHEVSKAYA_SINGER (NAME,NICKNAME,COUNTRY) values ('singer_5','nick_4','country_1');
+Insert into GRUSHEVSKAYA_SINGER (NAME,NICKNAME,COUNTRY) values ('singer_7','nick_5','country_5');
+Insert into GRUSHEVSKAYA_SINGER (NAME,NICKNAME,COUNTRY) values ('singer_9','nick_6','country_2');
+Insert into GRUSHEVSKAYA_SINGER (NAME,NICKNAME,COUNTRY) values ('singer_11','nick_7','country_4');
+Insert into GRUSHEVSKAYA_SINGER (NAME,NICKNAME,COUNTRY) values ('singer_13','nick_9','country_5');
+Insert into GRUSHEVSKAYA_SINGER (NAME,NICKNAME,COUNTRY) values ('singer_14','nick_9','country_5');
+Insert into GRUSHEVSKAYA_SINGER (NAME,NICKNAME,COUNTRY) values ('singer_15','nick_9','country_6');
 --------------------------------------------------------
 --  DDL for Index GRUSHEVSKAYA_ALBUM_PK
 --------------------------------------------------------
@@ -162,22 +224,22 @@ END;
   CREATE UNIQUE INDEX "GRUSHEVSKAYA_ALBUM_PK" ON "GRUSHEVSKAYA_ALBUM" ("ID") 
   ;
 --------------------------------------------------------
---  DDL for Index SYS_C0018761
+--  DDL for Index SYS_C0019268
 --------------------------------------------------------
 
-  CREATE UNIQUE INDEX "SYS_C0018761" ON "GRUSHEVSKAYA_DICT_COUNTRY" ("NAME") 
+  CREATE UNIQUE INDEX "SYS_C0019268" ON "GRUSHEVSKAYA_DICT_COUNTRY" ("NAME") 
   ;
 --------------------------------------------------------
---  DDL for Index SYS_C0018768
+--  DDL for Index SYS_C0019275
 --------------------------------------------------------
 
-  CREATE UNIQUE INDEX "SYS_C0018768" ON "GRUSHEVSKAYA_DICT_STYLE" ("NAME") 
+  CREATE UNIQUE INDEX "SYS_C0019275" ON "GRUSHEVSKAYA_DICT_STYLE" ("NAME") 
   ;
 --------------------------------------------------------
---  DDL for Index SYS_C0018769
+--  DDL for Index SYS_C0019276
 --------------------------------------------------------
 
-  CREATE UNIQUE INDEX "SYS_C0018769" ON "GRUSHEVSKAYA_RECORD" ("SYS_NC0000800009$") 
+  CREATE UNIQUE INDEX "SYS_C0019276" ON "GRUSHEVSKAYA_RECORD" ("SYS_NC0000800009$") 
   ;
 --------------------------------------------------------
 --  DDL for Index GRUSHEVSKAYA_RECORD_PK
@@ -198,10 +260,10 @@ END;
   CREATE UNIQUE INDEX "GRUSHEVSKAYA_SINGER_UK" ON "GRUSHEVSKAYA_SINGER" ("NAME", "NICKNAME") 
   ;
 --------------------------------------------------------
---  DDL for Index SYS_FK0000079802N00008$
+--  DDL for Index SYS_FK0000080190N00008$
 --------------------------------------------------------
 
-  CREATE INDEX "SYS_FK0000079802N00008$" ON "GRUSHEVSKAYA_SINGER_LIST" ("NESTED_TABLE_ID") 
+  CREATE INDEX "SYS_FK0000080190N00008$" ON "GRUSHEVSKAYA_SINGER_LIST" ("NESTED_TABLE_ID") 
   ;
 --------------------------------------------------------
 --  DDL for Trigger GRUSHEVSKAYA_TR_ON_ALBUM
@@ -227,7 +289,8 @@ BEGIN
                 :NEW.PRICE := :OLD.PRICE;
                 :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
                 :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
-                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;
+                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                               
+                DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
                 DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
                     || :OLD.ID 
                     || ' не был обновлен. Нельзя добавлять треки, если альбом продан.');
@@ -239,7 +302,8 @@ BEGIN
                 :NEW.PRICE := :OLD.PRICE;
                 :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
                 :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
-                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;
+                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                               
+                DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
                 DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
                     || :OLD.ID 
                     || ' не был обновлен. Нельзя добавлять треки, если альбом продан.');
@@ -257,7 +321,8 @@ BEGIN
     LOOP
        IF NOT :NEW.RECORD_ARRAY(i) IS NULL
           AND NOT LIST_ID.EXISTS(:NEW.RECORD_ARRAY(i)) THEN
-            IF INSERTING THEN
+            IF INSERTING THEN                               
+                DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_ALBUM');
                 DBMS_OUTPUT.PUT_LINE('Некорректный список записей.');
                 RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM;
             ELSE
@@ -266,7 +331,8 @@ BEGIN
                 :NEW.PRICE := :OLD.PRICE;
                 :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
                 :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
-                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;
+                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                          
+                DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
                 DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
                     || :OLD.ID 
                     || ' не был обновлен из-за нарушения внешнего ключа (записи).');
@@ -290,7 +356,8 @@ BEGIN
     LOOP
         FOR i IN 1..ALBUM_ROW.RECORD_ARRAY.COUNT
         LOOP
-            IF ALBUM_ROW.RECORD_ARRAY(i) = :OLD.ID THEN
+            IF ALBUM_ROW.RECORD_ARRAY(i) = :OLD.ID THEN                               
+                DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORD_DEL');
                 DBMS_OUTPUT.PUT_LINE('Запиь с идентификатором ' 
                     || :OLD.ID 
                     || ' удалять нельзя - она есть в альбоме.');
@@ -302,88 +369,6 @@ END;
 
 /
 ALTER TRIGGER "GRUSHEVSKAYA_TR_ON_RECORD_DEL" ENABLE;
---------------------------------------------------------
---  DDL for Trigger GRUSHEVSKAYA_TR_ON_RECORDS
---------------------------------------------------------
-
-  CREATE OR REPLACE TRIGGER "GRUSHEVSKAYA_TR_ON_RECORDS" 
-BEFORE INSERT OR UPDATE ON GRUSHEVSKAYA_RECORD
-FOR EACH ROW
-DECLARE
-    LIST_NAME GRUSHEVSKAYA_SINGER_TAB;
-    FLAG_RECORD_USES BOOLEAN := FALSE;
-BEGIN
-    -- Удаление пустот во вл.таб.
-    FOR i IN 1..:NEW.SINGER_LIST.COUNT
-    LOOP
-        IF :NEW.SINGER_LIST(i) IS NULL THEN 
-            :NEW.SINGER_LIST.DELETE(i);
-        END IF;
-    END LOOP;
-    :NEW.SINGER_LIST := SET(:NEW.SINGER_LIST);
-    -- Список исполнителей не должен быть пуст
-    IF UPDATING
-       AND :NEW.SINGER_LIST IS EMPTY THEN
-        :NEW.ID := :OLD.ID;
-            :NEW.NAME := :OLD.NAME;
-            :NEW.TIME := :OLD.TIME;
-            :NEW.STYLE := :OLD.STYLE;
-            :NEW.SINGER_LIST := :OLD.SINGER_LIST;
-            DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
-                || :OLD.ID 
-                || ' не была обновлена.');
-            DBMS_OUTPUT.PUT_LINE('Список исполнителей обновлять нельзя,' 
-                || ' так как исполнитель хотя бы один должен быть.');
-            RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_UPDATE_SINGER_IN_RECORD;
-    END IF;
-    -- Запись уже содержится в одном из альбомов => обновлять исп. нельзя
-    FOR ALBUM_ROW IN (SELECT * FROM GRUSHEVSKAYA_ALBUM)
-    LOOP
-        FOR i IN 1..ALBUM_ROW.RECORD_ARRAY.COUNT
-        LOOP
-            IF ALBUM_ROW.RECORD_ARRAY(i) = :OLD.ID THEN
-                FLAG_RECORD_USES := TRUE;
-            END IF;
-        END LOOP;
-    END LOOP;
-    IF UPDATING
-        AND FLAG_RECORD_USES
-        AND NOT (SET(:NEW.SINGER_LIST) = SET(:OLD.SINGER_LIST)) THEN
-            :NEW.ID := :OLD.ID;
-            :NEW.NAME := :OLD.NAME;
-            :NEW.TIME := :OLD.TIME;
-            :NEW.STYLE := :OLD.STYLE;
-            :NEW.SINGER_LIST := :OLD.SINGER_LIST;
-            DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
-                || :OLD.ID 
-                || ' не была обновлена.');
-            DBMS_OUTPUT.PUT_LINE('Список исполнителей обновлять нельзя,' 
-                || ' так как запись уже содержится в одном из альбомов.'); 
-            RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_UPDATE_SINGER_IN_RECORD;
-    END IF;
-    -- Проверка внеш.кл.
-    -- Если подмножество исполнителей не соответствует таблице исполнителей,
-    -- то отменить вставку или "откатить" обновление
-    SELECT NAME BULK COLLECT INTO LIST_NAME FROM GRUSHEVSKAYA_SINGER;
-    IF :NEW.SINGER_LIST NOT SUBMULTISET OF LIST_NAME THEN
-        IF INSERTING THEN
-            DBMS_OUTPUT.PUT_LINE('Некорректный список исполнителей.');
-            RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_RECORD;
-        ELSE
-            :NEW.ID := :OLD.ID;
-            :NEW.NAME := :OLD.NAME;
-            :NEW.TIME := :OLD.TIME;
-            :NEW.STYLE := :OLD.STYLE;
-            :NEW.SINGER_LIST := :OLD.SINGER_LIST;
-            DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
-                || :OLD.ID 
-                || ' не была обновлена из-за нарушения внешнего ключа (исполнители).');
-        END IF;
-    END IF;
-END;
-
-/
-ALTER TRIGGER "GRUSHEVSKAYA_TR_ON_RECORDS" ENABLE;
 --------------------------------------------------------
 --  DDL for Trigger GRUSHEVSKAYA_TR_ON_RECORD_UDP
 --------------------------------------------------------
@@ -424,6 +409,93 @@ END;
 /
 ALTER TRIGGER "GRUSHEVSKAYA_TR_ON_RECORD_UDP" ENABLE;
 --------------------------------------------------------
+--  DDL for Trigger GRUSHEVSKAYA_TR_ON_RECORDS
+--------------------------------------------------------
+
+  CREATE OR REPLACE TRIGGER "GRUSHEVSKAYA_TR_ON_RECORDS" 
+BEFORE INSERT OR UPDATE ON GRUSHEVSKAYA_RECORD
+FOR EACH ROW
+DECLARE
+    LIST_NAME GRUSHEVSKAYA_SINGER_TAB;
+    FLAG_RECORD_USES BOOLEAN := FALSE;
+BEGIN
+    -- Удаление пустот во вл.таб.
+    FOR i IN 1..:NEW.SINGER_LIST.COUNT
+    LOOP
+        IF :NEW.SINGER_LIST(i) IS NULL THEN 
+            :NEW.SINGER_LIST.DELETE(i);
+        END IF;
+    END LOOP;
+    :NEW.SINGER_LIST := SET(:NEW.SINGER_LIST);
+    -- Список исполнителей не должен быть пуст
+    IF UPDATING
+       AND :NEW.SINGER_LIST IS EMPTY THEN
+        :NEW.ID := :OLD.ID;
+            :NEW.NAME := :OLD.NAME;
+            :NEW.TIME := :OLD.TIME;
+            :NEW.STYLE := :OLD.STYLE;
+            :NEW.SINGER_LIST := :OLD.SINGER_LIST;
+            DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_RECORDS');
+            DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
+                || :OLD.ID 
+                || ' не была обновлена.');
+            DBMS_OUTPUT.PUT_LINE('Список исполнителей обновлять нельзя,' 
+                || ' так как исполнитель хотя бы один должен быть.');
+            RETURN;
+    END IF;
+    -- Запись уже содержится в одном из альбомов => обновлять исп. нельзя
+    FOR ALBUM_ROW IN (SELECT * FROM GRUSHEVSKAYA_ALBUM)
+    LOOP
+        FOR i IN 1..ALBUM_ROW.RECORD_ARRAY.COUNT
+        LOOP
+            IF ALBUM_ROW.RECORD_ARRAY(i) = :OLD.ID THEN
+                FLAG_RECORD_USES := TRUE;
+            END IF;
+        END LOOP;
+    END LOOP;
+    IF UPDATING
+        AND FLAG_RECORD_USES
+        AND NOT (SET(:NEW.SINGER_LIST) = SET(:OLD.SINGER_LIST)) THEN
+            :NEW.ID := :OLD.ID;
+            :NEW.NAME := :OLD.NAME;
+            :NEW.TIME := :OLD.TIME;
+            :NEW.STYLE := :OLD.STYLE;
+            :NEW.SINGER_LIST := :OLD.SINGER_LIST;
+            DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_RECORDS');
+            DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
+                || :OLD.ID 
+                || ' не была обновлена.');
+            DBMS_OUTPUT.PUT_LINE('Список исполнителей обновлять нельзя,' 
+                || ' так как запись уже содержится в одном из альбомов.');
+            RETURN;
+    END IF;
+    -- Проверка внеш.кл.
+    -- Если подмножество исполнителей не соответствует таблице исполнителей,
+    -- то отменить вставку или "откатить" обновление
+    SELECT NAME BULK COLLECT INTO LIST_NAME FROM GRUSHEVSKAYA_SINGER;
+    IF :NEW.SINGER_LIST NOT SUBMULTISET OF LIST_NAME THEN
+        IF INSERTING THEN            
+            DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORDS');
+            DBMS_OUTPUT.PUT_LINE('Некорректный список исполнителей.');
+            RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_RECORD;
+        ELSE
+            :NEW.ID := :OLD.ID;
+            :NEW.NAME := :OLD.NAME;
+            :NEW.TIME := :OLD.TIME;
+            :NEW.STYLE := :OLD.STYLE;
+            :NEW.SINGER_LIST := :OLD.SINGER_LIST;
+            DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_RECORDS');
+            DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
+                || :OLD.ID 
+                || ' не была обновлена из-за нарушения внешнего ключа (исполнители).');
+            RETURN;
+        END IF;
+    END IF;
+END;
+
+/
+ALTER TRIGGER "GRUSHEVSKAYA_TR_ON_RECORDS" ENABLE;
+--------------------------------------------------------
 --  DDL for Trigger GRUSHEVSKAYA_TR_ON_SINGERS_DEL
 --------------------------------------------------------
 
@@ -435,7 +507,8 @@ BEGIN
     LOOP
         FOR i IN 1..RECORD_ROW.SINGER_LIST.COUNT
         LOOP
-            IF RECORD_ROW.SINGER_LIST(i) = :OLD.NAME THEN
+            IF RECORD_ROW.SINGER_LIST(i) = :OLD.NAME THEN                
+                DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_SINGERS_DEL');
                 DBMS_OUTPUT.PUT_LINE('Исполнителя с идентификатором ' 
                     || :OLD.NAME 
                     || ' удалять нельзя - у него есть треки.');
@@ -510,7 +583,8 @@ BEGIN
                 :NEW.PRICE := :OLD.PRICE;
                 :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
                 :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
-                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;
+                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                               
+                DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
                 DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
                     || :OLD.ID 
                     || ' не был обновлен. Нельзя добавлять треки, если альбом продан.');
@@ -522,7 +596,8 @@ BEGIN
                 :NEW.PRICE := :OLD.PRICE;
                 :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
                 :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
-                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;
+                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                               
+                DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
                 DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
                     || :OLD.ID 
                     || ' не был обновлен. Нельзя добавлять треки, если альбом продан.');
@@ -540,7 +615,8 @@ BEGIN
     LOOP
        IF NOT :NEW.RECORD_ARRAY(i) IS NULL
           AND NOT LIST_ID.EXISTS(:NEW.RECORD_ARRAY(i)) THEN
-            IF INSERTING THEN
+            IF INSERTING THEN                               
+                DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_ALBUM');
                 DBMS_OUTPUT.PUT_LINE('Некорректный список записей.');
                 RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM;
             ELSE
@@ -549,7 +625,8 @@ BEGIN
                 :NEW.PRICE := :OLD.PRICE;
                 :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
                 :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
-                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;
+                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                          
+                DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
                 DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
                     || :OLD.ID 
                     || ' не был обновлен из-за нарушения внешнего ключа (записи).');
@@ -612,7 +689,8 @@ BEGIN
     LOOP
         FOR i IN 1..ALBUM_ROW.RECORD_ARRAY.COUNT
         LOOP
-            IF ALBUM_ROW.RECORD_ARRAY(i) = :OLD.ID THEN
+            IF ALBUM_ROW.RECORD_ARRAY(i) = :OLD.ID THEN                               
+                DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORD_DEL');
                 DBMS_OUTPUT.PUT_LINE('Запиь с идентификатором ' 
                     || :OLD.ID 
                     || ' удалять нельзя - она есть в альбоме.');
@@ -651,12 +729,13 @@ BEGIN
             :NEW.TIME := :OLD.TIME;
             :NEW.STYLE := :OLD.STYLE;
             :NEW.SINGER_LIST := :OLD.SINGER_LIST;
+            DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_RECORDS');
             DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
                 || :OLD.ID 
                 || ' не была обновлена.');
             DBMS_OUTPUT.PUT_LINE('Список исполнителей обновлять нельзя,' 
                 || ' так как исполнитель хотя бы один должен быть.');
-            RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_UPDATE_SINGER_IN_RECORD;
+            RETURN;
     END IF;
     -- Запись уже содержится в одном из альбомов => обновлять исп. нельзя
     FOR ALBUM_ROW IN (SELECT * FROM GRUSHEVSKAYA_ALBUM)
@@ -676,19 +755,21 @@ BEGIN
             :NEW.TIME := :OLD.TIME;
             :NEW.STYLE := :OLD.STYLE;
             :NEW.SINGER_LIST := :OLD.SINGER_LIST;
+            DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_RECORDS');
             DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
                 || :OLD.ID 
                 || ' не была обновлена.');
             DBMS_OUTPUT.PUT_LINE('Список исполнителей обновлять нельзя,' 
-                || ' так как запись уже содержится в одном из альбомов.'); 
-            RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_UPDATE_SINGER_IN_RECORD;
+                || ' так как запись уже содержится в одном из альбомов.');
+            RETURN;
     END IF;
     -- Проверка внеш.кл.
     -- Если подмножество исполнителей не соответствует таблице исполнителей,
     -- то отменить вставку или "откатить" обновление
     SELECT NAME BULK COLLECT INTO LIST_NAME FROM GRUSHEVSKAYA_SINGER;
     IF :NEW.SINGER_LIST NOT SUBMULTISET OF LIST_NAME THEN
-        IF INSERTING THEN
+        IF INSERTING THEN            
+            DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORDS');
             DBMS_OUTPUT.PUT_LINE('Некорректный список исполнителей.');
             RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_RECORD;
         ELSE
@@ -697,9 +778,11 @@ BEGIN
             :NEW.TIME := :OLD.TIME;
             :NEW.STYLE := :OLD.STYLE;
             :NEW.SINGER_LIST := :OLD.SINGER_LIST;
+            DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_RECORDS');
             DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
                 || :OLD.ID 
                 || ' не была обновлена из-за нарушения внешнего ключа (исполнители).');
+            RETURN;
         END IF;
     END IF;
 END;
@@ -757,7 +840,8 @@ BEGIN
     LOOP
         FOR i IN 1..RECORD_ROW.SINGER_LIST.COUNT
         LOOP
-            IF RECORD_ROW.SINGER_LIST(i) = :OLD.NAME THEN
+            IF RECORD_ROW.SINGER_LIST(i) = :OLD.NAME THEN                
+                DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_SINGERS_DEL');
                 DBMS_OUTPUT.PUT_LINE('Исполнителя с идентификатором ' 
                     || :OLD.NAME 
                     || ' удалять нельзя - у него есть треки.');
@@ -780,7 +864,6 @@ ALTER TRIGGER "GRUSHEVSKAYA_TR_ON_SINGERS_DEL" ENABLE;
     ERROR_SINGER_DEL EXCEPTION;
     ERROR_ALBUM EXCEPTION;
     ERROR_RECORD_DEL EXCEPTION;
-    LONG_VARCHAR2 EXCEPTION;
 END;
 
 /
@@ -1007,6 +1090,8 @@ END;
   ALTER TABLE "GRUSHEVSKAYA_RECORD" MODIFY ("NAME" NOT NULL ENABLE);
  
   ALTER TABLE "GRUSHEVSKAYA_RECORD" MODIFY ("TIME" NOT NULL ENABLE);
+ 
+  ALTER TABLE "GRUSHEVSKAYA_RECORD" MODIFY ("STYLE" NOT NULL ENABLE);
 --------------------------------------------------------
 --  Constraints for Table GRUSHEVSKAYA_SINGER
 --------------------------------------------------------

@@ -566,7 +566,7 @@ CREATE OR REPLACE
 PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     PROCEDURE PRINT_MSG_EX(SQLCODE NUMBER) IS
     BEGIN
-        DBMS_OUTPUT.PUT_LINE('Неизвестное исключение');
+        DBMS_OUTPUT.PUT_LINE('Ой. Неизвестное исключение.');
         DBMS_OUTPUT.PUT_LINE('Код: ' || SQLCODE);
         DBMS_OUTPUT.PUT_LINE('Сообщение: ' || SQLERRM(SQLCODE));        
     END PRINT_MSG_EX;
@@ -577,13 +577,16 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     BEGIN
         INSERT INTO GRUSHEVSKAYA_DICT_COUNTRY (NAME) VALUES (NAME);
         COMMIT;
+        DBMS_OUTPUT.PUT_LINE('Страна ' || NAME || ' успешно добавлена.');
     EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_IN_DICT_COUNTRY');
         IF SQLCODE = -12899 THEN
-            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -1 THEN
-            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей');
+            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей.');
+        ELSIF SQLCODE = -1400 THEN
+            DBMS_OUTPUT.PUT_LINE('Невозможно вставить NULL для одного из столбцов.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
@@ -594,14 +597,17 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     )IS
     BEGIN
         INSERT INTO GRUSHEVSKAYA_DICT_STYLE (NAME) VALUES (NAME);
-        COMMIT;
+        COMMIT;        
+        DBMS_OUTPUT.PUT_LINE('Стиль ' || NAME || ' успешно добавлен.');
     EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_IN_DICT_STYLE');
         IF SQLCODE = -12899 THEN
-            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -1 THEN
-            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей');
+            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей.');
+        ELSIF SQLCODE = -1400 THEN
+            DBMS_OUTPUT.PUT_LINE('Невозможно вставить NULL для одного из столбцов.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
@@ -621,7 +627,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         TIME := NEW GRUSHEVSKAYA_TIME(HOURS, MINUTES, SECONDS);
         INSERT INTO GRUSHEVSKAYA_RECORD (ID, NAME, TIME, STYLE, SINGER_LIST)
             VALUES (ID, NAME, TIME, STYLE, GRUSHEVSKAYA_SINGER_TAB(SINGER));
-        COMMIT;
+        COMMIT;        
+        DBMS_OUTPUT.PUT_LINE('Запись ' || NAME || ' с ID ' || ID || ' успешно добавлена.');
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_RECORD THEN
         RETURN;
@@ -630,9 +637,11 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         IF SQLCODE = -02291 THEN
             DBMS_OUTPUT.PUT_LINE('Нет такого стиля в словаре');
         ELSIF SQLCODE = -12899 THEN
-            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -1 THEN
-            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей');
+            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей.');
+        ELSIF SQLCODE = -1400 THEN
+            DBMS_OUTPUT.PUT_LINE('Невозможно вставить NULL для одного из столбцов.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
@@ -644,6 +653,10 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     ) IS
         TMP_SINGER_LIST GRUSHEVSKAYA_SINGER_TAB;
     BEGIN
+        IF SINGER_NAME IS NULL THEN
+            DBMS_OUTPUT.PUT_LINE('Нельзя вставлять NULL-значения.');
+            RETURN;
+        END IF;
         SELECT SINGER_LIST INTO TMP_SINGER_LIST 
             FROM GRUSHEVSKAYA_RECORD
             WHERE ID = RECORD_ID;
@@ -652,12 +665,15 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         UPDATE GRUSHEVSKAYA_RECORD
             SET SINGER_LIST = TMP_SINGER_LIST
             WHERE ID = RECORD_ID;
-        COMMIT;
+        COMMIT;        
+        DBMS_OUTPUT.PUT_LINE('Исполнитель ' || SINGER_NAME || ' успешно добавлен в запись с ID ' || RECORD_ID || '.');
     EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_SINGER_IN_RECORD');
         IF SQLCODE = -12899 THEN
-            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
+        ELSIF SQLCODE = 100 THEN
+            DBMS_OUTPUT.PUT_LINE('Вставка в несуществующую запись.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
@@ -671,16 +687,19 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     BEGIN
         INSERT INTO GRUSHEVSKAYA_SINGER (NAME, NICKNAME, COUNTRY)
             VALUES (NAME, NICKNAME, COUNTRY);
-        COMMIT;
+        COMMIT;      
+        DBMS_OUTPUT.PUT_LINE('Исполнитель ' || NAME || ' успешно добавлен.');
     EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_SINGER');
         IF SQLCODE = -02291 THEN
-            DBMS_OUTPUT.PUT_LINE('Нет такой страны в словаре');
+            DBMS_OUTPUT.PUT_LINE('Нет такой страны в словаре.');
         ELSIF SQLCODE = -12899 THEN
-            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -1 THEN
-            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей');
+            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей.');
+        ELSIF SQLCODE = -1400 THEN
+            DBMS_OUTPUT.PUT_LINE('Невозможно вставить NULL для одного из столбцов.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
@@ -714,18 +733,27 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             QUANTITY_OF_SOLD,
             RECORD_ARR
         );
-        COMMIT;
+        COMMIT;      
+        DBMS_OUTPUT.PUT_LINE('Альбом ' || NAME || ' с ID ' || ID || ' успешно добавлен.');
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
         RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUM');
         IF SQLCODE = -12899 THEN
-            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -6532 THEN
-            DBMS_OUTPUT.PUT_LINE('Индекс превышает пределы');
+            DBMS_OUTPUT.PUT_LINE('Индекс превышает пределы.');
         ELSIF SQLCODE = -1 THEN
-            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей');
+            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей.');
+        ELSIF SQLCODE = -1400 THEN
+            DBMS_OUTPUT.PUT_LINE('Невозможно вставить NULL для одного из столбцов.');
+        ELSIF SQLCODE = 100 THEN
+            DBMS_OUTPUT.PUT_LINE('Вставка несуществующей записи в альбом.');
+        ELSIF SQLCODE = -2290 THEN
+            DBMS_OUTPUT.PUT_LINE('Нарушено одно из условий.');
+            DBMS_OUTPUT.PUT_LINE('Значение цены не может быть отрицательным.');
+            DBMS_OUTPUT.PUT_LINE('Значения количества альбомов в продаже и проданных не могут быть отрицательными.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
@@ -756,18 +784,25 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             QUANTITY_OF_SOLD,
             RECORD_ARR
         );
-        COMMIT;
+        COMMIT;      
+        DBMS_OUTPUT.PUT_LINE('Альбом ' || NAME || ' с ID ' || ID || ' успешно добавлен.');
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
         RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUM');
         IF SQLCODE = -12899 THEN
-            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -6532 THEN
-            DBMS_OUTPUT.PUT_LINE('Индекс превышает пределы');
+            DBMS_OUTPUT.PUT_LINE('Индекс превышает пределы.');
         ELSIF SQLCODE = -1 THEN
-            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей');
+            DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей.');
+        ELSIF SQLCODE = -1400 THEN
+            DBMS_OUTPUT.PUT_LINE('Невозможно вставить NULL для одного из столбцов.');
+        ELSIF SQLCODE = -2290 THEN
+            DBMS_OUTPUT.PUT_LINE('Нарушено одно из условий.');
+            DBMS_OUTPUT.PUT_LINE('Значение цены не может быть отрицательным.');
+            DBMS_OUTPUT.PUT_LINE('Значения количества альбомов в продаже и проданных не могут быть отрицательными.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
@@ -779,7 +814,11 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         RECORD_SERIAL_NUMBER NUMBER
     )IS
         TMP_RECORD_ARR GRUSHEVSKAYA_RECORD_ARR;
-    BEGIN
+    BEGIN        
+        IF RECORD_ID IS NULL THEN
+            DBMS_OUTPUT.PUT_LINE('Нельзя вставлять NULL-значения.');
+            RETURN;
+        END IF;
         SELECT RECORD_ARRAY INTO TMP_RECORD_ARR
             FROM GRUSHEVSKAYA_ALBUM
             WHERE ID = ALBUM_ID;
@@ -787,16 +826,19 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         UPDATE GRUSHEVSKAYA_ALBUM
             SET RECORD_ARRAY = TMP_RECORD_ARR
             WHERE ID = ALBUM_ID;            
-        COMMIT;
+        COMMIT;      
+        DBMS_OUTPUT.PUT_LINE('Запись с ID ' || RECORD_ID || ' успешно добавлена в альбом с ID ' || ALBUM_ID || '.');
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
         RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_RECORD_IN_ALBUM');
         IF SQLCODE = -12899 THEN
-            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -6532 THEN
-            DBMS_OUTPUT.PUT_LINE('Индекс превышает пределы');
+            DBMS_OUTPUT.PUT_LINE('Индекс превышает пределы.');
+        ELSIF SQLCODE = 100 THEN
+            DBMS_OUTPUT.PUT_LINE('Вставка в несуществующий альбом.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
@@ -812,7 +854,11 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             DBMS_OUTPUT.PUT_LINE(ALBUM.NAME);
             QUANTITY := QUANTITY + 1;
         END LOOP;
-        DBMS_OUTPUT.PUT_LINE('Всего альбомов в продаже: ' || QUANTITY);
+        DBMS_OUTPUT.PUT_LINE('Всего альбомов в продаже: ' || QUANTITY);    
+    EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_ALBUMS_IN_STOCK');
+        PRINT_MSG_EX(SQLCODE);
     END PRINT_ALBUMS_IN_STOCK;
     
     PROCEDURE PRINT_SINGERS
@@ -822,7 +868,11 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         FOR SINGER IN (SELECT * FROM GRUSHEVSKAYA_SINGER)
         LOOP
             DBMS_OUTPUT.PUT_LINE(SINGER.NAME);
-        END LOOP;
+        END LOOP;    
+    EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_SINGERS');
+        PRINT_MSG_EX(SQLCODE);
     END PRINT_SINGERS;
     
     PROCEDURE ADD_ALBUMS_IN_STOCK (
@@ -830,15 +880,20 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         QUANTITY NUMBER
     ) IS
     BEGIN
+        IF QUANTITY <= 0 THEN
+            DBMS_OUTPUT.PUT_LINE('В продажу поступило отрицательное количество альбомов c ID ' || ALBUM_ID || '. Количество не обновлено.');
+            RETURN;
+        END IF;
         UPDATE GRUSHEVSKAYA_ALBUM
             SET QUANTITY_IN_STOCK = QUANTITY_IN_STOCK + QUANTITY
             WHERE ID = ALBUM_ID;
         COMMIT;
+        DBMS_OUTPUT.PUT_LINE('В продажу поступило ' || QUANTITY || ' альбомов c ID ' || ALBUM_ID || '.');
     EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUMS_IN_STOCK');
         IF SQLCODE = -12899 THEN
-            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;        
@@ -852,6 +907,10 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         FLAG_ONE_RECORD BOOLEAN := FALSE;
         MAX_QUANTITY NUMBER;
     BEGIN
+        IF QUANTITY <= 0 THEN
+            DBMS_OUTPUT.PUT_LINE('Подается отрицательное количество альбомов c ID ' || ALBUM_ID || '. Количество не обновлено.');
+            RETURN;
+        END IF;
         SELECT RECORD_ARRAY INTO RECORD_ARR 
             FROM GRUSHEVSKAYA_ALBUM
             WHERE ID = ALBUM_ID;
@@ -862,7 +921,7 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             END IF;
         END LOOP;
         IF NOT FLAG_ONE_RECORD THEN
-            DBMS_OUTPUT.PUT_LINE('Продать альбом нельзя. В альбоме нет треков');
+            DBMS_OUTPUT.PUT_LINE('Продать альбом c ID ' || ALBUM_ID || ' нельзя. В альбоме нет треков.');
             RETURN;
         END IF;
         SELECT QUANTITY_IN_STOCK INTO MAX_QUANTITY 
@@ -870,7 +929,7 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             WHERE ID = ALBUM_ID;
         MAX_QUANTITY := LEAST(MAX_QUANTITY, QUANTITY);
         IF MAX_QUANTITY <= 0 THEN
-            DBMS_OUTPUT.PUT_LINE('Продать альбом нельзя. Альбомов нет на складе');
+            DBMS_OUTPUT.PUT_LINE('Продать альбом c ID ' || ALBUM_ID || ' нельзя. Альбомов нет на складе.');
             RETURN;
         END IF;
         UPDATE GRUSHEVSKAYA_ALBUM
@@ -879,7 +938,7 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
                 QUANTITY_OF_SOLD = QUANTITY_OF_SOLD + MAX_QUANTITY
             WHERE ID = ALBUM_ID;
         COMMIT;
-        DBMS_OUTPUT.PUT_LINE('Продано ' || MAX_QUANTITY || ' альбомов.');
+        DBMS_OUTPUT.PUT_LINE('Продано ' || MAX_QUANTITY || ' альбомов c ID ' || ALBUM_ID || '.');
     EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN SELL_ALBUMS');
@@ -918,6 +977,7 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             END IF;
         END LOOP;
         COMMIT;
+        DBMS_OUTPUT.PUT_LINE('Исполнители без записей удалены успешно.');
     EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN DELETE_SINGERS_WITHOUT_RECORDS');
@@ -961,7 +1021,15 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
                 TIME := RECORD.TIME.ACCUMULATE(TIME);
             END IF;
         END LOOP;
-        DBMS_OUTPUT.PUT_LINE('Общее время звучания: ' || TIME.PRINT);
+        DBMS_OUTPUT.PUT_LINE('Общее время звучания: ' || TIME.PRINT);        
+    EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_ALBUM_RECORDS');
+        IF SQLCODE = 100 THEN
+            DBMS_OUTPUT.PUT_LINE('Печать несуществующего альбома.');
+        ELSE
+            PRINT_MSG_EX(SQLCODE);
+        END IF;
     END PRINT_ALBUM_RECORDS;
     
     PROCEDURE PRINT_INCOME
@@ -981,7 +1049,11 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             );
             TOTAL_INCOME := TOTAL_INCOME + ALBUM.PRICE * ALBUM.QUANTITY_OF_SOLD;
         END LOOP;
-        DBMS_OUTPUT.PUT_LINE('Выручка магазина в целом: ' || TOTAL_INCOME);
+        DBMS_OUTPUT.PUT_LINE('Выручка магазина в целом: ' || TOTAL_INCOME);       
+    EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_INCOME');
+        PRINT_MSG_EX(SQLCODE);
     END PRINT_INCOME;    
     
     PROCEDURE DELETE_RECORD_FROM_ALBUM(
@@ -1017,7 +1089,9 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN DELETE_RECORD_FROM_ALBUM');
         IF SQLCODE = -6532 THEN
-            DBMS_OUTPUT.PUT_LINE('Индекс превышает пределы');
+            DBMS_OUTPUT.PUT_LINE('Индекс превышает пределы');        
+        ELSIF SQLCODE = 100 THEN
+            DBMS_OUTPUT.PUT_LINE('Удаление несуществующего альбома.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;    
@@ -1037,18 +1111,19 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             SET SINGER_LIST = TMP_SINGER_LIST
             WHERE ID = RECORD_ID;
         COMMIT;
-        DBMS_OUTPUT.PUT_LINE('Исполнитель №' || SINGER_NUMBER || ' удален');
+        DBMS_OUTPUT.PUT_LINE('Исполнитель №' || SINGER_NUMBER || ' удален.');
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_UPDATE_SINGER_IN_RECORD THEN
         RETURN;
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_SINGER_IN_RECORD');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN DELETE_SINGER_FROM_RECORD');
         IF SQLCODE = -12899 THEN
-            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико');
+            DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');       
+        ELSIF SQLCODE = 100 THEN
+            DBMS_OUTPUT.PUT_LINE('Удаление из несуществующего исполнителя невозможно.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
-        END IF;
-        
+        END IF;        
     END DELETE_SINGER_FROM_RECORD;
         
     PROCEDURE PRINT_SINGER_STYLE(
@@ -1077,14 +1152,20 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         MAX_STYLE := SINGER_STYLE_LIST.FIRST;
         CURRENT_ELEM := SINGER_STYLE_LIST.FIRST;
         WHILE NOT CURRENT_ELEM IS NULL
-        LOOP        
---            DBMS_OUTPUT.PUT_LINE(CURRENT_ELEM || '  ' || SINGER_STYLE_LIST(CURRENT_ELEM));
+        LOOP  
             IF SINGER_STYLE_LIST(CURRENT_ELEM) > SINGER_STYLE_LIST(MAX_STYLE) THEN
                 MAX_STYLE := CURRENT_ELEM;
             END IF;
             CURRENT_ELEM := SINGER_STYLE_LIST.NEXT(CURRENT_ELEM);
         END LOOP;
-        DBMS_OUTPUT.PUT_LINE('Наиболее популярный стиль у ' || SINGER_NAME || ' - '  || MAX_STYLE);
+        IF MAX_STYLE IS NULL THEN
+            DBMS_OUTPUT.PUT_LINE('Исполнитель не найден.');
+        END IF;
+        DBMS_OUTPUT.PUT_LINE('Наиболее популярный стиль у ' || SINGER_NAME || ' - '  || MAX_STYLE || '.');       
+    EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_SINGER_STYLE');
+        PRINT_MSG_EX(SQLCODE);
     END PRINT_SINGER_STYLE;
     
     PROCEDURE PRINT_COUNTRY_STYLE
@@ -1120,22 +1201,19 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             MAX_STYLE := COUNTRY_STYLE_LIST(CURRENT_COUNTRY).FIRST;
             CURRENT_STYLE := COUNTRY_STYLE_LIST(CURRENT_COUNTRY).FIRST;
             WHILE NOT CURRENT_STYLE IS NULL
-            LOOP        
---                DBMS_OUTPUT.PUT_LINE(
---                    CURRENT_COUNTRY 
---                    || '  ' 
---                    || CURRENT_STYLE
---                    || '  ' 
---                    || COUNTRY_STYLE_LIST(CURRENT_COUNTRY)(CURRENT_STYLE)
---                );
+            LOOP  
                 IF COUNTRY_STYLE_LIST(CURRENT_COUNTRY)(CURRENT_STYLE) > COUNTRY_STYLE_LIST(CURRENT_COUNTRY)(MAX_STYLE) THEN
                     MAX_STYLE := CURRENT_STYLE;
                 END IF;
                 CURRENT_STYLE := COUNTRY_STYLE_LIST(CURRENT_COUNTRY).NEXT(CURRENT_STYLE);
             END LOOP;
-            DBMS_OUTPUT.PUT_LINE('Наиболее популярный стиль в '  || CURRENT_COUNTRY || ' - ' || MAX_STYLE);
+            DBMS_OUTPUT.PUT_LINE('Наиболее популярный стиль в '  || CURRENT_COUNTRY || ' - ' || MAX_STYLE || '.');
             CURRENT_COUNTRY := COUNTRY_STYLE_LIST.NEXT(CURRENT_COUNTRY);
-        END LOOP;
+        END LOOP;       
+    EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_COUNTRY_STYLE');
+        PRINT_MSG_EX(SQLCODE);
     END PRINT_COUNTRY_STYLE; 
     
     PROCEDURE PRINT_ALBUM_AUTHOR(
@@ -1174,12 +1252,12 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         CURRENT_SINGER := ALBUM_SINGER_LIST.FIRST;
         WHILE NOT CURRENT_SINGER IS NULL
         LOOP
---            DBMS_OUTPUT.PUT_LINE(RECORD_COUNT || ' ' || CURRENT_SINGER || ' ' || ALBUM_SINGER_LIST(CURRENT_SINGER));
             IF ALBUM_SINGER_LIST(CURRENT_SINGER) <> RECORD_COUNT THEN
                 FLAG_GROUP := TRUE;
             END IF;
             CURRENT_SINGER := ALBUM_SINGER_LIST.NEXT(CURRENT_SINGER);
         END LOOP;
+        DBMS_OUTPUT.PUT_LINE('Авторство альбома с ID ' || ALBUM_ID || '.');
         IF FLAG_GROUP THEN
             DBMS_OUTPUT.PUT_LINE('Коллективный сборник');
         ELSE
@@ -1190,6 +1268,14 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
                 DBMS_OUTPUT.PUT_LINE(CURRENT_SINGER);
                 CURRENT_SINGER := ALBUM_SINGER_LIST.NEXT(CURRENT_SINGER);
             END LOOP;
+        END IF;       
+    EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_ALBUM_AUTHOR');
+        IF SQLCODE = 100 THEN
+            DBMS_OUTPUT.PUT_LINE('Печать авторства несуществующего альбома невозможно.');
+        ELSE
+            PRINT_MSG_EX(SQLCODE);
         END IF;
     END PRINT_ALBUM_AUTHOR;
 END;

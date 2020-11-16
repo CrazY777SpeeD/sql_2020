@@ -30,8 +30,8 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('----- Добавление повторно singer_1 nick_1 country_1 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_1', 'nick_1', 'country_1');
     
-    DBMS_OUTPUT.PUT_LINE('----- Добавление singer_1 с несуществующей country_8 -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_7', 'nick_1', 'country_3');
+    DBMS_OUTPUT.PUT_LINE('----- Добавление singer_7 с несуществующей country_8 -----');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_7', 'nick_1', 'country_8');
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление style_1 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_1');

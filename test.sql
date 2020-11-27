@@ -24,14 +24,14 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('----- Добавление country_2 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('country_2');
     
-    DBMS_OUTPUT.PUT_LINE('----- Добавление singer_1 nick_1 country_1 -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_1', 'nick_1', 'country_1');
+    DBMS_OUTPUT.PUT_LINE('----- Добавление singer_1 country_1 -----');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_1', 'country_1');
     
-    DBMS_OUTPUT.PUT_LINE('----- Добавление повторно singer_1 nick_1 country_1 -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_1', 'nick_1', 'country_1');
+    DBMS_OUTPUT.PUT_LINE('----- Добавление повторно singer_1 country_1 -----');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_1', 'country_1');
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление singer_7 с несуществующей country_8 -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_7', 'nick_1', 'country_8');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_7', 'country_8');
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление style_1 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_1');
@@ -51,11 +51,11 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('----- Добавление записи c несуществующим стилем -----');
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD(7, 'song_7', 0, 1, 10, 'style_5', 'singer_1');
     
-    DBMS_OUTPUT.PUT_LINE('----- Добавление singer_2 nick_2 country_2 -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_2', 'nick_2', 'country_2');
+    DBMS_OUTPUT.PUT_LINE('----- Добавление singer_2  country_2 -----');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_2', 'country_2');
     
-    DBMS_OUTPUT.PUT_LINE('----- Повторное добавление singer_2 nick_2 country_2 -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_2', 'nick_2', 'country_1');
+    DBMS_OUTPUT.PUT_LINE('----- Повторное добавление singer_2 country_2 -----');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_2', 'country_1');
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление singer_2 в запись 1 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(1, 'singer_2');
@@ -231,16 +231,16 @@ BEGIN
     GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 2, QUANTITY => -5);
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление исполнителя 3 без записей -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_3', 'nick_3', 'country_1');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_3', 'country_1');
     
     DBMS_OUTPUT.PUT_LINE('----- Удаление исполнителей без записей -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_SINGERS_WITHOUT_RECORDS;   
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление исполнителя 4 без записей -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_4', 'nick_4', 'country_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_5', 'nick_4', 'country_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_6', 'nick_4', 'country_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_7', 'nick_4', 'country_1');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_4', 'country_1');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_5', 'country_1');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_6', 'country_1');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_7', 'country_1');
     
     DBMS_OUTPUT.PUT_LINE('----- Удаление исполнителей без записей -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_SINGERS_WITHOUT_RECORDS;  

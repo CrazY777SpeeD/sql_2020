@@ -1,15 +1,17 @@
 -- DROP ALL
 
---DROP TABLE GRUSHEVSKAYA_ALBUM;
---DROP TABLE GRUSHEVSKAYA_RECORD;
---DROP TABLE GRUSHEVSKAYA_SINGER;
---DROP TABLE GRUSHEVSKAYA_DICT_COUNTRY;
---DROP TABLE GRUSHEVSKAYA_DICT_STYLE;
---DROP TYPE GRUSHEVSKAYA_RECORD_ARR;
---DROP TYPE GRUSHEVSKAYA_SINGER_TAB;
---DROP TYPE GRUSHEVSKAYA_TIME;
---DROP PACKAGE GRUSHEVSKAYA_EXCEPTIONS;
---DROP PACKAGE GRUSHEVSKAYA_PACKAGE;
+DROP TABLE GRUSHEVSKAYA_ALBUM;
+DROP TABLE GRUSHEVSKAYA_RECORD;
+DROP TABLE GRUSHEVSKAYA_SINGER;
+DROP TABLE GRUSHEVSKAYA_DICT_COUNTRY;
+DROP TABLE GRUSHEVSKAYA_DICT_STYLE;
+DROP TYPE GRUSHEVSKAYA_RECORD_ARR;
+DROP TYPE GRUSHEVSKAYA_SINGER_TAB;
+DROP TYPE GRUSHEVSKAYA_TIME;
+DROP PACKAGE GRUSHEVSKAYA_EXCEPTIONS;
+DROP PACKAGE GRUSHEVSKAYA_PACKAGE;
+
+
 --/
 
 --Пакет с исключениями
@@ -38,7 +40,6 @@ CREATE TABLE GRUSHEVSKAYA_DICT_COUNTRY(
 
 CREATE TABLE GRUSHEVSKAYA_SINGER(
     NAME VARCHAR2(100 BYTE),
-    NICKNAME VARCHAR2(100 BYTE),
     COUNTRY VARCHAR2(100 BYTE)
 );
 
@@ -47,10 +48,6 @@ ALTER TABLE GRUSHEVSKAYA_SINGER
     PRIMARY KEY(NAME) ENABLE;
 ALTER TABLE GRUSHEVSKAYA_SINGER 
     MODIFY (NAME NOT NULL ENABLE);
-
-ALTER TABLE GRUSHEVSKAYA_SINGER 
-    ADD CONSTRAINT GRUSHEVSKAYA_SINGER_UK 
-    UNIQUE (NAME, NICKNAME) ENABLE;
 
 ALTER TABLE GRUSHEVSKAYA_SINGER 
     MODIFY (COUNTRY NOT NULL ENABLE);
@@ -577,8 +574,6 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
     PROCEDURE ADD_SINGER (
         -- Имя (ФИО)
         NAME VARCHAR2, 
-        -- Псевдоним, группа
-        NICKNAME VARCHAR2, 
         -- Страна из словаря
         COUNTRY VARCHAR2
     );
@@ -819,13 +814,12 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     END ADD_SINGER_IN_RECORD;
     
     PROCEDURE ADD_SINGER (
-        NAME VARCHAR2, 
-        NICKNAME VARCHAR2, 
+        NAME VARCHAR2,
         COUNTRY VARCHAR2
     ) IS
     BEGIN
-        INSERT INTO GRUSHEVSKAYA_SINGER (NAME, NICKNAME, COUNTRY)
-            VALUES (NAME, NICKNAME, COUNTRY);
+        INSERT INTO GRUSHEVSKAYA_SINGER (NAME, COUNTRY)
+            VALUES (NAME, COUNTRY);
         COMMIT;      
         DBMS_OUTPUT.PUT_LINE('Исполнитель ' || NAME || ' успешно добавлен.');
     EXCEPTION
@@ -1431,325 +1425,325 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         END IF;
     END PRINT_ALBUM_AUTHOR;
 END;
-/
-DECLARE 
-BEGIN
-    -- Тестовые данные
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('country_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('country_2');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('country_3');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('country_4');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('country_5');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('country_6');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_2');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_3');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_4');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_5');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_1', 'nick_1', 'country_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_2', 'nick_2', 'country_2');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_3', 'nick_3', 'country_3');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_4', 'nick_4', 'country_4');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_5', 'nick_4', 'country_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_6', 'nick_5', 'country_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_7', 'nick_5', 'country_5');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_8', 'nick_5', 'country_6');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_9', 'nick_6', 'country_2');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_10', 'nick_6', 'country_3');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_11', 'nick_7', 'country_4');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_12', 'nick_8', 'country_2');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_13', 'nick_9', 'country_5');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_14', 'nick_9', 'country_5');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_15', 'nick_9', 'country_6');
-
-
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(1, 'song_1', 0, 1, 01, 'style_1', 'singer_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(1, 'singer_2');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(2, 'song_2', 0, 1, 02, 'style_1', 'singer_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(2, 'singer_2');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(3, 'song_3', 0, 1, 03, 'style_1', 'singer_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(3, 'singer_2');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(4, 'song_4', 0, 1, 04, 'style_2', 'singer_2');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(4, 'singer_3');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(5, 'song_5', 0, 1, 05, 'style_2', 'singer_3');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(5, 'singer_4');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(6, 'song_6', 0, 1, 06, 'style_3', 'singer_5');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(6, 'singer_7');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(7, 'song_7', 0, 1, 07, 'style_4', 'singer_11');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(8, 'song_8', 0, 1, 07, 'style_5', 'singer_11');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(8, 'singer_7'); 
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(9, 'song_9', 0, 1, 09, 'style_5', 'singer_9');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(9, 'singer_13'); 
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(10, 'song_10', 0, 1, 10, 'style_4', 'singer_4');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(10, 'singer_9'); 
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(10, 'singer_11'); 
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(10, 'singer_13'); 
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(10, 'singer_14'); 
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(10, 'singer_15'); 
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(11, 'song_11', 0, 1, 11, 'style_3', 'singer_9');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(12, 'song_12', 0, 1, 12, 'style_3', 'singer_9');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(13, 'song_13', 0, 1, 13, 'style_1', 'singer_7');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(14, 'song_14', 0, 1, 14, 'style_5', 'singer_11');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(15, 'song_15', 0, 1, 15, 'style_2', 'singer_11');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(16, 'song_16', 0, 1, 16, 'style_2', 'singer_11');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(17, 'song_17', 0, 1, 17, 'style_2', 'singer_11');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(18, 'song_18', 0, 1, 18, 'style_1', 'singer_13');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(19, 'song_19', 0, 1, 19, 'style_3', 'singer_13');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(20, 'song_20', 0, 1, 20, 'style_4', 'singer_13');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(20, 'singer_7'); 
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(21, 'song_21', 0, 1, 21, 'style_4', 'singer_13');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(21, 'singer_7'); 
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(22, 'song_22', 0, 1, 22, 'style_3', 'singer_14');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(23, 'song_23', 0, 1, 23, 'style_5', 'singer_15');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(24, 'song_24', 0, 1, 24, 'style_3', 'singer_15');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(25, 'song_25', 0, 1, 25, 'style_3', 'singer_15');
-
-
-    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        ID => 1, 
-        NAME => 'album_1', 
-        PRICE => 100.50, 
-        QUANTITY_IN_STOCK => 25, 
-        QUANTITY_OF_SOLD => 0, 
-        RECORD_ID => 1, 
-        RECORD_SERIAL_NUMBER => 1
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 1,
-        RECORD_ID => 2, 
-        RECORD_SERIAL_NUMBER => 2
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 1,
-        RECORD_ID => 3, 
-        RECORD_SERIAL_NUMBER => 3
-    );
-    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 1, QUANTITY => 25);
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        ID => 2, 
-        NAME => 'album_2', 
-        PRICE => 123.55, 
-        QUANTITY_IN_STOCK => 225, 
-        QUANTITY_OF_SOLD => 0, 
-        RECORD_ID => 1, 
-        RECORD_SERIAL_NUMBER => 23
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 2, 
-        RECORD_SERIAL_NUMBER => 2
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 3, 
-        RECORD_SERIAL_NUMBER => 3
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 4, 
-        RECORD_SERIAL_NUMBER => 4
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 5, 
-        RECORD_SERIAL_NUMBER => 5
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 7, 
-        RECORD_SERIAL_NUMBER => 7
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 8, 
-        RECORD_SERIAL_NUMBER => 8
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 9, 
-        RECORD_SERIAL_NUMBER => 10
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 10, 
-        RECORD_SERIAL_NUMBER => 9
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 11, 
-        RECORD_SERIAL_NUMBER => 13
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 12, 
-        RECORD_SERIAL_NUMBER => 11
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 13, 
-        RECORD_SERIAL_NUMBER => 12
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 14, 
-        RECORD_SERIAL_NUMBER => 14
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 15, 
-        RECORD_SERIAL_NUMBER => 15
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 12, 
-        RECORD_SERIAL_NUMBER => 11
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 16, 
-        RECORD_SERIAL_NUMBER => 16
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 17, 
-        RECORD_SERIAL_NUMBER => 17
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 18, 
-        RECORD_SERIAL_NUMBER => 18
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 19, 
-        RECORD_SERIAL_NUMBER => 19
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 20, 
-        RECORD_SERIAL_NUMBER => 20
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 21, 
-        RECORD_SERIAL_NUMBER => 21
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 22, 
-        RECORD_SERIAL_NUMBER => 24
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 23, 
-        RECORD_SERIAL_NUMBER => 1
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 24, 
-        RECORD_SERIAL_NUMBER => 22
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 25, 
-        RECORD_SERIAL_NUMBER => 6
-    );
-    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 2, QUANTITY => 37);
-        
-    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        ID => 3, 
-        NAME => 'album_3', 
-        PRICE => 293.41, 
-        QUANTITY_IN_STOCK => 73, 
-        QUANTITY_OF_SOLD => 0, 
-        RECORD_ID => 7, 
-        RECORD_SERIAL_NUMBER => 1
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 8, 
-        RECORD_SERIAL_NUMBER => 5
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 14, 
-        RECORD_SERIAL_NUMBER => 6
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 15, 
-        RECORD_SERIAL_NUMBER => 2
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 16, 
-        RECORD_SERIAL_NUMBER => 4
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 17, 
-        RECORD_SERIAL_NUMBER => 3
-    );
-    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 3, QUANTITY => 11);
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        ID => 4, 
-        NAME => 'album_4', 
-        PRICE => 24.41, 
-        QUANTITY_IN_STOCK => 89, 
-        QUANTITY_OF_SOLD => 0
-    );
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        ID => 5, 
-        NAME => 'album_5', 
-        PRICE => 65.71, 
-        QUANTITY_IN_STOCK => 19, 
-        QUANTITY_OF_SOLD => 0
-    );    
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 5,
-        RECORD_ID => 23, 
-        RECORD_SERIAL_NUMBER => 2
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 5,
-        RECORD_ID => 24, 
-        RECORD_SERIAL_NUMBER => 1
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 5,
-        RECORD_ID => 25, 
-        RECORD_SERIAL_NUMBER => 3
-    );     
-END;
+--/
+--DECLARE 
+--BEGIN
+--    -- Тестовые данные
+--    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('country_1');
+--    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('country_2');
+--    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('country_3');
+--    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('country_4');
+--    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('country_5');
+--    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('country_6');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_1');
+--    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_2');
+--    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_3');
+--    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_4');
+--    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_5');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_1', 'nick_1', 'country_1');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_2', 'nick_2', 'country_2');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_3', 'nick_3', 'country_3');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_4', 'nick_4', 'country_4');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_5', 'nick_4', 'country_1');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_6', 'nick_5', 'country_1');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_7', 'nick_5', 'country_5');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_8', 'nick_5', 'country_6');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_9', 'nick_6', 'country_2');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_10', 'nick_6', 'country_3');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_11', 'nick_7', 'country_4');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_12', 'nick_8', 'country_2');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_13', 'nick_9', 'country_5');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_14', 'nick_9', 'country_5');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_15', 'nick_9', 'country_6');
+--
+--
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(1, 'song_1', 0, 1, 01, 'style_1', 'singer_1');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(1, 'singer_2');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(2, 'song_2', 0, 1, 02, 'style_1', 'singer_1');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(2, 'singer_2');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(3, 'song_3', 0, 1, 03, 'style_1', 'singer_1');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(3, 'singer_2');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(4, 'song_4', 0, 1, 04, 'style_2', 'singer_2');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(4, 'singer_3');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(5, 'song_5', 0, 1, 05, 'style_2', 'singer_3');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(5, 'singer_4');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(6, 'song_6', 0, 1, 06, 'style_3', 'singer_5');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(6, 'singer_7');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(7, 'song_7', 0, 1, 07, 'style_4', 'singer_11');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(8, 'song_8', 0, 1, 07, 'style_5', 'singer_11');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(8, 'singer_7'); 
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(9, 'song_9', 0, 1, 09, 'style_5', 'singer_9');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(9, 'singer_13'); 
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(10, 'song_10', 0, 1, 10, 'style_4', 'singer_4');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(10, 'singer_9'); 
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(10, 'singer_11'); 
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(10, 'singer_13'); 
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(10, 'singer_14'); 
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(10, 'singer_15'); 
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(11, 'song_11', 0, 1, 11, 'style_3', 'singer_9');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(12, 'song_12', 0, 1, 12, 'style_3', 'singer_9');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(13, 'song_13', 0, 1, 13, 'style_1', 'singer_7');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(14, 'song_14', 0, 1, 14, 'style_5', 'singer_11');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(15, 'song_15', 0, 1, 15, 'style_2', 'singer_11');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(16, 'song_16', 0, 1, 16, 'style_2', 'singer_11');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(17, 'song_17', 0, 1, 17, 'style_2', 'singer_11');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(18, 'song_18', 0, 1, 18, 'style_1', 'singer_13');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(19, 'song_19', 0, 1, 19, 'style_3', 'singer_13');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(20, 'song_20', 0, 1, 20, 'style_4', 'singer_13');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(20, 'singer_7'); 
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(21, 'song_21', 0, 1, 21, 'style_4', 'singer_13');
+--    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(21, 'singer_7'); 
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(22, 'song_22', 0, 1, 22, 'style_3', 'singer_14');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(23, 'song_23', 0, 1, 23, 'style_5', 'singer_15');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(24, 'song_24', 0, 1, 24, 'style_3', 'singer_15');
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(25, 'song_25', 0, 1, 25, 'style_3', 'singer_15');
+--
+--
+--    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
+--        ID => 1, 
+--        NAME => 'album_1', 
+--        PRICE => 100.50, 
+--        QUANTITY_IN_STOCK => 25, 
+--        QUANTITY_OF_SOLD => 0, 
+--        RECORD_ID => 1, 
+--        RECORD_SERIAL_NUMBER => 1
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 1,
+--        RECORD_ID => 2, 
+--        RECORD_SERIAL_NUMBER => 2
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 1,
+--        RECORD_ID => 3, 
+--        RECORD_SERIAL_NUMBER => 3
+--    );
+--    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 1, QUANTITY => 25);
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
+--        ID => 2, 
+--        NAME => 'album_2', 
+--        PRICE => 123.55, 
+--        QUANTITY_IN_STOCK => 225, 
+--        QUANTITY_OF_SOLD => 0, 
+--        RECORD_ID => 1, 
+--        RECORD_SERIAL_NUMBER => 23
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 2, 
+--        RECORD_SERIAL_NUMBER => 2
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 3, 
+--        RECORD_SERIAL_NUMBER => 3
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 4, 
+--        RECORD_SERIAL_NUMBER => 4
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 5, 
+--        RECORD_SERIAL_NUMBER => 5
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 7, 
+--        RECORD_SERIAL_NUMBER => 7
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 8, 
+--        RECORD_SERIAL_NUMBER => 8
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 9, 
+--        RECORD_SERIAL_NUMBER => 10
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 10, 
+--        RECORD_SERIAL_NUMBER => 9
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 11, 
+--        RECORD_SERIAL_NUMBER => 13
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 12, 
+--        RECORD_SERIAL_NUMBER => 11
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 13, 
+--        RECORD_SERIAL_NUMBER => 12
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 14, 
+--        RECORD_SERIAL_NUMBER => 14
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 15, 
+--        RECORD_SERIAL_NUMBER => 15
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 12, 
+--        RECORD_SERIAL_NUMBER => 11
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 16, 
+--        RECORD_SERIAL_NUMBER => 16
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 17, 
+--        RECORD_SERIAL_NUMBER => 17
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 18, 
+--        RECORD_SERIAL_NUMBER => 18
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 19, 
+--        RECORD_SERIAL_NUMBER => 19
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 20, 
+--        RECORD_SERIAL_NUMBER => 20
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 21, 
+--        RECORD_SERIAL_NUMBER => 21
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 22, 
+--        RECORD_SERIAL_NUMBER => 24
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 23, 
+--        RECORD_SERIAL_NUMBER => 1
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 24, 
+--        RECORD_SERIAL_NUMBER => 22
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 2,
+--        RECORD_ID => 25, 
+--        RECORD_SERIAL_NUMBER => 6
+--    );
+--    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 2, QUANTITY => 37);
+--        
+--    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
+--        ID => 3, 
+--        NAME => 'album_3', 
+--        PRICE => 293.41, 
+--        QUANTITY_IN_STOCK => 73, 
+--        QUANTITY_OF_SOLD => 0, 
+--        RECORD_ID => 7, 
+--        RECORD_SERIAL_NUMBER => 1
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 3,
+--        RECORD_ID => 8, 
+--        RECORD_SERIAL_NUMBER => 5
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 3,
+--        RECORD_ID => 14, 
+--        RECORD_SERIAL_NUMBER => 6
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 3,
+--        RECORD_ID => 15, 
+--        RECORD_SERIAL_NUMBER => 2
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 3,
+--        RECORD_ID => 16, 
+--        RECORD_SERIAL_NUMBER => 4
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 3,
+--        RECORD_ID => 17, 
+--        RECORD_SERIAL_NUMBER => 3
+--    );
+--    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 3, QUANTITY => 11);
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
+--        ID => 4, 
+--        NAME => 'album_4', 
+--        PRICE => 24.41, 
+--        QUANTITY_IN_STOCK => 89, 
+--        QUANTITY_OF_SOLD => 0
+--    );
+--    
+--    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
+--        ID => 5, 
+--        NAME => 'album_5', 
+--        PRICE => 65.71, 
+--        QUANTITY_IN_STOCK => 19, 
+--        QUANTITY_OF_SOLD => 0
+--    );    
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 5,
+--        RECORD_ID => 23, 
+--        RECORD_SERIAL_NUMBER => 2
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 5,
+--        RECORD_ID => 24, 
+--        RECORD_SERIAL_NUMBER => 1
+--    );
+--    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
+--        ALBUM_ID => 5,
+--        RECORD_ID => 25, 
+--        RECORD_SERIAL_NUMBER => 3
+--    );     
+--END;
 
 
 

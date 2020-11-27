@@ -46,10 +46,10 @@ BEGIN
     GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('style_2');
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление записи 1 -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(1, 'song_1', 0, 1, 10, 'style_2', 'singer_1');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('song_1', 0, 1, 10, 'style_2', 'singer_1');
     
-    DBMS_OUTPUT.PUT_LINE('----- Добавление записи c несуществующим стилем -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(7, 'song_7', 0, 1, 10, 'style_5', 'singer_1');
+    DBMS_OUTPUT.PUT_LINE('----- Добавление записи song_7 c несуществующим стилем -----');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('song_7', 0, 1, 10, 'style_5', 'singer_1');
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление singer_2  country_2 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_2', 'country_2');
@@ -77,7 +77,6 @@ BEGIN
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление альбома 1 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        ID => 1, 
         NAME => 'album_1', 
         PRICE => 100.50, 
         QUANTITY_IN_STOCK => 10, 
@@ -88,7 +87,6 @@ BEGIN
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление альбома 100 с отрицательными значениями кол-ва -----');
     GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        ID => 100, 
         NAME => 'album_100', 
         PRICE => 100.50, 
         QUANTITY_IN_STOCK => -10, 
@@ -99,7 +97,6 @@ BEGIN
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление альбома 100 с отрицательной ценой -----');
     GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        ID => 100, 
         NAME => 'album_100', 
         PRICE => -100.50, 
         QUANTITY_IN_STOCK => 10, 
@@ -110,7 +107,6 @@ BEGIN
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление альбома 100 с несуществующей записью 1000 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        ID => 100, 
         NAME => 'album_100', 
         PRICE => 100.50, 
         QUANTITY_IN_STOCK => 10, 
@@ -120,19 +116,19 @@ BEGIN
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление записи 2 -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(2, 'song_2', 0, 2, 50, 'style_1', 'singer_2');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('song_2', 0, 2, 50, 'style_1', 'singer_2');
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление записи 2 в альбом 1 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
         ALBUM_ID => 1,
-        RECORD_ID => 2, 
+        RECORD_ID => 3, 
         RECORD_SERIAL_NUMBER => 3
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Повторное добавление записи 2 в альбом 1 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
         ALBUM_ID => 1,
-        RECORD_ID => 2, 
+        RECORD_ID => 3, 
         RECORD_SERIAL_NUMBER => 3
     );
     
@@ -159,7 +155,6 @@ BEGIN
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление альбома 2 без записей -----');
     GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        ID => 2, 
         NAME => 'album_2', 
         PRICE => 123.50, 
         QUANTITY_IN_STOCK => 5, 
@@ -167,47 +162,38 @@ BEGIN
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление записей 3, 4 и 5 -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(3, 'song_3', 0, 1, 37, 'style_1', 'singer_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(4, 'song_4', 0, 2, 12, 'style_1', 'singer_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(4, 'singer_2');
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(5, 'song_5', 0, 1, 42, 'style_1', 'singer_2');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('song_3', 0, 1, 37, 'style_1', 'singer_1');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('song_4', 0, 2, 12, 'style_1', 'singer_1');
     GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(5, 'singer_2');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(5, 'singer_2');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('song_5', 0, 1, 42, 'style_1', 'singer_2');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(6, 'singer_2');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(6, 'singer_2');
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление записей 3, 4 и 5 в альбом 2 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 3, 
+        ALBUM_ID => 5,
+        RECORD_ID => 4, 
         RECORD_SERIAL_NUMBER => 1
     );
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 4, 
+        ALBUM_ID => 5,
+        RECORD_ID => 5, 
         RECORD_SERIAL_NUMBER => 8
     );
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 5, 
+        ALBUM_ID => 5,
+        RECORD_ID => 6, 
         RECORD_SERIAL_NUMBER => 4
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление альбома 3 без записей -----');
     GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        ID => 3, 
         NAME => 'album_3', 
         PRICE => 555.50, 
         QUANTITY_IN_STOCK => 0, 
         QUANTITY_OF_SOLD => 10
-    );
+    );   
     
-    DBMS_OUTPUT.PUT_LINE('----- Добавление NULL альбома без записей -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        ID => NULL, 
-        NAME => 'album_3', 
-        PRICE => 555.50, 
-        QUANTITY_IN_STOCK => 0, 
-        QUANTITY_OF_SOLD => 10
-    );
     
     DBMS_OUTPUT.PUT_LINE('----- Печать альбомов в продаже -----');
     GRUSHEVSKAYA_PACKAGE.PRINT_ALBUMS_IN_STOCK;
@@ -222,13 +208,13 @@ BEGIN
     GRUSHEVSKAYA_PACKAGE.ADD_ALBUMS_IN_STOCK(ALBUM_ID => 1, QUANTITY => -3);
     
     DBMS_OUTPUT.PUT_LINE('----- Продажа -----');
-    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 2, QUANTITY => 8);
-    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 2, QUANTITY => 8);
-    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 3, QUANTITY => 8);
+    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 5, QUANTITY => 8);
+    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 5, QUANTITY => 8);
+    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 6, QUANTITY => 8);
     
     DBMS_OUTPUT.PUT_LINE('----- Продажа отрицательного количества -----');
     GRUSHEVSKAYA_PACKAGE.ADD_ALBUMS_IN_STOCK(ALBUM_ID => 2, QUANTITY => 8);
-    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 2, QUANTITY => -5);
+    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 5, QUANTITY => -5);
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление исполнителя 3 без записей -----');
     GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_3', 'country_1');
@@ -249,10 +235,10 @@ BEGIN
     GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 1);
     
     DBMS_OUTPUT.PUT_LINE('----- Печать треков альбома 2 -----');
-    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 2);
+    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 5);
     
     DBMS_OUTPUT.PUT_LINE('----- Печать треков альбома 3 -----');
-    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 3);
+    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 6);
     
     DBMS_OUTPUT.PUT_LINE('----- Печать треков несуществующего альбома 4 -----');
     GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 4);
@@ -266,7 +252,7 @@ BEGIN
         RECORD_NUMBER => 3
     );
     
-    DBMS_OUTPUT.PUT_LINE('----- Удаление несущ. записи из альбома -----');
+    DBMS_OUTPUT.PUT_LINE('----- Удаление несущ. записи из альбома 1 -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_RECORD_FROM_ALBUM(
         ALBUM_ID => 1,
         RECORD_NUMBER => 0
@@ -284,35 +270,38 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('----- Печать треков альбома 1 -----');
     GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 1);
     
+    DBMS_OUTPUT.PUT_LINE('----- Печать треков альбома 2 -----');
+    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 5);
+    
     DBMS_OUTPUT.PUT_LINE('----- Удаление записи из альбома 2 -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_RECORD_FROM_ALBUM(
-        ALBUM_ID => 2,
+        ALBUM_ID => 5,
         RECORD_NUMBER => 3
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Печать треков альбома 2 -----');
-    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 2);
+    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 5);
     
     DBMS_OUTPUT.PUT_LINE('----- Удаление записи из альбома 2 -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_RECORD_FROM_ALBUM(
-        ALBUM_ID => 2,
+        ALBUM_ID => 5,
         RECORD_NUMBER => 1
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Печать треков альбома 2 -----');
-    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 2);
+    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 5);
     
     DBMS_OUTPUT.PUT_LINE('----- Печать треков альбома 3 -----');
-    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 3);
+    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 6);
     
     DBMS_OUTPUT.PUT_LINE('----- Удаление записи из альбома 3 -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_RECORD_FROM_ALBUM(
-        ALBUM_ID => 2,
+        ALBUM_ID => 6,
         RECORD_NUMBER => 3
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Печать треков альбома 3 -----');
-    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 3);
+    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 6);
     
     DBMS_OUTPUT.PUT_LINE('----- Удаление исполнителя из записи 1 -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_SINGER_FROM_RECORD(
@@ -321,14 +310,14 @@ BEGIN
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление песни 6 -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD(6, 'song_6', 0, 5, 15, 'style_1', 'singer_1');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(6, 'singer_2');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('song_6', 0, 5, 15, 'style_1', 'singer_1');
+    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(7, 'singer_2');
     
     
     DBMS_OUTPUT.PUT_LINE('----- Удаление несущ. исполнителя из записи 6 -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_SINGER_FROM_RECORD(
-        RECORD_ID => 6,
-        SINGER_NUMBER => 8
+        RECORD_ID => 7,
+        SINGER_NUMBER => 1000
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Удаление исполнителя из несущ. записи 1000 -----');
@@ -339,13 +328,13 @@ BEGIN
     
     DBMS_OUTPUT.PUT_LINE('----- Удаление исполнителя из записи 6 -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_SINGER_FROM_RECORD(
-        RECORD_ID => 6,
+        RECORD_ID => 7,
         SINGER_NUMBER => 1
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Удаление исполнителя из записи 5 -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_SINGER_FROM_RECORD(
-        RECORD_ID => 5,
+        RECORD_ID => 6,
         SINGER_NUMBER => 1
     );
     
@@ -379,16 +368,28 @@ BEGIN
     
     DBMS_OUTPUT.PUT_LINE('----- Печать авторства альбома 2 -----');
     GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_AUTHOR(
-        ALBUM_ID => 2
+        ALBUM_ID => 5
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Печать авторства альбома 3 -----');
     GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_AUTHOR(
-        ALBUM_ID => 3
+        ALBUM_ID => 6
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Печать авторства альбома 4 -----');
     GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_AUTHOR(
         ALBUM_ID => 4
-    );
+    );    
+    
+    
+    DBMS_OUTPUT.PUT_LINE('----- Добавление песни 7 с ошибкой времени сек -----');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('song_7', 8, 9, 85, 'style_1', 'singer_1');
+    
+    
+    DBMS_OUTPUT.PUT_LINE('----- Добавление песни 8 с ошибкой времени мин -----');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('song_8', 8, 95, 5, 'style_1', 'singer_1');
+    
+    
+    DBMS_OUTPUT.PUT_LINE('----- Добавление песни 9 с ошибкой времени час -----');
+    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('song_9', 78, 5, 8, 'style_1', 'singer_1');
 END;

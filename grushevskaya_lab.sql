@@ -8,8 +8,8 @@ DROP TABLE GRUSHEVSKAYA_DICT_STYLE;
 DROP TYPE GRUSHEVSKAYA_RECORD_ARR;
 DROP TYPE GRUSHEVSKAYA_SINGER_TAB;
 --DROP TYPE GRUSHEVSKAYA_TIME;
---DROP SEQUENCE GRUSHEVSKAYA_NUM_RECORD;
---DROP SEQUENCE GRUSHEVSKAYA_NUM_ALBUM;
+DROP SEQUENCE GRUSHEVSKAYA_NUM_RECORD;
+DROP SEQUENCE GRUSHEVSKAYA_NUM_ALBUM;
 DROP PACKAGE GRUSHEVSKAYA_EXCEPTIONS;
 DROP PACKAGE GRUSHEVSKAYA_PACKAGE;
 
@@ -384,6 +384,14 @@ BEGIN
     LOOP
        IF NOT :NEW.RECORD_ARRAY(i) IS NULL
           AND NOT LIST_ID.EXISTS(:NEW.RECORD_ARRAY(i)) THEN
+            IF (NOT LIST_ID.EXISTS(:NEW.RECORD_ARRAY(i))) THEN
+                DBMS_OUTPUT.PUT_LINE('NOT LIST_ID.EXISTS(:NEW.RECORD_ARRAY(i)) == True');
+            END IF;
+            DBMS_OUTPUT.PUT_LINE('Ошибка: нет записи с ID ' || :NEW.RECORD_ARRAY(i) || ' в списке:');
+            FOR i in 1..LIST_ID.COUNT
+            LOOP
+                DBMS_OUTPUT.PUT_LINE(LIST_ID(i));
+            END LOOP;
             IF INSERTING THEN                               
                 DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_ALBUM');
                 DBMS_OUTPUT.PUT_LINE('Некорректный список записей.');
@@ -486,22 +494,6 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
     
     -- 1) Добавить запись (изначально указывается один исполнитель).
     PROCEDURE ADD_RECORD (
-        -- ID записи
-        ID NUMBER, 
-        -- Название
-        NAME VARCHAR2, 
-        -- Количество часов звучания
-        HOURS NUMBER,
-        -- Количество минут звучания
-        MINUTES NUMBER,
-        -- Количество секунд звучания
-        SECONDS NUMBER,
-        -- Стиль из словаря
-        STYLE VARCHAR2,
-        -- Имя исполнителя
-        SINGER VARCHAR2
-    );
-    PROCEDURE ADD_RECORD (
         -- Название
         NAME VARCHAR2, 
         -- Количество часов звучания
@@ -534,22 +526,6 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
     -- 4) Добавить альбом (изначально указывается один трек или ни одного).
     -- Реализация для добавления альбома с одной записью.
     PROCEDURE ADD_ALBUM (
-        -- ID альбома
-        ID NUMBER,
-        -- Название
-        NAME VARCHAR2,
-        -- Цена (>= 0)
-        PRICE NUMBER,
-        -- Количество на складе (>= 0)
-        QUANTITY_IN_STOCK NUMBER,
-        -- Количество проданных альбомов (>= 0)
-        QUANTITY_OF_SOLD NUMBER, 
-        -- ID добавляемой записи
-        RECORD_ID NUMBER,
-        -- Номер звучания записи в альбоме
-        RECORD_SERIAL_NUMBER NUMBER
-    );
-    PROCEDURE ADD_ALBUM (
         -- Название
         NAME VARCHAR2,
         -- Цена (>= 0)
@@ -565,18 +541,6 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
     );
     -- 4) Добавить альбом (изначально указывается один трек или ни одного).
     -- Реализация для добавления альбома без записей.
-    PROCEDURE ADD_ALBUM (
-        -- ID альбома
-        ID NUMBER,
-        -- Название
-        NAME VARCHAR2,
-        -- Цена (>= 0)
-        PRICE NUMBER,
-        -- Количество на складе (>= 0)
-        QUANTITY_IN_STOCK NUMBER,
-        -- Количество проданных альбомов (>= 0)
-        QUANTITY_OF_SOLD NUMBER
-    );
     PROCEDURE ADD_ALBUM (
         -- Название
         NAME VARCHAR2,
@@ -726,7 +690,6 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     END ADD_IN_DICT_STYLE;
     
     PROCEDURE ADD_RECORD(
-        ID NUMBER, 
         NAME VARCHAR2,
         HOURS NUMBER,
         MINUTES NUMBER,
@@ -740,9 +703,15 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             + NUMTODSINTERVAL(MINUTES, 'MINUTE') 
             + NUMTODSINTERVAL(SECONDS, 'SECOND');
         INSERT INTO GRUSHEVSKAYA_RECORD (ID, NAME, TIME, STYLE, SINGER_LIST)
-            VALUES (ID, NAME, TIME, STYLE, GRUSHEVSKAYA_SINGER_TAB(SINGER));
+            VALUES (
+            GRUSHEVSKAYA_NUM_RECORD.NEXTVAL, 
+            NAME, 
+            TIME, 
+            STYLE, 
+            GRUSHEVSKAYA_SINGER_TAB(SINGER)
+        );
         COMMIT;        
-        DBMS_OUTPUT.PUT_LINE('Запись ' || NAME || ' с ID ' || ID || ' успешно добавлена.');
+        DBMS_OUTPUT.PUT_LINE('Запись ' || NAME || ' с ID ' || GRUSHEVSKAYA_NUM_RECORD.CURRVAL || ' успешно добавлена.');
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_RECORD THEN
         RETURN;
@@ -756,22 +725,12 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             DBMS_OUTPUT.PUT_LINE('Нарушено ограничение уникальности одного из полей.');
         ELSIF SQLCODE = -1400 THEN
             DBMS_OUTPUT.PUT_LINE('Невозможно вставить NULL для одного из столбцов.');
+        ELSIF SQLCODE = -1873 THEN
+            DBMS_OUTPUT.PUT_LINE('Неверное значение времени.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
     END ADD_RECORD; 
-    
-    PROCEDURE ADD_RECORD(
-        NAME VARCHAR2,
-        HOURS NUMBER,
-        MINUTES NUMBER,
-        SECONDS NUMBER,
-        STYLE VARCHAR2,
-        SINGER VARCHAR2
-    ) IS        
-    BEGIN
-        ADD_RECORD(GRUSHEVSKAYA_NUM_RECORD.NEXTVAL, NAME, HOURS, MINUTES, SECONDS, STYLE, SINGER);
-    END ADD_RECORD;
     
     PROCEDURE ADD_SINGER_IN_RECORD (
         RECORD_ID NUMBER,
@@ -831,7 +790,6 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     END ADD_SINGER;
         
     PROCEDURE ADD_ALBUM (
-        ID NUMBER,
         NAME VARCHAR2,
         PRICE NUMBER,
         QUANTITY_IN_STOCK NUMBER,
@@ -851,7 +809,7 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             QUANTITY_OF_SOLD,
             RECORD_ARRAY
         ) VALUES (
-            ID, 
+            GRUSHEVSKAYA_NUM_ALBUM.NEXTVAL, 
             NAME, 
             PRICE, 
             QUANTITY_IN_STOCK,
@@ -859,7 +817,7 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             RECORD_ARR
         );
         COMMIT;      
-        DBMS_OUTPUT.PUT_LINE('Альбом ' || NAME || ' с ID ' || ID || ' успешно добавлен.');
+        DBMS_OUTPUT.PUT_LINE('Альбом ' || NAME || ' с ID ' || GRUSHEVSKAYA_NUM_ALBUM.CURRVAL || ' успешно добавлен.');
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
         RETURN;
@@ -883,29 +841,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             PRINT_MSG_EX(SQLCODE);
         END IF;
     END ADD_ALBUM;
-    
-    PROCEDURE ADD_ALBUM (
-        NAME VARCHAR2,
-        PRICE NUMBER,
-        QUANTITY_IN_STOCK NUMBER,
-        QUANTITY_OF_SOLD NUMBER, 
-        RECORD_ID NUMBER,
-        RECORD_SERIAL_NUMBER NUMBER
-    ) IS
-    BEGIN
-        ADD_ALBUM (
-            GRUSHEVSKAYA_NUM_ALBUM.NEXTVAL,
-            NAME,
-            PRICE,
-            QUANTITY_IN_STOCK,
-            QUANTITY_OF_SOLD, 
-            RECORD_ID,
-            RECORD_SERIAL_NUMBER
-        );
-    END ADD_ALBUM;
         
     PROCEDURE ADD_ALBUM (
-        ID NUMBER,
         NAME VARCHAR2,
         PRICE NUMBER,
         QUANTITY_IN_STOCK NUMBER,
@@ -922,7 +859,7 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             QUANTITY_OF_SOLD,
             RECORD_ARRAY
         ) VALUES (
-            ID, 
+            GRUSHEVSKAYA_NUM_ALBUM.NEXTVAL, 
             NAME, 
             PRICE, 
             QUANTITY_IN_STOCK,
@@ -930,7 +867,7 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             RECORD_ARR
         );
         COMMIT;      
-        DBMS_OUTPUT.PUT_LINE('Альбом ' || NAME || ' с ID ' || ID || ' успешно добавлен.');
+        DBMS_OUTPUT.PUT_LINE('Альбом ' || NAME || ' с ID ' || GRUSHEVSKAYA_NUM_ALBUM.CURRVAL || ' успешно добавлен.');
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
         RETURN;
@@ -951,22 +888,6 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_ALBUM;
-    
-    PROCEDURE ADD_ALBUM (
-        NAME VARCHAR2,
-        PRICE NUMBER,
-        QUANTITY_IN_STOCK NUMBER,
-        QUANTITY_OF_SOLD NUMBER
-    ) IS
-    BEGIN
-        ADD_ALBUM (
-            GRUSHEVSKAYA_NUM_ALBUM.NEXTVAL,
-            NAME,
-            PRICE,
-            QUANTITY_IN_STOCK,
-            QUANTITY_OF_SOLD
-        );
     END ADD_ALBUM;
     
     PROCEDURE ADD_RECORD_IN_ALBUM (
@@ -1058,6 +979,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUMS_IN_STOCK');
         IF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
+        ELSIF SQLCODE = 100 THEN
+            DBMS_OUTPUT.PUT_LINE('Поставка несуществующего альбома.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;        
@@ -1112,6 +1035,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN SELL_ALBUMS');
         IF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
+        ELSIF SQLCODE = 100 THEN
+            DBMS_OUTPUT.PUT_LINE('Продажа несуществующего альбома.');
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;       

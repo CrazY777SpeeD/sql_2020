@@ -21,6 +21,7 @@ DROP PACKAGE GRUSHEVSKAYA_PACKAGE;
 CREATE OR REPLACE 
 PACKAGE GRUSHEVSKAYA_EXCEPTIONS AS
     INVALIDE_TYPE_FIELDS EXCEPTION;
+    WARNING_UPDATE EXCEPTION;
     ERROR_RECORD EXCEPTION;
     ERROR_UPDATE_SINGER_IN_RECORD EXCEPTION;
     ERROR_SINGER_DEL EXCEPTION;
@@ -209,7 +210,7 @@ BEGIN
                 || ' не была обновлена.');
             DBMS_OUTPUT.PUT_LINE('Список исполнителей обновлять нельзя,' 
                 || ' так как исполнитель хотя бы один должен быть.');
-            RETURN;
+            RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
     END IF;
     -- Запись уже содержится в одном из альбомов => обновлять исп. нельзя
     FOR ALBUM_ROW IN (SELECT * FROM GRUSHEVSKAYA_ALBUM)
@@ -235,7 +236,7 @@ BEGIN
                 || ' не была обновлена.');
             DBMS_OUTPUT.PUT_LINE('Список исполнителей обновлять нельзя,' 
                 || ' так как запись уже содержится в одном из альбомов.');
-            RETURN;
+            RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
     END IF;
     -- Проверка внеш.кл.
     -- Если подмножество исполнителей не соответствует таблице исполнителей,
@@ -256,7 +257,7 @@ BEGIN
             DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
                 || :OLD.ID 
                 || ' не была обновлена из-за нарушения внешнего ключа (исполнители).');
-            RETURN;
+            RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
         END IF;
     END IF;
 END;
@@ -357,7 +358,7 @@ BEGIN
                 DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
                     || :OLD.ID 
                     || ' не был обновлен. Нельзя добавлять треки, если альбом продан.');
-                RETURN;
+                RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
             END IF;
             IF :NEW.RECORD_ARRAY(j) <> :OLD.RECORD_ARRAY(j) THEN
                 :NEW.ID := :OLD.ID;
@@ -370,7 +371,7 @@ BEGIN
                 DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
                     || :OLD.ID 
                     || ' не был обновлен. Нельзя добавлять треки, если альбом продан.');
-                RETURN;          
+                RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
             END IF;
         END LOOP;
     END IF;
@@ -407,7 +408,7 @@ BEGIN
                 DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
                     || :OLD.ID 
                     || ' не был обновлен из-за нарушения внешнего ключа (записи).');
-                RETURN;
+                RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
             END IF;
         END IF;
     END LOOP;    
@@ -715,6 +716,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_RECORD THEN
         RETURN;
+    WHEN GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE THEN
+        RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_RECORD');
         IF SQLCODE = -02291 THEN
@@ -753,6 +756,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         COMMIT;        
         DBMS_OUTPUT.PUT_LINE('Исполнитель ' || SINGER_NAME || ' успешно добавлен в запись с ID ' || RECORD_ID || '.');
     EXCEPTION
+    WHEN GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE THEN
+        RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_SINGER_IN_RECORD');
         IF SQLCODE = -12899 THEN
@@ -821,6 +826,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
         RETURN;
+    WHEN GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE THEN
+        RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUM');
         IF SQLCODE = -12899 THEN
@@ -871,6 +878,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
         RETURN;
+    WHEN GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE THEN
+        RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUM');
         IF SQLCODE = -12899 THEN
@@ -912,6 +921,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         DBMS_OUTPUT.PUT_LINE('Запись с ID ' || RECORD_ID || ' успешно добавлена в альбом с ID ' || ALBUM_ID || '.');
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
+        RETURN;
+    WHEN GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE THEN
         RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_RECORD_IN_ALBUM');
@@ -1189,6 +1200,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
         RETURN;
+    WHEN GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE THEN
+        RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN DELETE_RECORD_FROM_ALBUM');
         IF SQLCODE = -6532 THEN
@@ -1217,6 +1230,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         DBMS_OUTPUT.PUT_LINE('Исполнитель №' || SINGER_NUMBER || ' удален.');
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_UPDATE_SINGER_IN_RECORD THEN
+        RETURN;
+    WHEN GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE THEN
         RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN DELETE_SINGER_FROM_RECORD');

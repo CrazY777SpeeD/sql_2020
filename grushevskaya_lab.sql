@@ -8,6 +8,8 @@ DROP TABLE GRUSHEVSKAYA_DICT_STYLE;
 DROP TYPE GRUSHEVSKAYA_RECORD_ARR;
 DROP TYPE GRUSHEVSKAYA_SINGER_TAB;
 --DROP TYPE GRUSHEVSKAYA_TIME;
+--DROP SEQUENCE GRUSHEVSKAYA_NUM_RECORD;
+--DROP SEQUENCE GRUSHEVSKAYA_NUM_ALBUM;
 DROP PACKAGE GRUSHEVSKAYA_EXCEPTIONS;
 DROP PACKAGE GRUSHEVSKAYA_PACKAGE;
 
@@ -27,6 +29,22 @@ PACKAGE GRUSHEVSKAYA_EXCEPTIONS AS
 END;
 /
 
+-- SEQUENCE для генерации id RECORD
+
+CREATE SEQUENCE GRUSHEVSKAYA_NUM_RECORD
+MINVALUE 1
+START WITH 1 
+INCREMENT BY 1
+NOCACHE NOCYCLE;
+/
+-- SEQUENCE для генерации id ALBUM
+
+CREATE SEQUENCE GRUSHEVSKAYA_NUM_ALBUM
+MINVALUE 1
+START WITH 1 
+INCREMENT BY 1
+NOCACHE NOCYCLE;
+/
 -- COUNTRY - вспомогательная таблица, содержащая словарь стран. 
 -- Исключает ситуацию, когда где-то страна "РФ", а где-то "Россия".
 
@@ -483,6 +501,20 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
         -- Имя исполнителя
         SINGER VARCHAR2
     );
+    PROCEDURE ADD_RECORD (
+        -- Название
+        NAME VARCHAR2, 
+        -- Количество часов звучания
+        HOURS NUMBER,
+        -- Количество минут звучания
+        MINUTES NUMBER,
+        -- Количество секунд звучания
+        SECONDS NUMBER,
+        -- Стиль из словаря
+        STYLE VARCHAR2,
+        -- Имя исполнителя
+        SINGER VARCHAR2
+    );
     -- 2) Добавить исполнителя для записи 
     -- (если указанная запись не добавлена ни в один альбом 
     --  - Условие проверяется на уровне триггера).
@@ -517,11 +549,35 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
         -- Номер звучания записи в альбоме
         RECORD_SERIAL_NUMBER NUMBER
     );
+    PROCEDURE ADD_ALBUM (
+        -- Название
+        NAME VARCHAR2,
+        -- Цена (>= 0)
+        PRICE NUMBER,
+        -- Количество на складе (>= 0)
+        QUANTITY_IN_STOCK NUMBER,
+        -- Количество проданных альбомов (>= 0)
+        QUANTITY_OF_SOLD NUMBER, 
+        -- ID добавляемой записи
+        RECORD_ID NUMBER,
+        -- Номер звучания записи в альбоме
+        RECORD_SERIAL_NUMBER NUMBER
+    );
     -- 4) Добавить альбом (изначально указывается один трек или ни одного).
     -- Реализация для добавления альбома без записей.
     PROCEDURE ADD_ALBUM (
         -- ID альбома
         ID NUMBER,
+        -- Название
+        NAME VARCHAR2,
+        -- Цена (>= 0)
+        PRICE NUMBER,
+        -- Количество на складе (>= 0)
+        QUANTITY_IN_STOCK NUMBER,
+        -- Количество проданных альбомов (>= 0)
+        QUANTITY_OF_SOLD NUMBER
+    );
+    PROCEDURE ADD_ALBUM (
         -- Название
         NAME VARCHAR2,
         -- Цена (>= 0)
@@ -703,7 +759,19 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_RECORD;    
+    END ADD_RECORD; 
+    
+    PROCEDURE ADD_RECORD(
+        NAME VARCHAR2,
+        HOURS NUMBER,
+        MINUTES NUMBER,
+        SECONDS NUMBER,
+        STYLE VARCHAR2,
+        SINGER VARCHAR2
+    ) IS        
+    BEGIN
+        ADD_RECORD(GRUSHEVSKAYA_NUM_RECORD.NEXTVAL, NAME, HOURS, MINUTES, SECONDS, STYLE, SINGER);
+    END ADD_RECORD;
     
     PROCEDURE ADD_SINGER_IN_RECORD (
         RECORD_ID NUMBER,
@@ -815,6 +883,26 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             PRINT_MSG_EX(SQLCODE);
         END IF;
     END ADD_ALBUM;
+    
+    PROCEDURE ADD_ALBUM (
+        NAME VARCHAR2,
+        PRICE NUMBER,
+        QUANTITY_IN_STOCK NUMBER,
+        QUANTITY_OF_SOLD NUMBER, 
+        RECORD_ID NUMBER,
+        RECORD_SERIAL_NUMBER NUMBER
+    ) IS
+    BEGIN
+        ADD_ALBUM (
+            GRUSHEVSKAYA_NUM_ALBUM.NEXTVAL,
+            NAME,
+            PRICE,
+            QUANTITY_IN_STOCK,
+            QUANTITY_OF_SOLD, 
+            RECORD_ID,
+            RECORD_SERIAL_NUMBER
+        );
+    END ADD_ALBUM;
         
     PROCEDURE ADD_ALBUM (
         ID NUMBER,
@@ -863,7 +951,23 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_ALBUM;    
+    END ADD_ALBUM;
+    
+    PROCEDURE ADD_ALBUM (
+        NAME VARCHAR2,
+        PRICE NUMBER,
+        QUANTITY_IN_STOCK NUMBER,
+        QUANTITY_OF_SOLD NUMBER
+    ) IS
+    BEGIN
+        ADD_ALBUM (
+            GRUSHEVSKAYA_NUM_ALBUM.NEXTVAL,
+            NAME,
+            PRICE,
+            QUANTITY_IN_STOCK,
+            QUANTITY_OF_SOLD
+        );
+    END ADD_ALBUM;
     
     PROCEDURE ADD_RECORD_IN_ALBUM (
         ALBUM_ID NUMBER, 

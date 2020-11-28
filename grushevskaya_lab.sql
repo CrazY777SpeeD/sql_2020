@@ -384,15 +384,7 @@ BEGIN
     FOR i IN 1..:NEW.RECORD_ARRAY.COUNT
     LOOP
        IF NOT :NEW.RECORD_ARRAY(i) IS NULL
-          AND NOT LIST_ID.EXISTS(:NEW.RECORD_ARRAY(i)) THEN --TODO
-            IF (NOT LIST_ID.EXISTS(:NEW.RECORD_ARRAY(i))) THEN
-                DBMS_OUTPUT.PUT_LINE('NOT LIST_ID.EXISTS(:NEW.RECORD_ARRAY(i)) == True');
-            END IF;
-            DBMS_OUTPUT.PUT_LINE('Ошибка: нет записи с ID ' || :NEW.RECORD_ARRAY(i) || ' в списке:');
-            FOR i in 1..LIST_ID.COUNT
-            LOOP
-                DBMS_OUTPUT.PUT_LINE(LIST_ID(i));
-            END LOOP;
+          AND NOT :NEW.RECORD_ARRAY(i) MEMBER LIST_ID THEN
             IF INSERTING THEN                               
                 DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_ALBUM');
                 DBMS_OUTPUT.PUT_LINE('Некорректный список записей.');
@@ -1257,7 +1249,7 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             FOR i IN 1..RECORD.SINGER_LIST.COUNT
             LOOP
                 IF RECORD.SINGER_LIST(i) = SINGER_NAME THEN
-                    IF SINGER_STYLE_LIST.EXISTS(RECORD.STYLE) THEN --TODO
+                    IF SINGER_STYLE_LIST.EXISTS(RECORD.STYLE) THEN
                         SINGER_STYLE_LIST(RECORD.STYLE) := 
                             SINGER_STYLE_LIST(RECORD.STYLE) 
                             + 1;
@@ -1305,8 +1297,8 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
                 SELECT COUNTRY INTO TMP_COUNTRY 
                     FROM GRUSHEVSKAYA_SINGER 
                     WHERE NAME =  RECORD.SINGER_LIST(i);
-                IF COUNTRY_STYLE_LIST.EXISTS(TMP_COUNTRY) --TODO
-                   AND COUNTRY_STYLE_LIST(TMP_COUNTRY).EXISTS(RECORD.STYLE) THEN --TODO
+                IF COUNTRY_STYLE_LIST.EXISTS(TMP_COUNTRY)
+                   AND COUNTRY_STYLE_LIST(TMP_COUNTRY).EXISTS(RECORD.STYLE) THEN
                     COUNTRY_STYLE_LIST(TMP_COUNTRY)(RECORD.STYLE) := 
                         COUNTRY_STYLE_LIST(TMP_COUNTRY)(RECORD.STYLE) 
                         + 1;
@@ -1361,7 +1353,7 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
                     WHERE ID = RECORD_ARR(i);
                 FOR j IN 1..SINGERS.COUNT
                 LOOP
-                    IF ALBUM_SINGER_LIST.EXISTS(SINGERS(j))THEN --TODO
+                    IF ALBUM_SINGER_LIST.EXISTS(SINGERS(j))THEN
                         ALBUM_SINGER_LIST(SINGERS(j)) := 
                             ALBUM_SINGER_LIST(SINGERS(j)) 
                             + 1;

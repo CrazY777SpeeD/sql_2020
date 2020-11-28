@@ -34,18 +34,20 @@ END;
 
 CREATE SEQUENCE GRUSHEVSKAYA_NUM_RECORD
 MINVALUE 1
-START WITH 1 
+START WITH 48 -- из-за тестовых данных
 INCREMENT BY 1
 NOCACHE NOCYCLE;
 /
+
 -- SEQUENCE для генерации id ALBUM
 
 CREATE SEQUENCE GRUSHEVSKAYA_NUM_ALBUM
 MINVALUE 1
-START WITH 1 
+START WITH 7  -- из-за тестовых данных
 INCREMENT BY 1
 NOCACHE NOCYCLE;
 /
+
 -- COUNTRY - вспомогательная таблица, содержащая словарь стран. 
 -- Исключает ситуацию, когда где-то страна "РФ", а где-то "Россия".
 
@@ -54,14 +56,32 @@ CREATE TABLE GRUSHEVSKAYA_DICT_COUNTRY(
         PRIMARY KEY
         NOT NULL
 );
-
+/
+Insert into GRUSHEVSKAYA_DICT_COUNTRY (NAME) values ('Великобритания');
+Insert into GRUSHEVSKAYA_DICT_COUNTRY (NAME) values ('Россия');
+Insert into GRUSHEVSKAYA_DICT_COUNTRY (NAME) values ('СССР');
+Insert into GRUSHEVSKAYA_DICT_COUNTRY (NAME) values ('США');
+Insert into GRUSHEVSKAYA_DICT_COUNTRY (NAME) values ('Швеция');
+/
 -- SINGER – исполнитель (имя, псевдоним или название группы; страна)
 
 CREATE TABLE GRUSHEVSKAYA_SINGER(
     NAME VARCHAR2(100 BYTE),
     COUNTRY VARCHAR2(100 BYTE)
 );
-
+/
+-- Тестовые данные
+Insert into GRUSHEVSKAYA_SINGER (NAME,COUNTRY) values ('Майкл Джексон','США');
+Insert into GRUSHEVSKAYA_SINGER (NAME,COUNTRY) values ('Пол Маккартни','Великобритания');
+Insert into GRUSHEVSKAYA_SINGER (NAME,COUNTRY) values ('Backstreet Boys','США');
+Insert into GRUSHEVSKAYA_SINGER (NAME,COUNTRY) values ('ABBA','Швеция');
+Insert into GRUSHEVSKAYA_SINGER (NAME,COUNTRY) values ('Валентина Толкунова','Россия');
+Insert into GRUSHEVSKAYA_SINGER (NAME,COUNTRY) values ('Лев Лещенко','Россия');
+Insert into GRUSHEVSKAYA_SINGER (NAME,COUNTRY) values ('Иосиф Кобзон','Россия');
+Insert into GRUSHEVSKAYA_SINGER (NAME,COUNTRY) values ('Майя Кристалинская','СССР');
+Insert into GRUSHEVSKAYA_SINGER (NAME,COUNTRY) values ('Эдуард Хиль','Россия');
+/
+-- Ограничения на SINGER
 ALTER TABLE GRUSHEVSKAYA_SINGER 
     ADD CONSTRAINT GRUSHEVSKAYA_SINGER_PK 
     PRIMARY KEY(NAME) ENABLE;
@@ -85,6 +105,17 @@ CREATE TABLE GRUSHEVSKAYA_DICT_STYLE(
         PRIMARY KEY
         NOT NULL
 );
+/
+-- Тестовые данные
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('Баллада');
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('Джаз');
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('Диско');
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('Поп-музыка');
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('Постдиско');
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('Ритм-н-блюз');
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('Софт-рок');
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('Фанк');
+Insert into GRUSHEVSKAYA_DICT_STYLE (NAME) values ('Хард-рок');
 
 -- RECORD
 
@@ -101,7 +132,57 @@ CREATE TABLE GRUSHEVSKAYA_RECORD(
     SINGER_LIST GRUSHEVSKAYA_SINGER_TAB
 )NESTED TABLE SINGER_LIST
     STORE AS GRUSHEVSKAYA_SINGER_LIST;
-
+/
+-- Тестовые данные
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('1','Wanna Be Startin’ Somethin’','+00 00:06:30.000000','Постдиско',gdv.GRUSHEVSKAYA_SINGER_TAB('Майкл Джексон'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('2','Baby Be Mine','+00 00:04:20.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Майкл Джексон'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('3','The Girl Is Mine','+00 00:03:41.000000','Софт-рок',gdv.GRUSHEVSKAYA_SINGER_TAB('Майкл Джексон', 'Пол Маккартни'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('4','Thriller','+00 00:05:58.000000','Фанк',gdv.GRUSHEVSKAYA_SINGER_TAB('Майкл Джексон'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('5','Beat It','+00 00:04:18.000000','Хард-рок',gdv.GRUSHEVSKAYA_SINGER_TAB('Майкл Джексон'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('6','Billie Jean','+00 00:04:50.000000','Фанк',gdv.GRUSHEVSKAYA_SINGER_TAB('Майкл Джексон'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('7','Human Nature','+00 00:04:06.000000','Ритм-н-блюз',gdv.GRUSHEVSKAYA_SINGER_TAB('Майкл Джексон'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('8','Pretty Young Thing','+00 00:03:58.000000','Джаз',gdv.GRUSHEVSKAYA_SINGER_TAB('Майкл Джексон'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('9','The Lady in My Life','+00 00:05:00.000000','Ритм-н-блюз',gdv.GRUSHEVSKAYA_SINGER_TAB('Майкл Джексон'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('10','Larger than life','+00 00:03:52.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Backstreet Boys'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('11','I want it that way','+00 00:03:33.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Backstreet Boys'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('12','Show me the meaning of being lonely','+00 00:03:54.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Backstreet Boys'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('13','It’s gotta be you','+00 00:02:56.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Backstreet Boys'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('14','I need you tonight','+00 00:04:23.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Backstreet Boys'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('15','Don’t want you back','+00 00:03:25.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Backstreet Boys'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('16','Don’t wanna lose you now','+00 00:03:54.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Backstreet Boys'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('17','The one','+00 00:03:46.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Backstreet Boys'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('18','Back to your heart','+00 00:04:21.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Backstreet Boys'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('19','Spanish eyes','+00 00:03:53.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Backstreet Boys'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('20','No one else comes close','+00 00:03:42.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Backstreet Boys'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('21','The perfect fan','+00 00:04:13.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Backstreet Boys'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('22','Dancing Queen','+00 00:03:51.000000','Диско',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('23','Knowing Me, Knowing You','+00 00:04:03.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('24','Take a Chance on Me','+00 00:04:06.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('25','Mamma Mia','+00 00:03:33.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('26','Lay All Your Love on Me','+00 00:04:35.000000','Диско',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('27','Super Trouper','+00 00:04:13.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('28','I Have a Dream','+00 00:04:42.000000','Баллада',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('29','The Winner Takes It All','+00 00:04:54.000000','Баллада',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('30','Money, Money, Money','+00 00:03:05.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('31','SOS','+00 00:03:23.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('32','Chiquitita','+00 00:05:26.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('33','Fernando','+00 00:04:14.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('34','Voulez-Vous','+00 00:05:09.000000','Диско',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('35','Gimme! Gimme! Gimme!','+00 00:04:46.000000','Диско',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('36','Does Your Mother Know','+00 00:03:15.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('37','One of Us','+00 00:03:56.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('38','The Name of the Game','+00 00:04:51.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('39','Thank You for the Music','+00 00:03:51.000000','Баллада',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('40','Waterloo','+00 00:02:42.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('ABBA'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('41','Старт даёт Москва','+00 00:02:52.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Валентина Толкунова', 'Лев Лещенко'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('42','Добрые приметы','+00 00:02:16.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Валентина Толкунова', 'Лев Лещенко'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('43','Олимпийский Мишка','+00 00:03:32.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Валентина Толкунова', 'Лев Лещенко'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('44','Вальс влюблённых','+00 00:02:34.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Валентина Толкунова', 'Лев Лещенко'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('45','Ночной звонок','+00 00:04:54.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Валентина Толкунова', 'Лев Лещенко'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('46','Осень','+00 00:03:49.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Валентина Толкунова', 'Лев Лещенко'));
+Insert into GRUSHEVSKAYA_RECORD (ID,NAME,TIME,STYLE,SINGER_LIST) values ('47','Песня остаётся с человеком','+00 00:03:49.000000','Поп-музыка',gdv.GRUSHEVSKAYA_SINGER_TAB('Валентина Толкунова', 'Лев Лещенко', 'Иосиф Кобзон', 'Майя Кристалинская', 'Эдуард Хиль'));
+/
+-- Ограничения на RECORD
 ALTER TABLE GRUSHEVSKAYA_RECORD 
     ADD CONSTRAINT GRUSHEVSKAYA_RECORD_PK 
     PRIMARY KEY(ID) ENABLE;
@@ -138,7 +219,16 @@ CREATE TABLE GRUSHEVSKAYA_ALBUM(
     QUANTITY_OF_SOLD NUMBER(5, 0),
     RECORD_ARRAY GRUSHEVSKAYA_RECORD_ARR
 );
-
+/
+-- Тестовые данные
+Insert into GRUSHEVSKAYA_ALBUM (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) values ('1','Thriller','792,5','188','37',gdv.GRUSHEVSKAYA_RECORD_ARR(1, 2, 3, 4, 5, 6, 7, 8, 9, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+Insert into GRUSHEVSKAYA_ALBUM (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) values ('2','Millennium','836,24','33','42',gdv.GRUSHEVSKAYA_RECORD_ARR(11, 13, 14, 15, 16, 17, 18, 19, 20, 21, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+Insert into GRUSHEVSKAYA_ALBUM (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) values ('3','ABBA Gold: Greatest Hits','921,34','199','142',gdv.GRUSHEVSKAYA_RECORD_ARR(22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, null, null, null, null, null, null, null, null, null, null, null));
+Insert into GRUSHEVSKAYA_ALBUM (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) values ('4','Валентина Толкунова и Лев Лещенко','127,99','44','7',gdv.GRUSHEVSKAYA_RECORD_ARR(41, 42, 43, 44, 45, 46, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+Insert into GRUSHEVSKAYA_ALBUM (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) values ('5','Разное','87,99','10','0',gdv.GRUSHEVSKAYA_RECORD_ARR(3, 4, 8, 12, 16, 17, 23, 29, 32, 38, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+Insert into GRUSHEVSKAYA_ALBUM (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) values ('6','Пустой альбом','0','0','0',gdv.GRUSHEVSKAYA_RECORD_ARR(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+/
+-- Ограничения на ALBUM
 ALTER TABLE GRUSHEVSKAYA_ALBUM 
     ADD CONSTRAINT GRUSHEVSKAYA_ALBUM_PK 
     PRIMARY KEY(ID) ENABLE;
@@ -1444,434 +1534,6 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         END IF;
     END PRINT_ALBUM_AUTHOR;
 END;
-/
-DECLARE 
-BEGIN
-    -- Тестовые данные    
-    
-    -- Альбом Thriller
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('США');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('Великобритания');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('Постдиско');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('Поп-музыка');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('Софт-рок');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('Фанк');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('Хард-рок');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('Ритм-н-блюз');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('Джаз');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('Майкл Джексон', 'США');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('Пол Маккартни', 'Великобритания');
-
-    --1
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Wanna Be Startin’ Somethin’', 0, 6, 30, 'Постдиско', 'Майкл Джексон');    
-    --2
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Baby Be Mine', 0, 4, 20, 'Поп-музыка', 'Майкл Джексон');    
-    --3
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('The Girl Is Mine', 0, 3, 41, 'Софт-рок', 'Майкл Джексон');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(3, 'Пол Маккартни');    
-    --4
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Thriller', 0, 5, 58, 'Фанк', 'Майкл Джексон');    
-    --5
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Beat It', 0, 4, 18, 'Хард-рок', 'Майкл Джексон');    
-    --6
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Billie Jean', 0, 4, 50, 'Фанк', 'Майкл Джексон');    
-    --7
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Human Nature', 0, 4, 6, 'Ритм-н-блюз', 'Майкл Джексон');    
-    --8
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Pretty Young Thing', 0, 3, 58, 'Джаз', 'Майкл Джексон');    
-    --9
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('The Lady in My Life', 0, 5, 0, 'Ритм-н-блюз', 'Майкл Джексон');
-    
-    --1
-    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        NAME => 'Thriller', 
-        PRICE => 792.50, 
-        QUANTITY_IN_STOCK => 225, 
-        QUANTITY_OF_SOLD => 0, 
-        RECORD_ID => 1
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 1,
-        RECORD_ID => 2
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 1,
-        RECORD_ID => 3
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 1,
-        RECORD_ID => 4
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 1,
-        RECORD_ID => 5
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 1,
-        RECORD_ID => 6
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 1,
-        RECORD_ID => 7
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 1,
-        RECORD_ID => 8
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 1,
-        RECORD_ID => 9
-    );
-    
-    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 1, QUANTITY => 37);
-    
-    -- Альбом Millennium
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('Backstreet Boys', 'США');
-
-    --10
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Larger than life', 0, 3, 52, 'Поп-музыка', 'Backstreet Boys');
-    --11
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('I want it that way', 0, 3, 33, 'Поп-музыка', 'Backstreet Boys'); 
-    --12
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Show me the meaning of being lonely', 0, 3, 54, 'Поп-музыка', 'Backstreet Boys'); 
-    --13
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('It’s gotta be you', 0, 2, 56, 'Поп-музыка', 'Backstreet Boys'); 
-    --14
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('I need you tonight', 0, 4, 23, 'Поп-музыка', 'Backstreet Boys'); 
-    --15
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Don’t want you back', 0, 3, 25, 'Поп-музыка', 'Backstreet Boys'); 
-    --16
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Don’t wanna lose you now', 0, 3, 54, 'Поп-музыка', 'Backstreet Boys'); 
-    --17
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('The one', 0, 3, 46, 'Поп-музыка', 'Backstreet Boys'); 
-    --18
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Back to your heart', 0, 4, 21, 'Поп-музыка', 'Backstreet Boys');  
-    --19
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Spanish eyes', 0, 3, 53, 'Поп-музыка', 'Backstreet Boys');  
-    --20
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('No one else comes close', 0, 3, 42, 'Поп-музыка', 'Backstreet Boys');  
-    --21
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('The perfect fan', 0, 4, 13, 'Поп-музыка', 'Backstreet Boys');    
-
-    --2
-    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        NAME => 'Millennium', 
-        PRICE => 836.24, 
-        QUANTITY_IN_STOCK => 75, 
-        QUANTITY_OF_SOLD => 0, 
-        RECORD_ID => 11
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 13
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 14
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 15
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 16
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 17
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 18
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 19
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 20
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 2,
-        RECORD_ID => 21
-    );
-    
-    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 2, QUANTITY => 42);
-    
-    -- ABBA Gold: Greatest Hits
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('Швеция');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('ABBA', 'Швеция');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('Диско');
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_STYLE('Баллада');
-    
-    --22 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Dancing Queen', 0, 3, 51, 'Диско', 'ABBA'); 
-    --23 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Knowing Me, Knowing You', 0, 4, 3, 'Поп-музыка', 'ABBA'); 
-    --24 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Take a Chance on Me', 0, 4, 6, 'Поп-музыка', 'ABBA'); 
-    --25 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Mamma Mia', 0, 3, 33, 'Поп-музыка', 'ABBA'); 
-    --26 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Lay All Your Love on Me', 0, 4, 35, 'Диско', 'ABBA'); 
-    --27 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Super Trouper', 0, 4, 13, 'Поп-музыка', 'ABBA'); 
-    --28 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('I Have a Dream', 0, 4, 42, 'Баллада', 'ABBA'); 
-    --29 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('The Winner Takes It All', 0, 4, 54, 'Баллада', 'ABBA'); 
-    --30 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Money, Money, Money', 0, 3, 5, 'Поп-музыка', 'ABBA'); 
-    --31 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('SOS', 0, 3, 23, 'Поп-музыка', 'ABBA'); 
-    --32 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Chiquitita', 0, 5, 26, 'Поп-музыка', 'ABBA');  
-    --33 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Fernando', 0, 4, 14, 'Поп-музыка', 'ABBA');  
-    --34 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Voulez-Vous', 0, 5, 9, 'Диско', 'ABBA');  
-    --35 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Gimme! Gimme! Gimme!', 0, 4, 46, 'Диско', 'ABBA');  
-    --36 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Does Your Mother Know', 0, 3, 15, 'Поп-музыка', 'ABBA');  
-    --37 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('One of Us', 0, 3, 56, 'Поп-музыка', 'ABBA');  
-    --38 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('The Name of the Game', 0, 4, 51, 'Поп-музыка', 'ABBA');  
-    --39 
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Thank You for the Music', 0, 3, 51, 'Баллада', 'ABBA');  
-    --40
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Waterloo', 0, 2, 42, 'Поп-музыка', 'ABBA'); 
-    
-    --3
-    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        NAME => 'ABBA Gold: Greatest Hits', 
-        PRICE => 921.34, 
-        QUANTITY_IN_STOCK => 341, 
-        QUANTITY_OF_SOLD => 0, 
-        RECORD_ID => 22
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 23
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 24
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 25
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 26
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 27
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 28
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 29
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 30
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 31
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 32
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 33
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 34
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 35
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 36
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 37
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 38
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 39
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 3,
-        RECORD_ID => 40
-    );  
-        
-    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 3, QUANTITY => 142);
-        
-    -- Валентина Толкунова & Лев Лещенко
-        
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('Россия');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('Валентина Толкунова', 'Россия');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('Лев Лещенко', 'Россия');    
-      
-    --41
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Старт даёт Москва', 0, 2, 52, 'Поп-музыка', 'Валентина Толкунова');    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(41, 'Лев Лещенко'); 
-    --42
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Добрые приметы', 0, 2, 16, 'Поп-музыка', 'Валентина Толкунова');    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(42, 'Лев Лещенко'); 
-    --43
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Олимпийский Мишка', 0, 3, 32, 'Поп-музыка', 'Валентина Толкунова');    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(43, 'Лев Лещенко');    
-    --44
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Вальс влюблённых', 0, 2, 34, 'Поп-музыка', 'Валентина Толкунова');    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(44, 'Лев Лещенко');
-    --45
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Ночной звонок', 0, 4, 54, 'Поп-музыка', 'Валентина Толкунова');    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(45, 'Лев Лещенко');
-    --46
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Осень', 0, 3, 49, 'Поп-музыка', 'Валентина Толкунова');    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(46, 'Лев Лещенко');
-    
-    --4
-    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        NAME => 'Валентина Толкунова и Лев Лещенко', 
-        PRICE => 127.99, 
-        QUANTITY_IN_STOCK => 51, 
-        QUANTITY_OF_SOLD => 0, 
-        RECORD_ID => 41
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 4,
-        RECORD_ID => 42
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 4,
-        RECORD_ID => 43
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 4,
-        RECORD_ID => 44
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 4,
-        RECORD_ID => 45
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 4,
-        RECORD_ID => 46
-    );
-    
-    GRUSHEVSKAYA_PACKAGE.SELL_ALBUMS(ALBUM_ID => 4, QUANTITY => 7);
-    
-    -- Разное
-    
-    --5
-    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        NAME => 'Разное', 
-        PRICE => 87.99, 
-        QUANTITY_IN_STOCK => 10, 
-        QUANTITY_OF_SOLD => 0, 
-        RECORD_ID => 3
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 5,
-        RECORD_ID => 4
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 5,
-        RECORD_ID => 8
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 5,
-        RECORD_ID => 12
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 5,
-        RECORD_ID => 16
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 5,
-        RECORD_ID => 17
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 5,
-        RECORD_ID => 23
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 5,
-        RECORD_ID => 29
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 5,
-        RECORD_ID => 32
-    );
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 5,
-        RECORD_ID => 38
-    );
-    
-    
-    -- Пустой альбом
-    --6 
-    GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
-        NAME => 'Пустой альбом', 
-        PRICE => 0, 
-        QUANTITY_IN_STOCK => 0, 
-        QUANTITY_OF_SOLD => 0
-    );
-    
-    -- Невостребованные исполнители  
-        
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('Иванов Иван', 'Россия');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('Сидоров Алексей', 'Россия');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('Петров Петр', 'Россия');
-    
-    -- Песня без альбома
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_IN_DICT_COUNTRY('СССР');
-    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('Иосиф Кобзон', 'Россия');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('Майя Кристалинская', 'СССР');
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER('Эдуард Хиль', 'Россия');
-    
-    --47
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD('Песня остаётся с человеком', 0, 3, 49, 'Поп-музыка', 'Валентина Толкунова');    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(47, 'Лев Лещенко');    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(47, 'Иосиф Кобзон');    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(47, 'Майя Кристалинская');    
-    GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(47, 'Эдуард Хиль');    
-    
-END;
-
-
 
 
 

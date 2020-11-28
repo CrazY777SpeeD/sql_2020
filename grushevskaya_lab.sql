@@ -337,43 +337,66 @@ TRIGGER GRUSHEVSKAYA_TR_ON_ALBUM
 BEFORE INSERT OR UPDATE ON GRUSHEVSKAYA_ALBUM
 FOR EACH ROW
 DECLARE
+    TYPE UNIQUE_RECORDS IS TABLE OF NUMBER INDEX BY VARCHAR(100);
+    LIST_UNIQUE_RECORDS UNIQUE_RECORDS;
+    UNIQUE_RECORDS_VARRAY GRUSHEVSKAYA_RECORD_ARR := GRUSHEVSKAYA_RECORD_ARR();
+    CURRENT_UNIQUE_RECORD VARCHAR2(100);
     TYPE GRUSHEVSKAYA_RECORD_TAB IS TABLE OF NUMBER(10, 0);
-    LIST_ID GRUSHEVSKAYA_RECORD_TAB;
+    LIST_ID GRUSHEVSKAYA_RECORD_TAB;    
 BEGIN
-    -- Если альбом продан, то добавлять треки нельзя.
-    IF UPDATING('RECORD_ARRAY') AND :OLD.QUANTITY_OF_SOLD > 0 THEN
-        FOR j IN 1..:OLD.RECORD_ARRAY.COUNT
+    IF UPDATING('RECORD_ARRAY') THEN
+--         Удаление дубликатов из VARRAY
+        FOR k IN 1..:NEW.RECORD_ARRAY.COUNT
         LOOP
-            IF :NEW.RECORD_ARRAY(j) IS NULL AND :OLD.RECORD_ARRAY(j) IS NULL THEN
-                CONTINUE;
-            END IF;
-            IF :NEW.RECORD_ARRAY(j) IS NULL OR :OLD.RECORD_ARRAY(j) IS NULL THEN
-                :NEW.ID := :OLD.ID;
-                :NEW.NAME := :OLD.NAME;
-                :NEW.PRICE := :OLD.PRICE;
-                :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
-                :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
-                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                               
-                DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
-                DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
-                    || :OLD.ID 
-                    || ' не был обновлен. Нельзя добавлять треки, если альбом продан.');
-                RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
-            END IF;
-            IF :NEW.RECORD_ARRAY(j) <> :OLD.RECORD_ARRAY(j) THEN
-                :NEW.ID := :OLD.ID;
-                :NEW.NAME := :OLD.NAME;
-                :NEW.PRICE := :OLD.PRICE;
-                :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
-                :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
-                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                               
-                DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
-                DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
-                    || :OLD.ID 
-                    || ' не был обновлен. Нельзя добавлять треки, если альбом продан.');
-                RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
+            IF NOT :NEW.RECORD_ARRAY(k) IS NULL THEN
+                IF NOT LIST_UNIQUE_RECORDS.EXISTS(:NEW.RECORD_ARRAY(k)) THEN
+                    LIST_UNIQUE_RECORDS(:NEW.RECORD_ARRAY(k)) := k;
+                END IF;                
             END IF;
         END LOOP;
+        UNIQUE_RECORDS_VARRAY.EXTEND(30);
+        CURRENT_UNIQUE_RECORD := LIST_UNIQUE_RECORDS.FIRST;
+        WHILE NOT CURRENT_UNIQUE_RECORD IS NULL
+        LOOP
+            UNIQUE_RECORDS_VARRAY(LIST_UNIQUE_RECORDS(CURRENT_UNIQUE_RECORD)) := CURRENT_UNIQUE_RECORD;
+            CURRENT_UNIQUE_RECORD := LIST_UNIQUE_RECORDS.NEXT(CURRENT_UNIQUE_RECORD);
+        END LOOP;
+        :NEW.RECORD_ARRAY := UNIQUE_RECORDS_VARRAY;
+        -- Если альбом продан, то добавлять треки нельзя.    
+        IF :OLD.QUANTITY_OF_SOLD > 0 THEN
+            FOR j IN 1..:OLD.RECORD_ARRAY.COUNT
+            LOOP
+                IF :NEW.RECORD_ARRAY(j) IS NULL AND :OLD.RECORD_ARRAY(j) IS NULL THEN
+                    CONTINUE;
+                END IF;
+                IF :NEW.RECORD_ARRAY(j) IS NULL OR :OLD.RECORD_ARRAY(j) IS NULL THEN
+                    :NEW.ID := :OLD.ID;
+                    :NEW.NAME := :OLD.NAME;
+                    :NEW.PRICE := :OLD.PRICE;
+                    :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
+                    :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
+                    :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                               
+                    DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
+                    DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
+                        || :OLD.ID 
+                        || ' не был обновлен. Нельзя добавлять треки, если альбом продан.');
+                    RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
+                END IF;
+                IF :NEW.RECORD_ARRAY(j) <> :OLD.RECORD_ARRAY(j) THEN
+                    :NEW.ID := :OLD.ID;
+                    :NEW.NAME := :OLD.NAME;
+                    :NEW.PRICE := :OLD.PRICE;
+                    :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
+                    :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
+                    :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                               
+                    DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
+                    DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
+                        || :OLD.ID 
+                        || ' не был обновлен. Нельзя добавлять треки, если альбом продан.');
+                    RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
+                END IF;
+            END LOOP;
+        END IF;
     END IF;
     -- Проверка внеш.кл.
     -- Перед вставкой или обновлением альбома
@@ -528,9 +551,7 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
         -- Количество проданных альбомов (>= 0)
         QUANTITY_OF_SOLD NUMBER, 
         -- ID добавляемой записи
-        RECORD_ID NUMBER,
-        -- Номер звучания записи в альбоме
-        RECORD_SERIAL_NUMBER NUMBER
+        RECORD_ID NUMBER
     );
     -- 4) Добавить альбом (изначально указывается один трек или ни одного).
     -- Реализация для добавления альбома без записей.
@@ -551,9 +572,7 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
         -- ID альбома
         ALBUM_ID NUMBER,
         -- ID добавляемой записи 
-        RECORD_ID NUMBER,
-        -- Номер звучания записи в альбоме
-        RECORD_SERIAL_NUMBER NUMBER
+        RECORD_ID NUMBER
     );
     -- 6) Список альбомов в продаже (количество на складе больше 0).
     PROCEDURE PRINT_ALBUMS_IN_STOCK;
@@ -791,13 +810,12 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         PRICE NUMBER,
         QUANTITY_IN_STOCK NUMBER,
         QUANTITY_OF_SOLD NUMBER, 
-        RECORD_ID NUMBER,
-        RECORD_SERIAL_NUMBER NUMBER
+        RECORD_ID NUMBER
     ) IS
         RECORD_ARR GRUSHEVSKAYA_RECORD_ARR := GRUSHEVSKAYA_RECORD_ARR();
     BEGIN
         RECORD_ARR.EXTEND(30);
-        RECORD_ARR(RECORD_SERIAL_NUMBER) := RECORD_ID;
+        RECORD_ARR(1) := RECORD_ID;
         INSERT INTO GRUSHEVSKAYA_ALBUM (
             ID, 
             NAME, 
@@ -893,9 +911,9 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     
     PROCEDURE ADD_RECORD_IN_ALBUM (
         ALBUM_ID NUMBER, 
-        RECORD_ID NUMBER,
-        RECORD_SERIAL_NUMBER NUMBER
+        RECORD_ID NUMBER
     )IS
+        RECORD_SERIAL_NUMBER NUMBER := -1;
         TMP_RECORD_ARR GRUSHEVSKAYA_RECORD_ARR;
     BEGIN        
         IF RECORD_ID IS NULL THEN
@@ -905,6 +923,21 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         SELECT RECORD_ARRAY INTO TMP_RECORD_ARR
             FROM GRUSHEVSKAYA_ALBUM
             WHERE ID = ALBUM_ID;
+        FOR i IN REVERSE 1..TMP_RECORD_ARR.COUNT
+        LOOP
+            IF TMP_RECORD_ARR(i) IS NULL THEN
+                RECORD_SERIAL_NUMBER := i;
+            END IF;
+        END LOOP;
+        IF RECORD_SERIAL_NUMBER = -1 THEN
+            DBMS_OUTPUT.PUT_LINE(
+                'Альбом с ID ' 
+                || ALBUM_ID 
+                || ' не может содержать больше 30 записей. Запись с ID ' 
+                || RECORD_ID 
+                || ' не добавлена.'
+            );
+        END IF;
         TMP_RECORD_ARR(RECORD_SERIAL_NUMBER) := RECORD_ID;
         UPDATE GRUSHEVSKAYA_ALBUM
             SET RECORD_ARRAY = TMP_RECORD_ARR

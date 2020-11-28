@@ -81,8 +81,7 @@ BEGIN
         PRICE => 100.50, 
         QUANTITY_IN_STOCK => 10, 
         QUANTITY_OF_SOLD => 0, 
-        RECORD_ID => 1, 
-        RECORD_SERIAL_NUMBER => 10
+        RECORD_ID => 1
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление альбома 100 с отрицательными значениями кол-ва -----');
@@ -91,8 +90,7 @@ BEGIN
         PRICE => 100.50, 
         QUANTITY_IN_STOCK => -10, 
         QUANTITY_OF_SOLD => -10, 
-        RECORD_ID => 1, 
-        RECORD_SERIAL_NUMBER => 10
+        RECORD_ID => 1
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление альбома 100 с отрицательной ценой -----');
@@ -101,8 +99,7 @@ BEGIN
         PRICE => -100.50, 
         QUANTITY_IN_STOCK => 10, 
         QUANTITY_OF_SOLD => 10, 
-        RECORD_ID => 1, 
-        RECORD_SERIAL_NUMBER => 10
+        RECORD_ID => 1
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление альбома 100 с несуществующей записью 1000 -----');
@@ -111,8 +108,7 @@ BEGIN
         PRICE => 100.50, 
         QUANTITY_IN_STOCK => 10, 
         QUANTITY_OF_SOLD => 10, 
-        RECORD_ID => 1000, 
-        RECORD_SERIAL_NUMBER => 10
+        RECORD_ID => 1000
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление записи 2 -----');
@@ -121,36 +117,25 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('----- Добавление записи 2 в альбом 1 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
         ALBUM_ID => 1,
-        RECORD_ID => 3, 
-        RECORD_SERIAL_NUMBER => 3
+        RECORD_ID => 3
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Повторное добавление записи 2 в альбом 1 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
         ALBUM_ID => 1,
-        RECORD_ID => 3, 
-        RECORD_SERIAL_NUMBER => 3
+        RECORD_ID => 3
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление несуществующей записи 100 в альбом 1 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
         ALBUM_ID => 1,
-        RECORD_ID => 100, 
-        RECORD_SERIAL_NUMBER => 3
+        RECORD_ID => 100
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление записи 1 в несуществующий альбом 1000 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
         ALBUM_ID => 1000,
-        RECORD_ID => 1, 
-        RECORD_SERIAL_NUMBER => 3
-    );
-    
-    DBMS_OUTPUT.PUT_LINE('----- Добавление записи 1 в альбом 1 с № выходящим за границы -----');
-    GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
-        ALBUM_ID => 1,
-        RECORD_ID => 1, 
-        RECORD_SERIAL_NUMBER => 31
+        RECORD_ID => 1
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление альбома 2 без записей -----');
@@ -172,18 +157,15 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('----- Добавление записей 3, 4 и 5 в альбом 2 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
         ALBUM_ID => 5,
-        RECORD_ID => 4, 
-        RECORD_SERIAL_NUMBER => 1
+        RECORD_ID => 4
     );
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
         ALBUM_ID => 5,
-        RECORD_ID => 5, 
-        RECORD_SERIAL_NUMBER => 8
+        RECORD_ID => 5
     );
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD_IN_ALBUM(
         ALBUM_ID => 5,
-        RECORD_ID => 6, 
-        RECORD_SERIAL_NUMBER => 4
+        RECORD_ID => 6
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление альбома 3 без записей -----');
@@ -264,7 +246,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('----- Удаление записи из альбома 1 -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_RECORD_FROM_ALBUM(
         ALBUM_ID => 1,
-        RECORD_NUMBER => 3
+        RECORD_NUMBER => 2
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Печать треков альбома 1 -----');

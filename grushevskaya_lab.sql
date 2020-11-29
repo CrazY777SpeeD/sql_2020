@@ -31,27 +31,30 @@ END;
 /
 
 -- SEQUENCE для генерации id RECORD
+-- из-за тестовых данных начинается с 48
 
 CREATE SEQUENCE GRUSHEVSKAYA_NUM_RECORD
-MINVALUE 1
-START WITH 48 -- из-за тестовых данных
-INCREMENT BY 1
-NOCACHE NOCYCLE;
+    MINVALUE 1
+    START WITH 48
+    INCREMENT BY 1
+    NOCACHE NOCYCLE;
 /
 
 -- SEQUENCE для генерации id ALBUM
+-- из-за тестовых данных начинается с 7
 
 CREATE SEQUENCE GRUSHEVSKAYA_NUM_ALBUM
-MINVALUE 1
-START WITH 7  -- из-за тестовых данных
-INCREMENT BY 1
-NOCACHE NOCYCLE;
+    MINVALUE 1
+    START WITH 7
+    INCREMENT BY 1
+    NOCACHE NOCYCLE;
 /
 
 -- COUNTRY - вспомогательная таблица, содержащая словарь стран. 
 -- Исключает ситуацию, когда где-то страна "РФ", а где-то "Россия".
 
 CREATE TABLE GRUSHEVSKAYA_DICT_COUNTRY(
+    -- название страны
     NAME VARCHAR2(100 BYTE)
         PRIMARY KEY
         NOT NULL
@@ -66,7 +69,9 @@ INSERT INTO GRUSHEVSKAYA_DICT_COUNTRY (NAME) VALUES ('Швеция');
 -- SINGER – исполнитель (имя, псевдоним или название группы; страна)
 
 CREATE TABLE GRUSHEVSKAYA_SINGER(
+    -- имя, псевдоним или название группы
     NAME VARCHAR2(100 BYTE),
+    -- страна
     COUNTRY VARCHAR2(100 BYTE)
 );
 /
@@ -104,6 +109,7 @@ ALTER TABLE GRUSHEVSKAYA_SINGER
 -- Исключает ситуацию, когда где-то стиль "Джаз", а где-то "джаз".
 
 CREATE TABLE GRUSHEVSKAYA_DICT_STYLE(
+    -- название стиля
     NAME VARCHAR2(100 BYTE)
         PRIMARY KEY
         NOT NULL
@@ -126,12 +132,18 @@ INSERT INTO GRUSHEVSKAYA_DICT_STYLE (NAME) VALUES ('Хард-рок');
 -- Вложенная таблица исполнителей
 CREATE TYPE GRUSHEVSKAYA_SINGER_TAB AS TABLE OF VARCHAR2(100 BYTE);
 /
--- RECORD – запись (идентификатор, название, время звучания, стиль)
+-- RECORD – запись (идентификатор, название, время звучания, 
+-- стиль, список исполнителей)
 CREATE TABLE GRUSHEVSKAYA_RECORD(
+    -- идентификатор
     ID NUMBER(10,0),
+    -- название
     NAME VARCHAR2(100 BYTE),
+    -- время звучания
     TIME INTERVAL DAY (0) TO SECOND (0),
+    -- стиль
     STYLE VARCHAR2(100 BYTE),
+    -- список исполнителей
     SINGER_LIST GRUSHEVSKAYA_SINGER_TAB
 )NESTED TABLE SINGER_LIST
     STORE AS GRUSHEVSKAYA_SINGER_LIST;
@@ -213,13 +225,20 @@ ALTER TABLE GRUSHEVSKAYA_RECORD
 CREATE TYPE GRUSHEVSKAYA_RECORD_ARR AS VARRAY(30) OF NUMBER(10,0);
 /
 -- ALBUM – альбом (идентификатор, название, стоимость, 
--- количество на складе, количество проданных экземпляров)
+-- количество на складе, количество проданных экземпляров,
+-- список записей)
 CREATE TABLE GRUSHEVSKAYA_ALBUM(
+    -- идентификатор    
     ID NUMBER(10, 0),
+    -- название
     NAME VARCHAR2(100 BYTE),
+    -- стоимость
     PRICE NUMBER(6,2),
+    -- количество на складе
     QUANTITY_IN_STOCK NUMBER(5, 0),
+    -- количество проданных экземпляров
     QUANTITY_OF_SOLD NUMBER(5, 0),
+    -- список (массив) записей
     RECORD_ARRAY GRUSHEVSKAYA_RECORD_ARR
 );
 /
@@ -305,11 +324,15 @@ BEGIN
             :NEW.STYLE := :OLD.STYLE;
             :NEW.SINGER_LIST := :OLD.SINGER_LIST;
             DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_RECORDS');
-            DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
+            DBMS_OUTPUT.PUT_LINE(
+                'Запись с идентификатором ' 
                 || :OLD.ID 
-                || ' не была обновлена.');
-            DBMS_OUTPUT.PUT_LINE('Список исполнителей обновлять нельзя,' 
-                || ' так как исполнитель хотя бы один должен быть.');
+                || ' не была обновлена.'
+            );
+            DBMS_OUTPUT.PUT_LINE(
+                'Список исполнителей обновлять нельзя,' 
+                || ' так как исполнитель хотя бы один должен быть.'
+            );
             RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
         END IF;
     END IF;
@@ -332,11 +355,15 @@ BEGIN
             :NEW.STYLE := :OLD.STYLE;
             :NEW.SINGER_LIST := :OLD.SINGER_LIST;
             DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_RECORDS');
-            DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
+            DBMS_OUTPUT.PUT_LINE(
+                'Запись с идентификатором ' 
                 || :OLD.ID 
-                || ' не была обновлена.');
-            DBMS_OUTPUT.PUT_LINE('Список исполнителей обновлять нельзя,' 
-                || ' так как запись уже содержится в одном из альбомов.');
+                || ' не была обновлена.'
+            );
+            DBMS_OUTPUT.PUT_LINE(
+                'Список исполнителей обновлять нельзя,' 
+                || ' так как запись уже содержится в одном из альбомов.'
+            );
             RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
         END IF;
     END IF;
@@ -356,9 +383,11 @@ BEGIN
             :NEW.STYLE := :OLD.STYLE;
             :NEW.SINGER_LIST := :OLD.SINGER_LIST;
             DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_RECORDS');
-            DBMS_OUTPUT.PUT_LINE('Запись с идентификатором ' 
+            DBMS_OUTPUT.PUT_LINE(
+                'Запись с идентификатором ' 
                 || :OLD.ID 
-                || ' не была обновлена из-за нарушения внешнего ключа (исполнители).');
+                || ' не была обновлена из-за нарушения внешнего ключа (исполнители).'
+            );
             RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
         END IF;
     END IF;
@@ -379,9 +408,11 @@ BEGIN
         LOOP
             IF RECORD_ROW.SINGER_LIST(i) = :OLD.NAME THEN                
                 DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_SINGERS_DEL');
-                DBMS_OUTPUT.PUT_LINE('Исполнителя с идентификатором ' 
+                DBMS_OUTPUT.PUT_LINE(
+                    'Исполнителя с идентификатором ' 
                     || :OLD.NAME 
-                    || ' удалять нельзя - у него есть треки.');
+                    || ' удалять нельзя - у него есть треки.'
+                );
                 RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_SINGER_DEL;
             END IF;
         END LOOP;
@@ -480,9 +511,11 @@ BEGIN
                     :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
                     :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                               
                     DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
-                    DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
+                    DBMS_OUTPUT.PUT_LINE(
+                        'Альбом с идентификатором ' 
                         || :OLD.ID 
-                        || ' не был обновлен. Нельзя добавлять треки, если альбом продан.');
+                        || ' не был обновлен. Нельзя добавлять треки, если альбом продан.'
+                    );
                     RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
                 END IF;
                 IF :NEW.RECORD_ARRAY(j) <> :OLD.RECORD_ARRAY(j) THEN
@@ -493,9 +526,11 @@ BEGIN
                     :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
                     :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                               
                     DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
-                    DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
+                    DBMS_OUTPUT.PUT_LINE(
+                        'Альбом с идентификатором ' 
                         || :OLD.ID 
-                        || ' не был обновлен. Нельзя добавлять треки, если альбом продан.');
+                        || ' не был обновлен. Нельзя добавлять треки, если альбом продан.'
+                    );
                     RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
                 END IF;
             END LOOP;
@@ -523,9 +558,11 @@ BEGIN
                 :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
                 :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                          
                 DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
-                DBMS_OUTPUT.PUT_LINE('Альбом с идентификатором ' 
+                DBMS_OUTPUT.PUT_LINE(
+                    'Альбом с идентификатором ' 
                     || :OLD.ID 
-                    || ' не был обновлен из-за нарушения внешнего ключа (записи).');
+                    || ' не был обновлен из-за нарушения внешнего ключа (записи).'
+                );
                 RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
             END IF;
         END IF;
@@ -546,9 +583,11 @@ BEGIN
         LOOP
             IF ALBUM_ROW.RECORD_ARRAY(i) = :OLD.ID THEN                               
                 DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORD_DEL');
-                DBMS_OUTPUT.PUT_LINE('Запиь с идентификатором ' 
+                DBMS_OUTPUT.PUT_LINE(
+                    'Запиь с идентификатором ' 
                     || :OLD.ID 
-                    || ' удалять нельзя - она есть в альбоме.');
+                    || ' удалять нельзя - она есть в альбоме.'
+                );
                 RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_RECORD_DEL;
             END IF;
         END LOOP;
@@ -942,7 +981,11 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             RECORD_ARR
         );
         COMMIT;      
-        DBMS_OUTPUT.PUT_LINE('Альбом ' || NAME || ' с ID ' || GRUSHEVSKAYA_NUM_ALBUM.CURRVAL || ' успешно добавлен.');
+        DBMS_OUTPUT.PUT_LINE(
+            'Альбом ' || NAME 
+            || ' с ID ' || GRUSHEVSKAYA_NUM_ALBUM.CURRVAL 
+            || ' успешно добавлен.'
+        );
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
         RETURN;
@@ -994,7 +1037,11 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             RECORD_ARR
         );
         COMMIT;      
-        DBMS_OUTPUT.PUT_LINE('Альбом ' || NAME || ' с ID ' || GRUSHEVSKAYA_NUM_ALBUM.CURRVAL || ' успешно добавлен.');
+        DBMS_OUTPUT.PUT_LINE(
+            'Альбом ' || NAME 
+            || ' с ID ' || GRUSHEVSKAYA_NUM_ALBUM.CURRVAL 
+            || ' успешно добавлен.'
+        );
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_ALBUM THEN
         RETURN;
@@ -1113,17 +1160,21 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     ) IS
     BEGIN
         IF QUANTITY <= 0 THEN
-            DBMS_OUTPUT.PUT_LINE('В продажу поступило отрицательное ' 
+            DBMS_OUTPUT.PUT_LINE(
+                'В продажу поступило отрицательное ' 
                 || 'количество альбомов c ID ' 
-                || ALBUM_ID || '. Количество не обновлено.');
+                || ALBUM_ID || '. Количество не обновлено.'
+            );
             RETURN;
         END IF;
         UPDATE GRUSHEVSKAYA_ALBUM
             SET QUANTITY_IN_STOCK = QUANTITY_IN_STOCK + QUANTITY
             WHERE ID = ALBUM_ID;
         COMMIT;
-        DBMS_OUTPUT.PUT_LINE('В продажу поступило ' 
-            || QUANTITY || ' альбомов c ID ' || ALBUM_ID || '.');
+        DBMS_OUTPUT.PUT_LINE(
+            'В продажу поступило ' || QUANTITY 
+            || ' альбомов c ID ' || ALBUM_ID || '.'
+        );
     EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUMS_IN_STOCK');
@@ -1145,8 +1196,10 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         MAX_QUANTITY NUMBER;
     BEGIN
         IF QUANTITY <= 0 THEN
-            DBMS_OUTPUT.PUT_LINE('Подается отрицательное количество альбомов c ID ' 
-                || ALBUM_ID || '. Количество не обновлено.');
+            DBMS_OUTPUT.PUT_LINE(
+                'Подается отрицательное количество альбомов c ID ' 
+                || ALBUM_ID || '. Количество не обновлено.'
+            );
             RETURN;
         END IF;
         SELECT RECORD_ARRAY INTO RECORD_ARR 
@@ -1159,8 +1212,10 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             END IF;
         END LOOP;
         IF NOT FLAG_ONE_RECORD THEN
-            DBMS_OUTPUT.PUT_LINE('Продать альбом c ID ' 
-                || ALBUM_ID || ' нельзя. В альбоме нет треков.');
+            DBMS_OUTPUT.PUT_LINE(
+                'Продать альбом c ID ' 
+                || ALBUM_ID || ' нельзя. В альбоме нет треков.'
+            );
             RETURN;
         END IF;
         SELECT QUANTITY_IN_STOCK INTO MAX_QUANTITY 
@@ -1168,8 +1223,10 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             WHERE ID = ALBUM_ID;
         MAX_QUANTITY := LEAST(MAX_QUANTITY, QUANTITY);
         IF MAX_QUANTITY <= 0 THEN
-            DBMS_OUTPUT.PUT_LINE('Продать альбом c ID ' 
-                || ALBUM_ID || ' нельзя. Альбомов нет на складе.');
+            DBMS_OUTPUT.PUT_LINE(
+                'Продать альбом c ID ' 
+                || ALBUM_ID || ' нельзя. Альбомов нет на складе.'
+            );
             RETURN;
         END IF;
         UPDATE GRUSHEVSKAYA_ALBUM
@@ -1178,8 +1235,10 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
                 QUANTITY_OF_SOLD = QUANTITY_OF_SOLD + MAX_QUANTITY
             WHERE ID = ALBUM_ID;
         COMMIT;
-        DBMS_OUTPUT.PUT_LINE('Продано ' || MAX_QUANTITY 
-            || ' альбомов c ID ' || ALBUM_ID || '.');
+        DBMS_OUTPUT.PUT_LINE(
+            'Продано ' || MAX_QUANTITY 
+            || ' альбомов c ID ' || ALBUM_ID || '.'
+        );
     EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN SELL_ALBUMS');
@@ -1216,8 +1275,10 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             IF NOT DEL_SINGERS_LIST(j) IS NULL THEN
                 DELETE FROM GRUSHEVSKAYA_SINGER
                 WHERE NAME = DEL_SINGERS_LIST(j);
-                DBMS_OUTPUT.PUT_LINE('Удален исполнитель ' 
-                    || DEL_SINGERS_LIST(j) || '.');
+                DBMS_OUTPUT.PUT_LINE(
+                    'Удален исполнитель ' 
+                    || DEL_SINGERS_LIST(j) || '.'
+                );
             END IF;
         END LOOP;
         COMMIT;
@@ -1323,8 +1384,10 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             FROM GRUSHEVSKAYA_ALBUM
             WHERE ID = ALBUM_ID;
         IF TMP_QUANTITY_OF_SOLD > 0 THEN
-            DBMS_OUTPUT.PUT_LINE('Удалить трек №' 
-                || RECORD_NUMBER || ' нельзя, так как альбом продан');
+            DBMS_OUTPUT.PUT_LINE(
+                'Удалить трек №' 
+                || RECORD_NUMBER || ' нельзя, так как альбом продан'
+            );
             RETURN;
         END IF;
         SELECT RECORD_ARRAY INTO TMP_RECORD_ARR 
@@ -1423,8 +1486,10 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
             DBMS_OUTPUT.PUT_LINE('Исполнитель не найден.');
             RETURN;
         END IF;
-        DBMS_OUTPUT.PUT_LINE('Наиболее популярный стиль у ' 
-            || SINGER_NAME || ' - '  || MAX_STYLE || '.');       
+        DBMS_OUTPUT.PUT_LINE(
+            'Наиболее популярный стиль у ' 
+            || SINGER_NAME || ' - '  || MAX_STYLE || '.'
+        );       
     EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_SINGER_STYLE');
@@ -1471,8 +1536,10 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
                 END IF;
                 CURRENT_STYLE := COUNTRY_STYLE_LIST(CURRENT_COUNTRY).NEXT(CURRENT_STYLE);
             END LOOP;
-            DBMS_OUTPUT.PUT_LINE('Наиболее популярный стиль в '  
-                || CURRENT_COUNTRY || ' - ' || MAX_STYLE || '.');
+            DBMS_OUTPUT.PUT_LINE(
+                'Наиболее популярный стиль в '  
+                || CURRENT_COUNTRY || ' - ' || MAX_STYLE || '.'
+            );
             CURRENT_COUNTRY := COUNTRY_STYLE_LIST.NEXT(CURRENT_COUNTRY);
         END LOOP;       
     EXCEPTION

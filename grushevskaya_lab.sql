@@ -317,19 +317,19 @@ BEGIN
             RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
         END IF;
     END IF;
-    -- Запись уже содержится в одном из альбомов => обновлять исп. нельзя
-    FOR ALBUM_ROW IN (SELECT * FROM GRUSHEVSKAYA_ALBUM)
-    LOOP
-        FOR i IN 1..ALBUM_ROW.RECORD_ARRAY.COUNT
+    -- Запись уже содержится в одном из альбомов => обновлять исп. нельзя    
+    IF UPDATING THEN
+        FOR ALBUM_ROW IN (SELECT * FROM GRUSHEVSKAYA_ALBUM)
         LOOP
-            IF ALBUM_ROW.RECORD_ARRAY(i) = :OLD.ID THEN
-                FLAG_RECORD_USES := TRUE;
-            END IF;
+            FOR i IN 1..ALBUM_ROW.RECORD_ARRAY.COUNT
+            LOOP
+                IF ALBUM_ROW.RECORD_ARRAY(i) = :OLD.ID THEN
+                    FLAG_RECORD_USES := TRUE;
+                END IF;
+            END LOOP;
         END LOOP;
-    END LOOP;
-    IF UPDATING
-        AND FLAG_RECORD_USES
-        AND NOT (SET(:NEW.SINGER_LIST) = SET(:OLD.SINGER_LIST)) THEN
+        IF FLAG_RECORD_USES
+           AND NOT (SET(:NEW.SINGER_LIST) = SET(:OLD.SINGER_LIST)) THEN
             :NEW.ID := :OLD.ID;
             :NEW.NAME := :OLD.NAME;
             :NEW.TIME := :OLD.TIME;
@@ -342,6 +342,7 @@ BEGIN
             DBMS_OUTPUT.PUT_LINE('Список исполнителей обновлять нельзя,' 
                 || ' так как запись уже содержится в одном из альбомов.');
             RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
+        END IF;
     END IF;
     -- Проверка внеш.кл.
     -- Если подмножество исполнителей не соответствует таблице исполнителей,

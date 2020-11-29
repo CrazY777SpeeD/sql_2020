@@ -296,9 +296,14 @@ BEGIN
     END LOOP;
     :NEW.SINGER_LIST := SET(:NEW.SINGER_LIST);
     -- Список исполнителей не должен быть пуст
-    IF UPDATING
-       AND :NEW.SINGER_LIST IS EMPTY THEN
-        :NEW.ID := :OLD.ID;
+    IF :NEW.SINGER_LIST IS EMPTY THEN
+        IF INSERTING THEN
+           DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORDS');
+           DBMS_OUTPUT.PUT_LINE('SINGER_LIST не должен быть пустым (EMPTY).'); 
+           RAISE GRUSHEVSKAYA_EXCEPTIONS.ERROR_RECORD;
+        END IF;
+        IF UPDATING THEN
+            :NEW.ID := :OLD.ID;
             :NEW.NAME := :OLD.NAME;
             :NEW.TIME := :OLD.TIME;
             :NEW.STYLE := :OLD.STYLE;
@@ -310,6 +315,7 @@ BEGIN
             DBMS_OUTPUT.PUT_LINE('Список исполнителей обновлять нельзя,' 
                 || ' так как исполнитель хотя бы один должен быть.');
             RAISE GRUSHEVSKAYA_EXCEPTIONS.WARNING_UPDATE;
+        END IF;
     END IF;
     -- Запись уже содержится в одном из альбомов => обновлять исп. нельзя
     FOR ALBUM_ROW IN (SELECT * FROM GRUSHEVSKAYA_ALBUM)

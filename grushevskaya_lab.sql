@@ -265,12 +265,8 @@ ALTER TABLE GRUSHEVSKAYA_ALBUM
 
 -- Связь «многие-ко-многим» SINGER-RECORD
 
--- Перед вставкой или обновлением записи
--- удалить NULL-значения исполнителей и уплотнить список исполнителей.
--- При обновлении проверить не пуст ли список исполнителей. 
--- Список исполнителей не должен быть пустым.
--- Если запись содержится в одном из альбомов, 
--- то список исполнителей изменять нельзя.
+-- Проверка естественных ограничений.
+-- Имитация внешнего ключа.
 -- Если подмножество исполнителей не соответствует таблице исполнителей,
 -- то отменить вставку или "откатить" обновление
 CREATE OR REPLACE 
@@ -402,11 +398,11 @@ FOR UPDATE OF NAME ON GRUSHEVSKAYA_SINGER
 COMPOUND TRIGGER
     TYPE CHANGES_ARR IS TABLE OF VARCHAR2(100 BYTE) INDEX BY PLS_INTEGER;
     SINGERS_CHANGES CHANGES_ARR;
-    AFTER EACH ROW IS
+AFTER EACH ROW IS
     BEGIN
         SINGERS_CHANGES(:OLD.NAME) := :NEW.NAME;
     END AFTER EACH ROW;
-    AFTER STATEMENT IS
+AFTER STATEMENT IS
         LIST_NAME GRUSHEVSKAYA_SINGER_TAB;
         FLAG BOOLEAN := FALSE;
     BEGIN
@@ -433,7 +429,8 @@ END;
 
 -- Связь «многие-ко-многим» RECORD-ALBUM
 
--- Если альбом продан, то добавлять треки нельзя.
+-- Проверка естественных ограничений.
+-- Имитация внеш. кл.
 -- Перед вставкой или обновлением альбома
 -- проверить, что все записи существуют.
 -- Если нет, то либо отменить втавку, 
@@ -451,7 +448,7 @@ DECLARE
     LIST_ID GRUSHEVSKAYA_RECORD_TAB;    
 BEGIN
     IF UPDATING('RECORD_ARRAY') THEN
---         Удаление дубликатов из VARRAY
+        -- Удаление дубликатов из VARRAY
         FOR k IN 1..:NEW.RECORD_ARRAY.COUNT
         LOOP
             IF NOT :NEW.RECORD_ARRAY(k) IS NULL THEN

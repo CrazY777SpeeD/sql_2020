@@ -195,8 +195,18 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('----- ƒобавление исполнител€ 3 без записей -----');
     GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_3', 'country_1');
     
+    DBMS_OUTPUT.PUT_LINE('----- ѕечать стил€ исполнител€ 3 без записей -----');
+    GRUSHEVSKAYA_PACKAGE.PRINT_SINGER_STYLE(
+        SINGER_NAME => 'singer_3'
+    );    
+    
     DBMS_OUTPUT.PUT_LINE('----- ”даление исполнителей без записей -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_SINGERS_WITHOUT_RECORDS;   
+    
+    DBMS_OUTPUT.PUT_LINE('----- ѕечать стил€ несуществующего исполнител€ 3 -----');
+    GRUSHEVSKAYA_PACKAGE.PRINT_SINGER_STYLE(
+        SINGER_NAME => 'singer_3'
+    );
     
     DBMS_OUTPUT.PUT_LINE('----- ƒобавление исполнител€ 4 без записей -----');
     GRUSHEVSKAYA_PACKAGE.ADD_SINGER('singer_4', 'country_1');

@@ -80,7 +80,6 @@ BEGIN
         NAME => 'album_1', 
         PRICE => 100.50, 
         QUANTITY_IN_STOCK => 10, 
-        QUANTITY_OF_SOLD => 0, 
         RECORD_ID => 1
     );
     
@@ -88,8 +87,7 @@ BEGIN
     GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
         NAME => 'album_100', 
         PRICE => 100.50, 
-        QUANTITY_IN_STOCK => -10, 
-        QUANTITY_OF_SOLD => -10, 
+        QUANTITY_IN_STOCK => -10,
         RECORD_ID => 1
     );
     
@@ -98,7 +96,6 @@ BEGIN
         NAME => 'album_100', 
         PRICE => -100.50, 
         QUANTITY_IN_STOCK => 10, 
-        QUANTITY_OF_SOLD => 10, 
         RECORD_ID => 1
     );
     
@@ -107,7 +104,6 @@ BEGIN
         NAME => 'album_100', 
         PRICE => 100.50, 
         QUANTITY_IN_STOCK => 10, 
-        QUANTITY_OF_SOLD => 10, 
         RECORD_ID => 1000
     );
     
@@ -142,8 +138,7 @@ BEGIN
     GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
         NAME => 'album_2', 
         PRICE => 123.50, 
-        QUANTITY_IN_STOCK => 5, 
-        QUANTITY_OF_SOLD => 0
+        QUANTITY_IN_STOCK => 5
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление записей 3, 4 и 5 -----');
@@ -172,8 +167,7 @@ BEGIN
     GRUSHEVSKAYA_PACKAGE.ADD_ALBUM(
         NAME => 'album_3', 
         PRICE => 555.50, 
-        QUANTITY_IN_STOCK => 0, 
-        QUANTITY_OF_SOLD => 10
+        QUANTITY_IN_STOCK => 0
     );   
     
     

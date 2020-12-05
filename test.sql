@@ -292,36 +292,30 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('----- Удаление исполнителя из записи 1 -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_SINGER_FROM_RECORD(
         RECORD_ID => 1,
-        SINGER_NUMBER => 1
+        SINGER_NAME => 'singer_1'
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление песни 6 -----');
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD('song_6', 0, 5, 15, 'style_1', 'singer_1');
     GRUSHEVSKAYA_PACKAGE.ADD_SINGER_IN_RECORD(7, 'singer_2');
     
-    
-    DBMS_OUTPUT.PUT_LINE('----- Удаление несущ. исполнителя из записи 6 -----');
-    GRUSHEVSKAYA_PACKAGE.DELETE_SINGER_FROM_RECORD(
-        RECORD_ID => 7,
-        SINGER_NUMBER => 1000
-    );
-    
+   
     DBMS_OUTPUT.PUT_LINE('----- Удаление исполнителя из несущ. записи 1000 -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_SINGER_FROM_RECORD(
         RECORD_ID => 1000,
-        SINGER_NUMBER => 1
+        SINGER_NAME => 'singer_1'
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Удаление исполнителя из записи 6 -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_SINGER_FROM_RECORD(
         RECORD_ID => 7,
-        SINGER_NUMBER => 1
+        SINGER_NAME => 'singer_1'
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Удаление исполнителя из записи 5 -----');
     GRUSHEVSKAYA_PACKAGE.DELETE_SINGER_FROM_RECORD(
         RECORD_ID => 6,
-        SINGER_NUMBER => 1
+        SINGER_NAME => 'singer_2'
     );
     
     DBMS_OUTPUT.PUT_LINE('----- Печать стиля исполнителя 1 -----');

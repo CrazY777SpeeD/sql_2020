@@ -761,8 +761,8 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
     PROCEDURE DELETE_SINGER_FROM_RECORD(
         -- ID записи
         RECORD_ID NUMBER,
-        -- Номер исполнителя в списке
-        SINGER_NUMBER NUMBER
+        -- Имя исполнителя        
+        SINGER_NAME VARCHAR2
     );
     -- 15) Определить предпочитаемый музыкальный стиль указанного исполнителя 
     -- (стиль, в котором записано большинство его треков). 
@@ -1409,19 +1409,28 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
     
     PROCEDURE DELETE_SINGER_FROM_RECORD(
         RECORD_ID NUMBER,
-        SINGER_NUMBER NUMBER
+        SINGER_NAME VARCHAR2
     ) IS
         TMP_SINGER_LIST GRUSHEVSKAYA_SINGER_TAB;
+        SINGER_NUMBER NUMBER := 0;
     BEGIN
         SELECT SINGER_LIST INTO TMP_SINGER_LIST 
             FROM GRUSHEVSKAYA_RECORD
-            WHERE ID = RECORD_ID;            
+            WHERE ID = RECORD_ID;
+        FOR i IN 1..TMP_SINGER_LIST.COUNT
+        LOOP
+            IF TMP_SINGER_LIST(i) = SINGER_NAME THEN
+                SINGER_NUMBER := i;
+            END IF;
+        END LOOP;
         TMP_SINGER_LIST.DELETE(SINGER_NUMBER);        
         UPDATE GRUSHEVSKAYA_RECORD
             SET SINGER_LIST = TMP_SINGER_LIST
             WHERE ID = RECORD_ID;
         COMMIT;
-        DBMS_OUTPUT.PUT_LINE('Исполнитель №' || SINGER_NUMBER || ' удален.');
+        DBMS_OUTPUT.PUT_LINE(
+            'Исполнитель ' || SINGER_NAME || ' под №' || SINGER_NUMBER || ' удален.'
+        );
     EXCEPTION
     WHEN GRUSHEVSKAYA_EXCEPTIONS.ERROR_UPDATE_SINGER_IN_RECORD THEN
         RETURN;

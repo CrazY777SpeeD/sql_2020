@@ -347,26 +347,8 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE('----- печать стилей стран -----');
     GRUSHEVSKAYA_PACKAGE.PRINT_COUNTRY_STYLE;
     
-    DBMS_OUTPUT.PUT_LINE('----- Печать авторства альбома 1 -----');
-    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_AUTHOR(
-        ALBUM_ID => 1
-    );
-    
-    DBMS_OUTPUT.PUT_LINE('----- Печать авторства альбома 2 -----');
-    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_AUTHOR(
-        ALBUM_ID => 5
-    );
-    
-    DBMS_OUTPUT.PUT_LINE('----- Печать авторства альбома 3 -----');
-    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_AUTHOR(
-        ALBUM_ID => 6
-    );
-    
-    DBMS_OUTPUT.PUT_LINE('----- Печать авторства альбома 4 -----');
-    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_AUTHOR(
-        ALBUM_ID => 4
-    );    
-    
+    DBMS_OUTPUT.PUT_LINE('----- Печать авторства альбомов -----');
+    GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_AUTHOR; 
     
     DBMS_OUTPUT.PUT_LINE('----- Добавление песни 7 с ошибкой времени сек -----');
     GRUSHEVSKAYA_PACKAGE.ADD_RECORD('song_7', 8, 9, 85, 'style_1', 'singer_1');

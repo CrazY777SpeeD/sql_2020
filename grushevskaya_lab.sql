@@ -779,10 +779,7 @@ PACKAGE GRUSHEVSKAYA_PACKAGE AS
     -- если все треки этого альбома записаны 
     -- одним множеством исполнителей; 
     -- в противном случае выводится «Коллективный сборник»).
-    PROCEDURE PRINT_ALBUM_AUTHOR(
-        -- ID альбома
-        ALBUM_ID NUMBER
-    );
+    PROCEDURE PRINT_ALBUM_AUTHOR;
 END;
 /
 CREATE OR REPLACE
@@ -1547,62 +1544,69 @@ PACKAGE BODY GRUSHEVSKAYA_PACKAGE AS
         PRINT_MSG_EX(SQLCODE);
     END PRINT_COUNTRY_STYLE; 
     
-    PROCEDURE PRINT_ALBUM_AUTHOR(
-        ALBUM_ID NUMBER
-    ) IS
+    PROCEDURE PRINT_ALBUM_AUTHOR
+    IS
+        TYPE ALL_ALBUM_ID IS TABLE OF VARCHAR2(100 BYTE);
+        ALBUM_ID ALL_ALBUM_ID;
         TYPE ALBUM_SINGER IS TABLE OF NUMBER INDEX BY VARCHAR2(100 BYTE);
         ALBUM_SINGER_LIST ALBUM_SINGER;
         SINGERS GRUSHEVSKAYA_SINGER_TAB;
         RECORD_ARR GRUSHEVSKAYA_RECORD_ARR;
-        RECORD_COUNT NUMBER := 0;
+        RECORD_COUNT NUMBER;
         CURRENT_SINGER VARCHAR(100 BYTE);
-        FLAG_GROUP BOOLEAN := FALSE;
-    BEGIN
-        SELECT RECORD_ARRAY INTO RECORD_ARR
-            FROM GRUSHEVSKAYA_ALBUM
-            WHERE ID = ALBUM_ID;
-        FOR i IN 1..RECORD_ARR.COUNT
+        FLAG_GROUP BOOLEAN;
+    BEGIN   
+        DBMS_OUTPUT.PUT_LINE('Авторство альбомов.');
+        FOR ALBUM IN (SELECT ID FROM GRUSHEVSKAYA_ALBUM)
         LOOP
-            IF NOT RECORD_ARR(i) IS NULL THEN
-                RECORD_COUNT := RECORD_COUNT + 1;
-                SELECT SINGER_LIST INTO SINGERS
-                    FROM GRUSHEVSKAYA_RECORD
-                    WHERE ID = RECORD_ARR(i);
-                FOR j IN 1..SINGERS.COUNT
-                LOOP
-                    IF ALBUM_SINGER_LIST.EXISTS(SINGERS(j))THEN
-                        ALBUM_SINGER_LIST(SINGERS(j)) := 
-                            ALBUM_SINGER_LIST(SINGERS(j)) 
-                            + 1;
-                    ELSE
-                        ALBUM_SINGER_LIST(SINGERS(j)) := 1;
-                    END IF;
-                END LOOP;
-            END IF;
-        END LOOP;
-        CURRENT_SINGER := ALBUM_SINGER_LIST.FIRST;
-        WHILE NOT CURRENT_SINGER IS NULL
-        LOOP
-            IF ALBUM_SINGER_LIST(CURRENT_SINGER) <> RECORD_COUNT THEN
-                FLAG_GROUP := TRUE;
-            END IF;
-            CURRENT_SINGER := ALBUM_SINGER_LIST.NEXT(CURRENT_SINGER);
-        END LOOP;
-        DBMS_OUTPUT.PUT_LINE('Авторство альбома с ID ' || ALBUM_ID || '.');
-        IF FLAG_GROUP THEN
-            DBMS_OUTPUT.PUT_LINE('Коллективный сборник.');
-        ELSE
-            DBMS_OUTPUT.PUT_LINE('Исполнители:');
+            RECORD_COUNT := 0;
+            FLAG_GROUP := FALSE;
+            SELECT RECORD_ARRAY INTO RECORD_ARR
+                FROM GRUSHEVSKAYA_ALBUM
+                WHERE ID = ALBUM.ID;
+            FOR i IN 1..RECORD_ARR.COUNT
+            LOOP
+                IF NOT RECORD_ARR(i) IS NULL THEN
+                    RECORD_COUNT := RECORD_COUNT + 1;
+                    SELECT SINGER_LIST INTO SINGERS
+                        FROM GRUSHEVSKAYA_RECORD
+                        WHERE ID = RECORD_ARR(i);
+                    FOR j IN 1..SINGERS.COUNT
+                    LOOP
+                        IF ALBUM_SINGER_LIST.EXISTS(SINGERS(j))THEN
+                            ALBUM_SINGER_LIST(SINGERS(j)) := 
+                                ALBUM_SINGER_LIST(SINGERS(j)) 
+                                + 1;
+                        ELSE
+                            ALBUM_SINGER_LIST(SINGERS(j)) := 1;
+                        END IF;
+                    END LOOP;
+                END IF;
+            END LOOP;
             CURRENT_SINGER := ALBUM_SINGER_LIST.FIRST;
-            IF CURRENT_SINGER IS NULL THEN
-                DBMS_OUTPUT.PUT_LINE('Исполнителей в альбоме нет.');
-            END IF;
             WHILE NOT CURRENT_SINGER IS NULL
             LOOP
-                DBMS_OUTPUT.PUT_LINE(CURRENT_SINGER);
+                IF ALBUM_SINGER_LIST(CURRENT_SINGER) <> RECORD_COUNT THEN
+                    FLAG_GROUP := TRUE;
+                END IF;
                 CURRENT_SINGER := ALBUM_SINGER_LIST.NEXT(CURRENT_SINGER);
             END LOOP;
-        END IF;       
+            DBMS_OUTPUT.PUT_LINE('Авторство альбома с ID ' || ALBUM.ID || '.');
+            IF FLAG_GROUP THEN
+                DBMS_OUTPUT.PUT_LINE('Коллективный сборник.');
+            ELSE
+                DBMS_OUTPUT.PUT_LINE('Исполнители:');
+                CURRENT_SINGER := ALBUM_SINGER_LIST.FIRST;
+                IF CURRENT_SINGER IS NULL THEN
+                    DBMS_OUTPUT.PUT_LINE('Исполнителей в альбоме нет.');
+                END IF;
+                WHILE NOT CURRENT_SINGER IS NULL
+                LOOP
+                    DBMS_OUTPUT.PUT_LINE(CURRENT_SINGER);
+                    CURRENT_SINGER := ALBUM_SINGER_LIST.NEXT(CURRENT_SINGER);
+                END LOOP;
+            END IF; 
+        END LOOP;        
     EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_ALBUM_AUTHOR');

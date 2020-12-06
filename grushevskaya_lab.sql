@@ -131,7 +131,7 @@ CREATE TYPE Grushevskaya_singer_tab AS TABLE OF VARCHAR2(100 BYTE);
 -- record – запись 
 -- (идентификатор, название, время звучания, 
 -- стиль, список исполнителей)
-CREATE TABLE Grushevskaya_record (
+CREATE TABLE Grushevskaya_record(
     -- идентификатор
     id NUMBER(10,0),
     -- название
@@ -635,12 +635,12 @@ END;
 CREATE OR REPLACE 
 PACKAGE grushevskaya_package AS
     -- Добавить страну в словарь.
-    PROCEDURE add_in_dict_country (
+    PROCEDURE add_in_dict_country(
         -- Название страны
         name VARCHAR2
     );
     -- Добавить стиль в словарь.
-    PROCEDURE add_in_dict_style (
+    PROCEDURE add_in_dict_style(
         -- Название стиля
         name VARCHAR2
     );
@@ -648,7 +648,7 @@ PACKAGE grushevskaya_package AS
     -- Минимальный функционал
     
     -- 1) Добавить запись (изначально указывается один исполнитель).
-    PROCEDURE add_record (
+    PROCEDURE add_record(
         -- Название
         name VARCHAR2, 
         -- Количество часов звучания
@@ -665,14 +665,14 @@ PACKAGE grushevskaya_package AS
     -- 2) Добавить исполнителя для записи 
     -- (если указанная запись не добавлена ни в один альбом 
     --  - Условие проверяется на уровне триггера).
-    PROCEDURE add_singer_in_record (
+    PROCEDURE add_singer_in_record(
         -- id записи
         record_id NUMBER,
         -- Имя исполнителя
         singer_name VARCHAR2
     );
     -- 3) Добавить исполнителя.
-    PROCEDURE add_singer (
+    PROCEDURE add_singer(
         -- Имя (ФИО)
         name VARCHAR2, 
         -- Страна из словаря
@@ -680,7 +680,7 @@ PACKAGE grushevskaya_package AS
     );
     -- 4) Добавить альбом (изначально указывается один трек или ни одного).
     -- Реализация для добавления альбома с одной записью.
-    PROCEDURE add_album (
+    PROCEDURE add_album(
         -- Название
         name VARCHAR2,
         -- Цена (>= 0)
@@ -692,7 +692,7 @@ PACKAGE grushevskaya_package AS
     );
     -- 4) Добавить альбом (изначально указывается один трек или ни одного).
     -- Реализация для добавления альбома без записей.
-    PROCEDURE add_album (
+    PROCEDURE add_album(
         -- Название
         name VARCHAR2,
         -- Цена (>= 0)
@@ -703,7 +703,7 @@ PACKAGE grushevskaya_package AS
     -- 5) Добавить трек в альбом 
     -- (если не продано ни одного экземпляра
     --  - Условие проверяется на уровне триггера).
-    PROCEDURE add_record_in_album (
+    PROCEDURE add_record_in_album(
         -- id альбома
         album_id NUMBER,
         -- id добавляемой записи 
@@ -715,7 +715,7 @@ PACKAGE grushevskaya_package AS
     PROCEDURE print_singers;
     -- 8) Поставка альбома
     -- (количество на складе увеличивается на указанное значение).
-    PROCEDURE add_albums_in_stock (
+    PROCEDURE add_albums_in_stock(
         -- id альбома
         album_id NUMBER,
         -- Количество
@@ -725,7 +725,7 @@ PACKAGE grushevskaya_package AS
     -- (количество на складе уменьшается, проданных – увеличивается; 
     -- продать можно только альбомы, в которых есть хотя бы один трек
     --  - Условие проверяется в самой функции). 
-    PROCEDURE sell_albums (
+    PROCEDURE sell_albums(
         -- id альбома
         album_id NUMBER,
         -- Количество
@@ -748,7 +748,7 @@ PACKAGE grushevskaya_package AS
     -- с пересчётом остальных номеров 
     -- (если не продано ни одного экземпляра альбома
     --  - Условие проверяется на уровне триггера).
-    PROCEDURE delete_record_from_album (
+    PROCEDURE delete_record_from_album(
         -- id альбома
         album_id NUMBER,
         -- Номер звучания записи в альбоме
@@ -758,7 +758,7 @@ PACKAGE grushevskaya_package AS
     -- (если запись не входит ни в один альбом 
     -- и если этот исполнитель не единственный
     --  - Условия проверяются на уровне триггера). 
-    PROCEDURE delete_singer_from_record (
+    PROCEDURE delete_singer_from_record(
         -- id записи
         record_id NUMBER,
         -- Имя исполнителя        
@@ -766,7 +766,7 @@ PACKAGE grushevskaya_package AS
     );
     -- 15) Определить предпочитаемый музыкальный стиль указанного исполнителя 
     -- (стиль, в котором записано большинство его треков). 
-    PROCEDURE print_singer_style (
+    PROCEDURE print_singer_style(
         -- Имя исполнителя
         singer_name VARCHAR2
     );
@@ -784,16 +784,17 @@ END;
 /
 CREATE OR REPLACE
 PACKAGE BODY grushevskaya_package AS
-    PROCEDURE print_msg_ex(sqlcode NUMBER) IS
+    PROCEDURE print_msg_ex(sqlcode NUMBER) 
+    IS
     BEGIN
         dbms_output.put_line('Ой. Неизвестное исключение.');
         dbms_output.put_line('Код: ' || sqlcode);
         dbms_output.put_line('Сообщение: ' || SQLERRM(sqlcode));        
     END print_msg_ex;
     
-    PROCEDURE add_in_dict_country (
+    PROCEDURE add_in_dict_country(
         name VARCHAR2
-    )IS
+    ) IS
     BEGIN
         INSERT INTO Grushevskaya_dict_country (name) VALUES (name);
         COMMIT;
@@ -812,9 +813,9 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_in_dict_country;
     
-    PROCEDURE add_in_dict_style (
+    PROCEDURE add_in_dict_style(
         name VARCHAR2
-    )IS
+    ) IS
     BEGIN
         INSERT INTO Grushevskaya_dict_style (name) VALUES (name);
         COMMIT;        
@@ -882,7 +883,7 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_record; 
     
-    PROCEDURE add_singer_in_record (
+    PROCEDURE add_singer_in_record(
         record_id NUMBER,
         singer_name VARCHAR2
     ) IS
@@ -919,7 +920,7 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_singer_in_record;
     
-    PROCEDURE add_singer (
+    PROCEDURE add_singer(
         name VARCHAR2,
         country VARCHAR2
     ) IS
@@ -944,7 +945,7 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_singer;
         
-    PROCEDURE add_album (
+    PROCEDURE add_album(
         name VARCHAR2,
         price NUMBER,
         quantity_in_stock NUMBER,
@@ -1001,7 +1002,7 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_album;
         
-    PROCEDURE add_album (
+    PROCEDURE add_album(
         name VARCHAR2,
         price NUMBER,
         quantity_in_stock NUMBER
@@ -1054,10 +1055,10 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_album;
     
-    PROCEDURE add_record_in_album (
+    PROCEDURE add_record_in_album(
         album_id NUMBER, 
         record_id NUMBER
-    )IS
+    ) IS
         record_serial_number NUMBER := -1;
         tmp_record_arr Grushevskaya_record_arr;
     BEGIN        
@@ -1361,7 +1362,7 @@ PACKAGE BODY grushevskaya_package AS
         print_msg_ex(sqlcode);
     END print_income;    
     
-    PROCEDURE delete_record_from_album (
+    PROCEDURE delete_record_from_album(
         album_id NUMBER,
         record_number NUMBER
     ) IS
@@ -1408,7 +1409,7 @@ PACKAGE BODY grushevskaya_package AS
         END IF;    
     END delete_record_from_album;    
     
-    PROCEDURE delete_singer_from_record (
+    PROCEDURE delete_singer_from_record(
         record_id NUMBER,
         singer_name VARCHAR2
     ) IS
@@ -1448,7 +1449,7 @@ PACKAGE BODY grushevskaya_package AS
         END IF;        
     END delete_singer_from_record;
         
-    PROCEDURE print_singer_style (
+    PROCEDURE print_singer_style(
         singer_name VARCHAR2
     ) IS
         count_singer_in_table NUMBER := 0;

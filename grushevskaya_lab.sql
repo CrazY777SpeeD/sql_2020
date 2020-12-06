@@ -46,81 +46,81 @@ CREATE SEQUENCE Grushevskaya_num_album
     NOCACHE NOCYCLE;
 /
 
--- COUNTRY - вспомогательная таблица, содержащая словарь стран. 
+-- country - вспомогательная таблица, содержащая словарь стран. 
 -- Исключает ситуацию, когда где-то страна "РФ", а где-то "Россия".
 
 CREATE TABLE Grushevskaya_dict_country(
     -- название страны
-    NAME VARCHAR2(100 BYTE)
+    name VARCHAR2(100 BYTE)
         PRIMARY KEY
         NOT NULL
 );
 --/
---INSERT INTO Grushevskaya_dict_country (NAME) VALUES ('Великобритания');
---INSERT INTO Grushevskaya_dict_country (NAME) VALUES ('Россия');
---INSERT INTO Grushevskaya_dict_country (NAME) VALUES ('СССР');
---INSERT INTO Grushevskaya_dict_country (NAME) VALUES ('США');
---INSERT INTO Grushevskaya_dict_country (NAME) VALUES ('Швеция');
+--INSERT INTO Grushevskaya_dict_country (name) VALUES ('Великобритания');
+--INSERT INTO Grushevskaya_dict_country (name) VALUES ('Россия');
+--INSERT INTO Grushevskaya_dict_country (name) VALUES ('СССР');
+--INSERT INTO Grushevskaya_dict_country (name) VALUES ('США');
+--INSERT INTO Grushevskaya_dict_country (name) VALUES ('Швеция');
 /
--- SINGER – исполнитель (имя, псевдоним или название группы; страна)
+-- singer – исполнитель (имя, псевдоним или название группы; страна)
 
 CREATE TABLE Grushevskaya_singer(
     -- имя, псевдоним или название группы
-    NAME VARCHAR2(100 BYTE),
+    name VARCHAR2(100 BYTE),
     -- страна
-    COUNTRY VARCHAR2(100 BYTE)
+    country VARCHAR2(100 BYTE)
 );
 --/
 ---- Тестовые данные
---INSERT INTO Grushevskaya_singer (NAME,COUNTRY) VALUES ('Майкл Джексон','США');
---INSERT INTO Grushevskaya_singer (NAME,COUNTRY) VALUES ('Пол Маккартни','Великобритания');
---INSERT INTO Grushevskaya_singer (NAME,COUNTRY) VALUES ('Backstreet Boys','США');
---INSERT INTO Grushevskaya_singer (NAME,COUNTRY) VALUES ('ABBA','Швеция');
---INSERT INTO Grushevskaya_singer (NAME,COUNTRY) VALUES ('Валентина Толкунова','Россия');
---INSERT INTO Grushevskaya_singer (NAME,COUNTRY) VALUES ('Лев Лещенко','Россия');
---INSERT INTO Grushevskaya_singer (NAME,COUNTRY) VALUES ('Иванов Иван','Россия');
---INSERT INTO Grushevskaya_singer (NAME,COUNTRY) VALUES ('Сидоров Алексей','Россия');
---INSERT INTO Grushevskaya_singer (NAME,COUNTRY) VALUES ('Петров Петр','Россия');
---INSERT INTO Grushevskaya_singer (NAME,COUNTRY) VALUES ('Иосиф Кобзон','Россия');
---INSERT INTO Grushevskaya_singer (NAME,COUNTRY) VALUES ('Майя Кристалинская','СССР');
---INSERT INTO Grushevskaya_singer (NAME,COUNTRY) VALUES ('Эдуард Хиль','Россия');
+--INSERT INTO Grushevskaya_singer (name,country) VALUES ('Майкл Джексон','США');
+--INSERT INTO Grushevskaya_singer (name,country) VALUES ('Пол Маккартни','Великобритания');
+--INSERT INTO Grushevskaya_singer (name,country) VALUES ('Backstreet Boys','США');
+--INSERT INTO Grushevskaya_singer (name,country) VALUES ('ABBA','Швеция');
+--INSERT INTO Grushevskaya_singer (name,country) VALUES ('Валентина Толкунова','Россия');
+--INSERT INTO Grushevskaya_singer (name,country) VALUES ('Лев Лещенко','Россия');
+--INSERT INTO Grushevskaya_singer (name,country) VALUES ('Иванов Иван','Россия');
+--INSERT INTO Grushevskaya_singer (name,country) VALUES ('Сидоров Алексей','Россия');
+--INSERT INTO Grushevskaya_singer (name,country) VALUES ('Петров Петр','Россия');
+--INSERT INTO Grushevskaya_singer (name,country) VALUES ('Иосиф Кобзон','Россия');
+--INSERT INTO Grushevskaya_singer (name,country) VALUES ('Майя Кристалинская','СССР');
+--INSERT INTO Grushevskaya_singer (name,country) VALUES ('Эдуард Хиль','Россия');
 /
 -- Ограничения на SINGER
 ALTER TABLE Grushevskaya_singer 
-    ADD CONSTRAINT Grushevskaya_singer_pk
-    PRIMARY KEY(NAME) ENABLE;
+    ADD CONSTRAINT grushevskaya_singer_pk
+    PRIMARY KEY(name) ENABLE;
 ALTER TABLE Grushevskaya_singer 
-    MODIFY (NAME NOT NULL ENABLE);
+    MODIFY (name NOT NULL ENABLE);
 
 ALTER TABLE Grushevskaya_singer 
-    MODIFY (COUNTRY NOT NULL ENABLE);
+    MODIFY (country NOT NULL ENABLE);
     
 ALTER TABLE Grushevskaya_singer 
-    ADD CONSTRAINT Grushevskaya_singer_fk
-    FOREIGN KEY (COUNTRY)
-    REFERENCES Grushevskaya_dict_country (NAME) 
+    ADD CONSTRAINT grushevskaya_singer_fk
+    FOREIGN KEY (country)
+    REFERENCES Grushevskaya_dict_country (name) 
     ON DELETE SET NULL ENABLE;
 
--- STYLE - вспомогательная таблица, содержащая словарь стилей
+-- style - вспомогательная таблица, содержащая словарь стилей
 -- Исключает ситуацию, когда где-то стиль "Джаз", а где-то "джаз".
 
 CREATE TABLE Grushevskaya_dict_style(
     -- название стиля
-    NAME VARCHAR2(100 BYTE)
+    name VARCHAR2(100 BYTE)
         PRIMARY KEY
         NOT NULL
 );
 --/
 ---- Тестовые данные
---INSERT INTO Grushevskaya_dict_style (NAME) VALUES ('Баллада');
---INSERT INTO Grushevskaya_dict_style (NAME) VALUES ('Джаз');
---INSERT INTO Grushevskaya_dict_style (NAME) VALUES ('Диско');
---INSERT INTO Grushevskaya_dict_style (NAME) VALUES ('Поп-музыка');
---INSERT INTO Grushevskaya_dict_style (NAME) VALUES ('Постдиско');
---INSERT INTO Grushevskaya_dict_style (NAME) VALUES ('Ритм-н-блюз');
---INSERT INTO Grushevskaya_dict_style (NAME) VALUES ('Софт-рок');
---INSERT INTO Grushevskaya_dict_style (NAME) VALUES ('Фанк');
---INSERT INTO Grushevskaya_dict_style (NAME) VALUES ('Хард-рок');
+--INSERT INTO Grushevskaya_dict_style (name) VALUES ('Баллада');
+--INSERT INTO Grushevskaya_dict_style (name) VALUES ('Джаз');
+--INSERT INTO Grushevskaya_dict_style (name) VALUES ('Диско');
+--INSERT INTO Grushevskaya_dict_style (name) VALUES ('Поп-музыка');
+--INSERT INTO Grushevskaya_dict_style (name) VALUES ('Постдиско');
+--INSERT INTO Grushevskaya_dict_style (name) VALUES ('Ритм-н-блюз');
+--INSERT INTO Grushevskaya_dict_style (name) VALUES ('Софт-рок');
+--INSERT INTO Grushevskaya_dict_style (name) VALUES ('Фанк');
+--INSERT INTO Grushevskaya_dict_style (name) VALUES ('Хард-рок');
 
 -- RECORD
 
@@ -128,91 +128,92 @@ CREATE TABLE Grushevskaya_dict_style(
 -- Вложенная таблица исполнителей
 CREATE TYPE Grushevskaya_singer_tab AS TABLE OF VARCHAR2(100 BYTE);
 /
--- RECORD – запись (идентификатор, название, время звучания, 
+-- record – запись 
+-- (идентификатор, название, время звучания, 
 -- стиль, список исполнителей)
-CREATE TABLE Grushevskaya_record(
+CREATE TABLE Grushevskaya_record (
     -- идентификатор
-    ID NUMBER(10,0),
+    id NUMBER(10,0),
     -- название
-    NAME VARCHAR2(100 BYTE),
+    name VARCHAR2(100 BYTE),
     -- время звучания
-    TIME INTERVAL DAY (0) TO SECOND (0),
+    time INTERVAL DAY (0) TO SECOND (0),
     -- стиль
-    STYLE VARCHAR2(100 BYTE),
+    style VARCHAR2(100 BYTE),
     -- список исполнителей
-    SINGER_LIST Grushevskaya_singer_tab
-)NESTED TABLE SINGER_LIST
+    singer_list Grushevskaya_singer_tab
+) NESTED TABLE Singer_list
     STORE AS Grushevskaya_singer_list;
 --/
 ---- Тестовые данные
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('1','Wanna Be Startin’ Somethin’','+00 00:06:30.000000','Постдиско', Grushevskaya_singer_tab('Майкл Джексон'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('2','Baby Be Mine','+00 00:04:20.000000','Поп-музыка', Grushevskaya_singer_tab('Майкл Джексон'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('3','The Girl Is Mine','+00 00:03:41.000000','Софт-рок', Grushevskaya_singer_tab('Майкл Джексон', 'Пол Маккартни'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('4','Thriller','+00 00:05:58.000000','Фанк', Grushevskaya_singer_tab('Майкл Джексон'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('5','Beat It','+00 00:04:18.000000','Хард-рок', Grushevskaya_singer_tab('Майкл Джексон'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('6','Billie Jean','+00 00:04:50.000000','Фанк', Grushevskaya_singer_tab('Майкл Джексон'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('7','Human Nature','+00 00:04:06.000000','Ритм-н-блюз', Grushevskaya_singer_tab('Майкл Джексон'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('8','Pretty Young Thing','+00 00:03:58.000000','Джаз', Grushevskaya_singer_tab('Майкл Джексон'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('9','The Lady in My Life','+00 00:05:00.000000','Ритм-н-блюз', Grushevskaya_singer_tab('Майкл Джексон'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('10','Larger than life','+00 00:03:52.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('11','I want it that way','+00 00:03:33.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('12','Show me the meaning of being lonely','+00 00:03:54.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('13','It’s gotta be you','+00 00:02:56.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('14','I need you tonight','+00 00:04:23.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('15','Don’t want you back','+00 00:03:25.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('16','Don’t wanna lose you now','+00 00:03:54.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('17','The one','+00 00:03:46.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('18','Back to your heart','+00 00:04:21.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('19','Spanish eyes','+00 00:03:53.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('20','No one else comes close','+00 00:03:42.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('21','The perfect fan','+00 00:04:13.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('22','Dancing Queen','+00 00:03:51.000000','Диско', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('23','Knowing Me, Knowing You','+00 00:04:03.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('24','Take a Chance on Me','+00 00:04:06.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('25','Mamma Mia','+00 00:03:33.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('26','Lay All Your Love on Me','+00 00:04:35.000000','Диско', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('27','Super Trouper','+00 00:04:13.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('28','I Have a Dream','+00 00:04:42.000000','Баллада', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('29','The Winner Takes It All','+00 00:04:54.000000','Баллада', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('30','Money, Money, Money','+00 00:03:05.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('31','SOS','+00 00:03:23.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('32','Chiquitita','+00 00:05:26.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('33','Fernando','+00 00:04:14.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('34','Voulez-Vous','+00 00:05:09.000000','Диско', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('35','Gimme! Gimme! Gimme!','+00 00:04:46.000000','Диско', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('36','Does Your Mother Know','+00 00:03:15.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('37','One of Us','+00 00:03:56.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('38','The Name of the Game','+00 00:04:51.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('39','Thank You for the Music','+00 00:03:51.000000','Баллада', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('40','Waterloo','+00 00:02:42.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('41','Старт даёт Москва','+00 00:02:52.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('42','Добрые приметы','+00 00:02:16.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('43','Олимпийский Мишка','+00 00:03:32.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('44','Вальс влюблённых','+00 00:02:34.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('45','Ночной звонок','+00 00:04:54.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('46','Осень','+00 00:03:49.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
---INSERT INTO Grushevskaya_record (ID,NAME,TIME,STYLE,SINGER_LIST) VALUES ('47','Песня остаётся с человеком','+00 00:03:49.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко', 'Иосиф Кобзон', 'Майя Кристалинская', 'Эдуард Хиль'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('1','Wanna Be Startin’ Somethin’','+00 00:06:30.000000','Постдиско', Grushevskaya_singer_tab('Майкл Джексон'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('2','Baby Be Mine','+00 00:04:20.000000','Поп-музыка', Grushevskaya_singer_tab('Майкл Джексон'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('3','The Girl Is Mine','+00 00:03:41.000000','Софт-рок', Grushevskaya_singer_tab('Майкл Джексон', 'Пол Маккартни'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('4','Thriller','+00 00:05:58.000000','Фанк', Grushevskaya_singer_tab('Майкл Джексон'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('5','Beat It','+00 00:04:18.000000','Хард-рок', Grushevskaya_singer_tab('Майкл Джексон'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('6','Billie Jean','+00 00:04:50.000000','Фанк', Grushevskaya_singer_tab('Майкл Джексон'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('7','Human Nature','+00 00:04:06.000000','Ритм-н-блюз', Grushevskaya_singer_tab('Майкл Джексон'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('8','Pretty Young Thing','+00 00:03:58.000000','Джаз', Grushevskaya_singer_tab('Майкл Джексон'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('9','The Lady in My Life','+00 00:05:00.000000','Ритм-н-блюз', Grushevskaya_singer_tab('Майкл Джексон'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('10','Larger than life','+00 00:03:52.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('11','I want it that way','+00 00:03:33.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('12','Show me the meaning of being lonely','+00 00:03:54.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('13','It’s gotta be you','+00 00:02:56.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('14','I need you tonight','+00 00:04:23.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('15','Don’t want you back','+00 00:03:25.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('16','Don’t wanna lose you now','+00 00:03:54.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('17','The one','+00 00:03:46.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('18','Back to your heart','+00 00:04:21.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('19','Spanish eyes','+00 00:03:53.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('20','No one else comes close','+00 00:03:42.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('21','The perfect fan','+00 00:04:13.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('22','Dancing Queen','+00 00:03:51.000000','Диско', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('23','Knowing Me, Knowing You','+00 00:04:03.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('24','Take a Chance on Me','+00 00:04:06.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('25','Mamma Mia','+00 00:03:33.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('26','Lay All Your Love on Me','+00 00:04:35.000000','Диско', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('27','Super Trouper','+00 00:04:13.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('28','I Have a Dream','+00 00:04:42.000000','Баллада', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('29','The Winner Takes It All','+00 00:04:54.000000','Баллада', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('30','Money, Money, Money','+00 00:03:05.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('31','SOS','+00 00:03:23.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('32','Chiquitita','+00 00:05:26.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('33','Fernando','+00 00:04:14.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('34','Voulez-Vous','+00 00:05:09.000000','Диско', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('35','Gimme! Gimme! Gimme!','+00 00:04:46.000000','Диско', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('36','Does Your Mother Know','+00 00:03:15.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('37','One of Us','+00 00:03:56.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('38','The Name of the Game','+00 00:04:51.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('39','Thank You for the Music','+00 00:03:51.000000','Баллада', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('40','Waterloo','+00 00:02:42.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('41','Старт даёт Москва','+00 00:02:52.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('42','Добрые приметы','+00 00:02:16.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('43','Олимпийский Мишка','+00 00:03:32.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('44','Вальс влюблённых','+00 00:02:34.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('45','Ночной звонок','+00 00:04:54.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('46','Осень','+00 00:03:49.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
+--INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('47','Песня остаётся с человеком','+00 00:03:49.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко', 'Иосиф Кобзон', 'Майя Кристалинская', 'Эдуард Хиль'));
 /
 -- Ограничения на RECORD
 ALTER TABLE Grushevskaya_record 
-    ADD CONSTRAINT Grushevskaya_record_pk 
-    PRIMARY KEY(ID) ENABLE;
+    ADD CONSTRAINT grushevskaya_record_pk 
+    PRIMARY KEY(id) ENABLE;
 ALTER TABLE Grushevskaya_record 
-    MODIFY (ID NOT NULL ENABLE);
+    MODIFY (id NOT NULL ENABLE);
 
 ALTER TABLE Grushevskaya_record 
-    MODIFY (NAME NOT NULL ENABLE);
+    MODIFY (name NOT NULL ENABLE);
 
 ALTER TABLE Grushevskaya_record 
-    MODIFY (TIME NOT NULL ENABLE);
+    MODIFY (time NOT NULL ENABLE);
     
 ALTER TABLE Grushevskaya_record 
-    MODIFY (STYLE NOT NULL ENABLE);
+    MODIFY (style NOT NULL ENABLE);
 
 ALTER TABLE Grushevskaya_record 
-    ADD CONSTRAINT Grushevskaya_record_fk
-    FOREIGN KEY (STYLE)
-    REFERENCES Grushevskaya_dict_style (NAME) 
+    ADD CONSTRAINT grushevskaya_record_fk
+    FOREIGN KEY (style)
+    REFERENCES Grushevskaya_dict_style (name) 
     ON DELETE SET NULL ENABLE;
     
 -- ALBUM
@@ -223,59 +224,59 @@ CREATE TYPE Grushevskaya_record_arr AS VARRAY(30) OF NUMBER(10,0);
 -- ALBUM – альбом (идентификатор, название, стоимость, 
 -- количество на складе, количество проданных экземпляров,
 -- список записей)
-CREATE TABLE Grushevskaya_album(
+CREATE TABLE Grushevskaya_album (
     -- идентификатор    
-    ID NUMBER(10, 0),
+    id NUMBER(10, 0),
     -- название
-    NAME VARCHAR2(100 BYTE),
+    name VARCHAR2(100 BYTE),
     -- стоимость
-    PRICE NUMBER(6,2),
+    price NUMBER(6,2),
     -- количество на складе
-    QUANTITY_IN_STOCK NUMBER(5, 0),
+    quantity_in_stock NUMBER(5, 0),
     -- количество проданных экземпляров
-    QUANTITY_OF_SOLD NUMBER(5, 0),
+    quantity_of_sold NUMBER(5, 0),
     -- список (массив) записей
-    RECORD_ARRAY Grushevskaya_record_arr
+    record_array Grushevskaya_record_arr
 );
 --/
 ---- Тестовые данные
---INSERT INTO Grushevskaya_album (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) VALUES ('1','Thriller','792,5','188','37', Grushevskaya_record_arr(1, 2, 3, 4, 5, 6, 7, 8, 9, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
---INSERT INTO Grushevskaya_album (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) VALUES ('2','Millennium','836,24','33','42', Grushevskaya_record_arr(11, 13, 14, 15, 16, 17, 18, 19, 20, 21, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
---INSERT INTO Grushevskaya_album (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) VALUES ('3','ABBA Gold: Greatest Hits','921,34','199','142', Grushevskaya_record_arr(22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, null, null, null, null, null, null, null, null, null, null, null));
---INSERT INTO Grushevskaya_album (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) VALUES ('4','Валентина Толкунова и Лев Лещенко','127,99','44','7', Grushevskaya_record_arr(41, 42, 43, 44, 45, 46, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
---INSERT INTO Grushevskaya_album (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) VALUES ('5','Разное','87,99','10','0', Grushevskaya_record_arr(3, 4, 8, 12, 16, 17, 23, 29, 32, 38, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
---INSERT INTO Grushevskaya_album (ID,NAME,PRICE,QUANTITY_IN_STOCK,QUANTITY_OF_SOLD,RECORD_ARRAY) VALUES ('6','Пустой альбом','0','0','0', Grushevskaya_record_arr(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+--INSERT INTO Grushevskaya_album (id,name,price,quantity_in_stock,quantity_of_sold,record_array) VALUES ('1','Thriller','792,5','188','37', Grushevskaya_record_arr(1, 2, 3, 4, 5, 6, 7, 8, 9, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+--INSERT INTO Grushevskaya_album (id,name,price,quantity_in_stock,quantity_of_sold,record_array) VALUES ('2','Millennium','836,24','33','42', Grushevskaya_record_arr(11, 13, 14, 15, 16, 17, 18, 19, 20, 21, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+--INSERT INTO Grushevskaya_album (id,name,price,quantity_in_stock,quantity_of_sold,record_array) VALUES ('3','ABBA Gold: Greatest Hits','921,34','199','142', Grushevskaya_record_arr(22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, null, null, null, null, null, null, null, null, null, null, null));
+--INSERT INTO Grushevskaya_album (id,name,price,quantity_in_stock,quantity_of_sold,record_array) VALUES ('4','Валентина Толкунова и Лев Лещенко','127,99','44','7', Grushevskaya_record_arr(41, 42, 43, 44, 45, 46, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+--INSERT INTO Grushevskaya_album (id,name,price,quantity_in_stock,quantity_of_sold,record_array) VALUES ('5','Разное','87,99','10','0', Grushevskaya_record_arr(3, 4, 8, 12, 16, 17, 23, 29, 32, 38, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+--INSERT INTO Grushevskaya_album (id,name,price,quantity_in_stock,quantity_of_sold,record_array) VALUES ('6','Пустой альбом','0','0','0', Grushevskaya_record_arr(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
 /
 -- Ограничения на ALBUM
 ALTER TABLE Grushevskaya_album 
-    ADD CONSTRAINT Grushevskaya_album_pk
-    PRIMARY KEY(ID) ENABLE;
+    ADD CONSTRAINT grushevskaya_album_pk
+    PRIMARY KEY(id) ENABLE;
 ALTER TABLE Grushevskaya_album 
-    MODIFY (ID NOT NULL ENABLE);
+    MODIFY (id NOT NULL ENABLE);
 
 ALTER TABLE Grushevskaya_album 
-    MODIFY (NAME NOT NULL ENABLE);
+    MODIFY (name NOT NULL ENABLE);
 
 ALTER TABLE Grushevskaya_album 
-    MODIFY (PRICE NOT NULL ENABLE);
+    MODIFY (price NOT NULL ENABLE);
 ALTER TABLE Grushevskaya_album 
-    ADD CONSTRAINT Grushevskaya_album_chk1 
-    CHECK (PRICE >= 0) ENABLE;
+    ADD CONSTRAINT grushevskaya_album_chk1 
+    CHECK (price >= 0) ENABLE;
 
 ALTER TABLE Grushevskaya_album 
-    MODIFY (QUANTITY_IN_STOCK NOT NULL ENABLE);
+    MODIFY (quantity_in_stock NOT NULL ENABLE);
 ALTER TABLE Grushevskaya_album 
-    ADD CONSTRAINT Grushevskaya_album_chk2 
-    CHECK (QUANTITY_IN_STOCK >= 0) ENABLE;
+    ADD CONSTRAINT grushevskaya_album_chk2 
+    CHECK (quantity_in_stock >= 0) ENABLE;
 
 ALTER TABLE Grushevskaya_album 
-    MODIFY (QUANTITY_OF_SOLD NOT NULL ENABLE);
+    MODIFY (quantity_of_sold NOT NULL ENABLE);
 ALTER TABLE Grushevskaya_album 
-    ADD CONSTRAINT Grushevskaya_album_chk3 
-    CHECK (QUANTITY_OF_SOLD >= 0) ENABLE;
+    ADD CONSTRAINT grushevskaya_album_chk3 
+    CHECK (quantity_of_sold >= 0) ENABLE;
 
 ALTER TABLE Grushevskaya_album 
-    MODIFY (RECORD_ARRAY NOT NULL ENABLE);
+    MODIFY (record_array NOT NULL ENABLE);
 /
 
 -- Связь «многие-ко-многим» SINGER-RECORD
@@ -292,37 +293,37 @@ DECLARE
     LIST_NAME Grushevskaya_singer_tab;
     FLAG_RECORD_USES BOOLEAN := FALSE;
 BEGIN
-    -- Проверка на NULL поля SINGER_LIST
-    IF :NEW.SINGER_LIST IS NULL THEN
+    -- Проверка на NULL поля singer_list
+    IF :NEW.singer_list IS NULL THEN
        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORDS');
-       DBMS_OUTPUT.PUT_LINE('SINGER_LIST не должен быть пустым (NULL).'); 
+       DBMS_OUTPUT.PUT_LINE('singer_list не должен быть пустым (NULL).'); 
        RAISE grushevskaya_exceptions.Error_record;
     END IF;
     -- Удаление пустот во вл.таб.
-    FOR i IN 1..:NEW.SINGER_LIST.COUNT
+    FOR i IN 1..:NEW.singer_list.COUNT
     LOOP
-        IF :NEW.SINGER_LIST(i) IS NULL THEN 
-            :NEW.SINGER_LIST.DELETE(i);
+        IF :NEW.singer_list(i) IS NULL THEN 
+            :NEW.singer_list.DELETE(i);
         END IF;
     END LOOP;
-    :NEW.SINGER_LIST := SET(:NEW.SINGER_LIST);
+    :NEW.singer_list := SET(:NEW.singer_list);
     -- Список исполнителей не должен быть пуст
-    IF :NEW.SINGER_LIST IS EMPTY THEN
+    IF :NEW.singer_list IS EMPTY THEN
         IF INSERTING THEN
            DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORDS');
-           DBMS_OUTPUT.PUT_LINE('SINGER_LIST не должен быть пустым (EMPTY).'); 
+           DBMS_OUTPUT.PUT_LINE('singer_list не должен быть пустым (EMPTY).'); 
            RAISE grushevskaya_exceptions.Error_record;
         END IF;
         IF UPDATING THEN
-            :NEW.ID := :OLD.ID;
-            :NEW.NAME := :OLD.NAME;
-            :NEW.TIME := :OLD.TIME;
-            :NEW.STYLE := :OLD.STYLE;
-            :NEW.SINGER_LIST := :OLD.SINGER_LIST;
+            :NEW.id := :OLD.id;
+            :NEW.name := :OLD.name;
+            :NEW.time := :OLD.time;
+            :NEW.style := :OLD.style;
+            :NEW.singer_list := :OLD.singer_list;
             DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_RECORDS');
             DBMS_OUTPUT.PUT_LINE(
                 'Запись с идентификатором ' 
-                || :OLD.ID 
+                || :OLD.id 
                 || ' не была обновлена.'
             );
             DBMS_OUTPUT.PUT_LINE(
@@ -336,24 +337,24 @@ BEGIN
     IF UPDATING THEN
         FOR ALBUM_ROW IN (SELECT * FROM Grushevskaya_album)
         LOOP
-            FOR i IN 1..ALBUM_ROW.RECORD_ARRAY.COUNT
+            FOR i IN 1..ALBUM_ROW.record_array.COUNT
             LOOP
-                IF ALBUM_ROW.RECORD_ARRAY(i) = :OLD.ID THEN
+                IF ALBUM_ROW.record_array(i) = :OLD.id THEN
                     FLAG_RECORD_USES := TRUE;
                 END IF;
             END LOOP;
         END LOOP;
         IF FLAG_RECORD_USES
-           AND NOT (SET(:NEW.SINGER_LIST) = SET(:OLD.SINGER_LIST)) THEN
-            :NEW.ID := :OLD.ID;
-            :NEW.NAME := :OLD.NAME;
-            :NEW.TIME := :OLD.TIME;
-            :NEW.STYLE := :OLD.STYLE;
-            :NEW.SINGER_LIST := :OLD.SINGER_LIST;
+           AND NOT (SET(:NEW.singer_list) = SET(:OLD.singer_list)) THEN
+            :NEW.id := :OLD.id;
+            :NEW.name := :OLD.name;
+            :NEW.time := :OLD.time;
+            :NEW.style := :OLD.style;
+            :NEW.singer_list := :OLD.singer_list;
             DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_RECORDS');
             DBMS_OUTPUT.PUT_LINE(
                 'Запись с идентификатором ' 
-                || :OLD.ID 
+                || :OLD.id 
                 || ' не была обновлена.'
             );
             DBMS_OUTPUT.PUT_LINE(
@@ -366,22 +367,22 @@ BEGIN
     -- Проверка внеш.кл.
     -- Если подмножество исполнителей не соответствует таблице исполнителей,
     -- то отменить вставку или "откатить" обновление
-    SELECT NAME BULK COLLECT INTO LIST_NAME FROM Grushevskaya_singer;
-    IF :NEW.SINGER_LIST NOT SUBMULTISET OF LIST_NAME THEN
+    SELECT name BULK COLLECT INTO LIST_NAME FROM Grushevskaya_singer;
+    IF :NEW.singer_list NOT SUBMULTISET OF LIST_NAME THEN
         IF INSERTING THEN            
             DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORDS');
             DBMS_OUTPUT.PUT_LINE('Некорректный список исполнителей.');
             RAISE grushevskaya_exceptions.Error_record;
         ELSE
-            :NEW.ID := :OLD.ID;
-            :NEW.NAME := :OLD.NAME;
-            :NEW.TIME := :OLD.TIME;
-            :NEW.STYLE := :OLD.STYLE;
-            :NEW.SINGER_LIST := :OLD.SINGER_LIST;
+            :NEW.id := :OLD.id;
+            :NEW.name := :OLD.name;
+            :NEW.time := :OLD.time;
+            :NEW.style := :OLD.style;
+            :NEW.singer_list := :OLD.singer_list;
             DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_RECORDS');
             DBMS_OUTPUT.PUT_LINE(
                 'Запись с идентификатором ' 
-                || :OLD.ID 
+                || :OLD.id 
                 || ' не была обновлена из-за нарушения внешнего ключа (исполнители).'
             );
             RAISE grushevskaya_exceptions.Warning_update;
@@ -400,13 +401,13 @@ FOR EACH ROW
 BEGIN
     FOR RECORD_ROW IN (SELECT * FROM Grushevskaya_record)
     LOOP
-        FOR i IN 1..RECORD_ROW.SINGER_LIST.COUNT
+        FOR i IN 1..RECORD_ROW.singer_list.COUNT
         LOOP
-            IF RECORD_ROW.SINGER_LIST(i) = :OLD.NAME THEN                
+            IF RECORD_ROW.singer_list(i) = :OLD.name THEN                
                 DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_SINGERS_DEL');
                 DBMS_OUTPUT.PUT_LINE(
                     'Исполнителя с идентификатором ' 
-                    || :OLD.NAME 
+                    || :OLD.name 
                     || ' удалять нельзя - у него есть треки.'
                 );
                 RAISE grushevskaya_exceptions.Error_singer_del;
@@ -421,13 +422,13 @@ END;
 -- и обновить саму запись
 CREATE OR REPLACE 
 TRIGGER GRUSHEVSKAYA_TR_ON_SINGERS_UDP
-FOR UPDATE OF NAME ON Grushevskaya_singer
+FOR UPDATE OF name ON Grushevskaya_singer
 COMPOUND TRIGGER
     TYPE CHANGES_ARR IS TABLE OF VARCHAR2(100 BYTE) INDEX BY PLS_INTEGER;
     SINGERS_CHANGES CHANGES_ARR;
 AFTER EACH ROW IS
     BEGIN
-        SINGERS_CHANGES(:OLD.NAME) := :NEW.NAME;
+        SINGERS_CHANGES(:OLD.name) := :NEW.name;
     END AFTER EACH ROW;
 AFTER STATEMENT IS
         LIST_NAME Grushevskaya_singer_tab;
@@ -436,7 +437,7 @@ AFTER STATEMENT IS
         FOR RECORD_ROW IN (SELECT * FROM Grushevskaya_record)
         LOOP
             FLAG := FALSE;
-            LIST_NAME := RECORD_ROW.SINGER_LIST;
+            LIST_NAME := RECORD_ROW.singer_list;
             FOR i IN 1..LIST_NAME.COUNT 
             LOOP
                 IF SINGERS_CHANGES.EXISTS(LIST_NAME(i)) THEN
@@ -446,8 +447,8 @@ AFTER STATEMENT IS
             END LOOP;
             IF FLAG = TRUE THEN
                 UPDATE Grushevskaya_record
-                    SET SINGER_LIST = SET(LIST_NAME)
-                    WHERE ID = RECORD_ROW.ID;
+                    SET singer_list = SET(LIST_NAME)
+                    WHERE id = RECORD_ROW.id;
             END IF;
         END LOOP;
     END AFTER STATEMENT;
@@ -472,15 +473,15 @@ DECLARE
     UNIQUE_RECORDS_VARRAY Grushevskaya_record_arr := Grushevskaya_record_arr();
     CURRENT_UNIQUE_RECORD VARCHAR2(100 BYTE);
     TYPE Grushevskaya_record_TAB IS TABLE OF NUMBER(10, 0);
-    LIST_ID Grushevskaya_record_TAB;    
+    LIST_id Grushevskaya_record_TAB;    
 BEGIN
-    IF UPDATING('RECORD_ARRAY') THEN
+    IF UPDATING('record_array') THEN
         -- Удаление дубликатов из VARRAY
-        FOR k IN 1..:NEW.RECORD_ARRAY.COUNT
+        FOR k IN 1..:NEW.record_array.COUNT
         LOOP
-            IF NOT :NEW.RECORD_ARRAY(k) IS NULL THEN
-                IF NOT LIST_UNIQUE_RECORDS.EXISTS(:NEW.RECORD_ARRAY(k)) THEN
-                    LIST_UNIQUE_RECORDS(:NEW.RECORD_ARRAY(k)) := k;
+            IF NOT :NEW.record_array(k) IS NULL THEN
+                IF NOT LIST_UNIQUE_RECORDS.EXISTS(:NEW.record_array(k)) THEN
+                    LIST_UNIQUE_RECORDS(:NEW.record_array(k)) := k;
                 END IF;                
             END IF;
         END LOOP;
@@ -491,40 +492,40 @@ BEGIN
             UNIQUE_RECORDS_VARRAY(LIST_UNIQUE_RECORDS(CURRENT_UNIQUE_RECORD)) := CURRENT_UNIQUE_RECORD;
             CURRENT_UNIQUE_RECORD := LIST_UNIQUE_RECORDS.NEXT(CURRENT_UNIQUE_RECORD);
         END LOOP;
-        :NEW.RECORD_ARRAY := UNIQUE_RECORDS_VARRAY;
+        :NEW.record_array := UNIQUE_RECORDS_VARRAY;
         -- Если альбом продан, то добавлять треки нельзя.    
-        IF :OLD.QUANTITY_OF_SOLD > 0 THEN
-            FOR j IN 1..:OLD.RECORD_ARRAY.COUNT
+        IF :OLD.quantity_of_sold > 0 THEN
+            FOR j IN 1..:OLD.record_array.COUNT
             LOOP
-                IF :NEW.RECORD_ARRAY(j) IS NULL AND :OLD.RECORD_ARRAY(j) IS NULL THEN
+                IF :NEW.record_array(j) IS NULL AND :OLD.record_array(j) IS NULL THEN
                     CONTINUE;
                 END IF;
-                IF :NEW.RECORD_ARRAY(j) IS NULL OR :OLD.RECORD_ARRAY(j) IS NULL THEN
-                    :NEW.ID := :OLD.ID;
-                    :NEW.NAME := :OLD.NAME;
-                    :NEW.PRICE := :OLD.PRICE;
-                    :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
-                    :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
-                    :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                               
+                IF :NEW.record_array(j) IS NULL OR :OLD.record_array(j) IS NULL THEN
+                    :NEW.id := :OLD.id;
+                    :NEW.name := :OLD.name;
+                    :NEW.price := :OLD.price;
+                    :NEW.quantity_in_stock := :OLD.quantity_in_stock;
+                    :NEW.quantity_of_sold := :OLD.quantity_of_sold;
+                    :NEW.record_array := :OLD.record_array;                               
                     DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
                     DBMS_OUTPUT.PUT_LINE(
                         'Альбом с идентификатором ' 
-                        || :OLD.ID 
+                        || :OLD.id 
                         || ' не был обновлен. Нельзя добавлять треки, если альбом продан.'
                     );
                     RAISE grushevskaya_exceptions.Warning_update;
                 END IF;
-                IF :NEW.RECORD_ARRAY(j) <> :OLD.RECORD_ARRAY(j) THEN
-                    :NEW.ID := :OLD.ID;
-                    :NEW.NAME := :OLD.NAME;
-                    :NEW.PRICE := :OLD.PRICE;
-                    :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
-                    :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
-                    :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                               
+                IF :NEW.record_array(j) <> :OLD.record_array(j) THEN
+                    :NEW.id := :OLD.id;
+                    :NEW.name := :OLD.name;
+                    :NEW.price := :OLD.price;
+                    :NEW.quantity_in_stock := :OLD.quantity_in_stock;
+                    :NEW.quantity_of_sold := :OLD.quantity_of_sold;
+                    :NEW.record_array := :OLD.record_array;                               
                     DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
                     DBMS_OUTPUT.PUT_LINE(
                         'Альбом с идентификатором ' 
-                        || :OLD.ID 
+                        || :OLD.id 
                         || ' не был обновлен. Нельзя добавлять треки, если альбом продан.'
                     );
                     RAISE grushevskaya_exceptions.Warning_update;
@@ -537,26 +538,26 @@ BEGIN
     -- проверить, что все записи существуют.
     -- Если нет, то либо отменить втавку, 
     -- либо "откатить" обновление.
-    SELECT ID BULK COLLECT INTO LIST_ID FROM Grushevskaya_record;
-    FOR i IN 1..:NEW.RECORD_ARRAY.COUNT
+    SELECT id BULK COLLECT INTO LIST_id FROM Grushevskaya_record;
+    FOR i IN 1..:NEW.record_array.COUNT
     LOOP
-       IF NOT :NEW.RECORD_ARRAY(i) IS NULL
-          AND NOT :NEW.RECORD_ARRAY(i) MEMBER LIST_ID THEN
+       IF NOT :NEW.record_array(i) IS NULL
+          AND NOT :NEW.record_array(i) MEMBER LIST_id THEN
             IF INSERTING THEN                               
                 DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_ALBUM');
                 DBMS_OUTPUT.PUT_LINE('Некорректный список записей.');
                 RAISE grushevskaya_exceptions.Error_album;
             ELSE
-                :NEW.ID := :OLD.ID;
-                :NEW.NAME := :OLD.NAME;
-                :NEW.PRICE := :OLD.PRICE;
-                :NEW.QUANTITY_IN_STOCK := :OLD.QUANTITY_IN_STOCK;
-                :NEW.QUANTITY_OF_SOLD := :OLD.QUANTITY_OF_SOLD;
-                :NEW.RECORD_ARRAY := :OLD.RECORD_ARRAY;                          
+                :NEW.id := :OLD.id;
+                :NEW.name := :OLD.name;
+                :NEW.price := :OLD.price;
+                :NEW.quantity_in_stock := :OLD.quantity_in_stock;
+                :NEW.quantity_of_sold := :OLD.quantity_of_sold;
+                :NEW.record_array := :OLD.record_array;                          
                 DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
                 DBMS_OUTPUT.PUT_LINE(
                     'Альбом с идентификатором ' 
-                    || :OLD.ID 
+                    || :OLD.id 
                     || ' не был обновлен из-за нарушения внешнего ключа (записи).'
                 );
                 RAISE grushevskaya_exceptions.Warning_update;
@@ -575,13 +576,13 @@ FOR EACH ROW
 BEGIN
     FOR ALBUM_ROW IN (SELECT * FROM Grushevskaya_album)
     LOOP
-        FOR i IN 1..ALBUM_ROW.RECORD_ARRAY.COUNT
+        FOR i IN 1..ALBUM_ROW.record_array.COUNT
         LOOP
-            IF ALBUM_ROW.RECORD_ARRAY(i) = :OLD.ID THEN                               
+            IF ALBUM_ROW.record_array(i) = :OLD.id THEN                               
                 DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORD_DEL');
                 DBMS_OUTPUT.PUT_LINE(
                     'Запиь с идентификатором ' 
-                    || :OLD.ID 
+                    || :OLD.id 
                     || ' удалять нельзя - она есть в альбоме.'
                 );
                 RAISE grushevskaya_exceptions.Error_record_del;
@@ -596,33 +597,33 @@ END;
 -- и обновить сами альбомы.
 CREATE OR REPLACE 
 TRIGGER GRUSHEVSKAYA_TR_ON_RECORD_UDP
-FOR UPDATE OF ID ON Grushevskaya_record
+FOR UPDATE OF id ON Grushevskaya_record
 COMPOUND TRIGGER
     TYPE CHANGES_ARR IS TABLE OF NUMBER(10,0) INDEX BY PLS_INTEGER;
     RECORD_CHANGES CHANGES_ARR;
     AFTER EACH ROW IS
     BEGIN
-        RECORD_CHANGES(:OLD.ID) := :NEW.ID;
+        RECORD_CHANGES(:OLD.id) := :NEW.id;
     END AFTER EACH ROW;
     AFTER STATEMENT IS
-        ID_ARR Grushevskaya_record_arr;
+        id_ARR Grushevskaya_record_arr;
         FLAG BOOLEAN := FALSE;
     BEGIN
         FOR ALBUM_ROW IN (SELECT * FROM Grushevskaya_album)
         LOOP
             FLAG := FALSE;
-            ID_ARR := ALBUM_ROW.RECORD_ARRAY;
-            FOR i IN 1..ID_ARR.COUNT 
+            id_ARR := ALBUM_ROW.record_array;
+            FOR i IN 1..id_ARR.COUNT 
             LOOP
-                IF RECORD_CHANGES.EXISTS(ID_ARR(i)) THEN
-                    ID_ARR(i) := RECORD_CHANGES(ID_ARR(i));
+                IF RECORD_CHANGES.EXISTS(id_ARR(i)) THEN
+                    id_ARR(i) := RECORD_CHANGES(id_ARR(i));
                     FLAG := TRUE;
                 END IF;
             END LOOP;
             IF FLAG = TRUE THEN
                 UPDATE Grushevskaya_album
-                    SET RECORD_ARRAY = ID_ARR
-                    WHERE ID = ALBUM_ROW.ID;
+                    SET record_array = id_ARR
+                    WHERE id = ALBUM_ROW.id;
             END IF;
         END LOOP;
     END AFTER STATEMENT;
@@ -634,14 +635,14 @@ END;
 CREATE OR REPLACE 
 PACKAGE grushevskaya_package AS
     -- Добавить страну в словарь.
-    PROCEDURE ADD_IN_DICT_COUNTRY (
+    PROCEDURE ADD_IN_DICT_country (
         -- Название страны
-        NAME VARCHAR2
+        name VARCHAR2
     );
     -- Добавить стиль в словарь.
-    PROCEDURE ADD_IN_DICT_STYLE (
+    PROCEDURE ADD_IN_DICT_style (
         -- Название стиля
-        NAME VARCHAR2
+        name VARCHAR2
     );
     
     -- Минимальный функционал
@@ -649,7 +650,7 @@ PACKAGE grushevskaya_package AS
     -- 1) Добавить запись (изначально указывается один исполнитель).
     PROCEDURE ADD_RECORD (
         -- Название
-        NAME VARCHAR2, 
+        name VARCHAR2, 
         -- Количество часов звучания
         HOURS NUMBER,
         -- Количество минут звучания
@@ -657,7 +658,7 @@ PACKAGE grushevskaya_package AS
         -- Количество секунд звучания
         SECONDS NUMBER,
         -- Стиль из словаря
-        STYLE VARCHAR2,
+        style VARCHAR2,
         -- Имя исполнителя
         SINGER VARCHAR2
     );
@@ -665,48 +666,48 @@ PACKAGE grushevskaya_package AS
     -- (если указанная запись не добавлена ни в один альбом 
     --  - Условие проверяется на уровне триггера).
     PROCEDURE ADD_SINGER_IN_RECORD (
-        -- ID записи
-        RECORD_ID NUMBER,
+        -- id записи
+        RECORD_id NUMBER,
         -- Имя исполнителя
         SINGER_NAME VARCHAR2
     );
     -- 3) Добавить исполнителя.
     PROCEDURE ADD_SINGER (
         -- Имя (ФИО)
-        NAME VARCHAR2, 
+        name VARCHAR2, 
         -- Страна из словаря
-        COUNTRY VARCHAR2
+        country VARCHAR2
     );
     -- 4) Добавить альбом (изначально указывается один трек или ни одного).
     -- Реализация для добавления альбома с одной записью.
     PROCEDURE ADD_ALBUM (
         -- Название
-        NAME VARCHAR2,
+        name VARCHAR2,
         -- Цена (>= 0)
-        PRICE NUMBER,
+        price NUMBER,
         -- Количество на складе (>= 0)
-        QUANTITY_IN_STOCK NUMBER,
-        -- ID добавляемой записи
-        RECORD_ID NUMBER
+        quantity_in_stock NUMBER,
+        -- id добавляемой записи
+        RECORD_id NUMBER
     );
     -- 4) Добавить альбом (изначально указывается один трек или ни одного).
     -- Реализация для добавления альбома без записей.
     PROCEDURE ADD_ALBUM (
         -- Название
-        NAME VARCHAR2,
+        name VARCHAR2,
         -- Цена (>= 0)
-        PRICE NUMBER,
+        price NUMBER,
         -- Количество на складе (>= 0)
-        QUANTITY_IN_STOCK NUMBER
+        quantity_in_stock NUMBER
     );
     -- 5) Добавить трек в альбом 
     -- (если не продано ни одного экземпляра
     --  - Условие проверяется на уровне триггера).
     PROCEDURE ADD_RECORD_IN_ALBUM (
-        -- ID альбома
-        ALBUM_ID NUMBER,
-        -- ID добавляемой записи 
-        RECORD_ID NUMBER
+        -- id альбома
+        ALBUM_id NUMBER,
+        -- id добавляемой записи 
+        RECORD_id NUMBER
     );
     -- 6) Список альбомов в продаже (количество на складе больше 0).
     PROCEDURE PRINT_ALBUMS_IN_STOCK;
@@ -715,8 +716,8 @@ PACKAGE grushevskaya_package AS
     -- 8) Поставка альбома
     -- (количество на складе увеличивается на указанное значение).
     PROCEDURE ADD_ALBUMS_IN_STOCK (
-        -- ID альбома
-        ALBUM_ID NUMBER,
+        -- id альбома
+        ALBUM_id NUMBER,
         -- Количество
         QUANTITY NUMBER
     );
@@ -725,8 +726,8 @@ PACKAGE grushevskaya_package AS
     -- продать можно только альбомы, в которых есть хотя бы один трек
     --  - Условие проверяется в самой функции). 
     PROCEDURE SELL_ALBUMS(
-        -- ID альбома
-        ALBUM_ID NUMBER,
+        -- id альбома
+        ALBUM_id NUMBER,
         -- Количество
         QUANTITY NUMBER
     );
@@ -737,7 +738,7 @@ PACKAGE grushevskaya_package AS
     
     -- 11) Трек-лист указанного альбома 
     -- с указанием суммарного времени звучания альбома.
-    PROCEDURE PRINT_ALBUM_RECORDS(ALBUM_ID NUMBER);
+    PROCEDURE PRINT_ALBUM_RECORDS(ALBUM_id NUMBER);
     -- 12) Выручка магазина 
     -- (суммарная стоимость проданных альбомов 
     -- по каждому в отдельности 
@@ -748,8 +749,8 @@ PACKAGE grushevskaya_package AS
     -- (если не продано ни одного экземпляра альбома
     --  - Условие проверяется на уровне триггера).
     PROCEDURE DELETE_RECORD_FROM_ALBUM(
-        -- ID альбома
-        ALBUM_ID NUMBER,
+        -- id альбома
+        ALBUM_id NUMBER,
         -- Номер звучания записи в альбоме
         RECORD_NUMBER NUMBER
     );
@@ -758,20 +759,20 @@ PACKAGE grushevskaya_package AS
     -- и если этот исполнитель не единственный
     --  - Условия проверяются на уровне триггера). 
     PROCEDURE DELETE_SINGER_FROM_RECORD(
-        -- ID записи
-        RECORD_ID NUMBER,
+        -- id записи
+        RECORD_id NUMBER,
         -- Имя исполнителя        
-        SINGER_NAME VARCHAR2
+        SINGER_name VARCHAR2
     );
     -- 15) Определить предпочитаемый музыкальный стиль указанного исполнителя 
     -- (стиль, в котором записано большинство его треков). 
-    PROCEDURE PRINT_SINGER_STYLE(
+    PROCEDURE PRINT_SINGER_style(
         -- Имя исполнителя
-        SINGER_NAME VARCHAR2
+        SINGER_name VARCHAR2
     );
     -- 16) Определить предпочитаемый музыкальный стиль 
     -- по каждой стране происхождения исполнителей.
-    PROCEDURE PRINT_COUNTRY_STYLE; 
+    PROCEDURE PRINT_country_style; 
     -- 17) Определить авторство альбомов 
     -- (для каждого альбома выводится 
     -- исполнитель или список исполнителей,
@@ -790,16 +791,16 @@ PACKAGE BODY grushevskaya_package AS
         DBMS_OUTPUT.PUT_LINE('Сообщение: ' || SQLERRM(SQLCODE));        
     END PRINT_MSG_EX;
     
-    PROCEDURE ADD_IN_DICT_COUNTRY (
-        NAME VARCHAR2
+    PROCEDURE ADD_IN_DICT_country (
+        name VARCHAR2
     )IS
     BEGIN
-        INSERT INTO Grushevskaya_dict_country (NAME) VALUES (NAME);
+        INSERT INTO Grushevskaya_dict_country (name) VALUES (name);
         COMMIT;
-        DBMS_OUTPUT.PUT_LINE('Страна ' || NAME || ' успешно добавлена.');
+        DBMS_OUTPUT.PUT_LINE('Страна ' || name || ' успешно добавлена.');
     EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_IN_DICT_COUNTRY');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_IN_DICT_country');
         IF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -1 THEN
@@ -809,18 +810,18 @@ PACKAGE BODY grushevskaya_package AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_IN_DICT_COUNTRY;
+    END ADD_IN_DICT_country;
     
-    PROCEDURE ADD_IN_DICT_STYLE (
-        NAME VARCHAR2
+    PROCEDURE ADD_IN_DICT_style (
+        name VARCHAR2
     )IS
     BEGIN
-        INSERT INTO Grushevskaya_dict_style (NAME) VALUES (NAME);
+        INSERT INTO Grushevskaya_dict_style (name) VALUES (name);
         COMMIT;        
-        DBMS_OUTPUT.PUT_LINE('Стиль ' || NAME || ' успешно добавлен.');
+        DBMS_OUTPUT.PUT_LINE('Стиль ' || name || ' успешно добавлен.');
     EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_IN_DICT_STYLE');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_IN_DICT_style');
         IF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -1 THEN
@@ -830,33 +831,33 @@ PACKAGE BODY grushevskaya_package AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_IN_DICT_STYLE;
+    END ADD_IN_DICT_style;
     
     PROCEDURE ADD_RECORD(
-        NAME VARCHAR2,
+        name VARCHAR2,
         HOURS NUMBER,
         MINUTES NUMBER,
         SECONDS NUMBER,
-        STYLE VARCHAR2,
+        style VARCHAR2,
         SINGER VARCHAR2
     ) IS
-        TIME INTERVAL DAY(0) TO SECOND(0);
+        time INTERVAL DAY(0) TO SECOND(0);
     BEGIN
-        TIME := NUMTODSINTERVAL(HOURS, 'HOUR') 
+        time := NUMTODSINTERVAL(HOURS, 'HOUR') 
             + NUMTODSINTERVAL(MINUTES, 'MINUTE') 
             + NUMTODSINTERVAL(SECONDS, 'SECOND');
-        INSERT INTO Grushevskaya_record (ID, NAME, TIME, STYLE, SINGER_LIST)
+        INSERT INTO Grushevskaya_record (id, name, time, style, singer_list)
             VALUES (
             Grushevskaya_num_record.NEXTVAL, 
-            NAME, 
-            TIME, 
-            STYLE, 
+            name, 
+            time, 
+            style, 
             Grushevskaya_singer_tab(SINGER)
         );
         COMMIT;        
         DBMS_OUTPUT.PUT_LINE(
-            'Запись ' || NAME 
-            || ' с ID ' || Grushevskaya_num_record.CURRVAL 
+            'Запись ' || name 
+            || ' с id ' || Grushevskaya_num_record.CURRVAL 
             || ' успешно добавлена.'
         );
     EXCEPTION
@@ -867,7 +868,7 @@ PACKAGE BODY grushevskaya_package AS
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_RECORD');
         IF SQLCODE = -02291 THEN
-            DBMS_OUTPUT.PUT_LINE('Нет стиля ' || STYLE || ' в словаре.');
+            DBMS_OUTPUT.PUT_LINE('Нет стиля ' || style || ' в словаре.');
         ELSIF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -1 THEN
@@ -882,27 +883,27 @@ PACKAGE BODY grushevskaya_package AS
     END ADD_RECORD; 
     
     PROCEDURE ADD_SINGER_IN_RECORD (
-        RECORD_ID NUMBER,
-        SINGER_NAME VARCHAR2
+        RECORD_id NUMBER,
+        SINGER_name VARCHAR2
     ) IS
-        TMP_SINGER_LIST Grushevskaya_singer_tab;
+        TMP_singer_list Grushevskaya_singer_tab;
     BEGIN
-        IF SINGER_NAME IS NULL THEN
+        IF SINGER_name IS NULL THEN
             DBMS_OUTPUT.PUT_LINE('Нельзя вставлять NULL-значения.');
             RETURN;
         END IF;
-        SELECT SINGER_LIST INTO TMP_SINGER_LIST 
+        SELECT singer_list INTO TMP_singer_list 
             FROM Grushevskaya_record
-            WHERE ID = RECORD_ID;
-        TMP_SINGER_LIST.EXTEND;
-        TMP_SINGER_LIST(TMP_SINGER_LIST.LAST) := SINGER_NAME;
+            WHERE id = RECORD_id;
+        TMP_singer_list.EXTEND;
+        TMP_singer_list(TMP_singer_list.LAST) := SINGER_name;
         UPDATE Grushevskaya_record
-            SET SINGER_LIST = TMP_SINGER_LIST
-            WHERE ID = RECORD_ID;
+            SET singer_list = TMP_singer_list
+            WHERE id = RECORD_id;
         COMMIT;        
         DBMS_OUTPUT.PUT_LINE(
-            'Исполнитель ' || SINGER_NAME 
-            || ' успешно добавлен в запись с ID ' || RECORD_ID || '.'
+            'Исполнитель ' || SINGER_name 
+            || ' успешно добавлен в запись с id ' || RECORD_id || '.'
         );
     EXCEPTION
     WHEN grushevskaya_exceptions.Warning_update THEN
@@ -919,19 +920,19 @@ PACKAGE BODY grushevskaya_package AS
     END ADD_SINGER_IN_RECORD;
     
     PROCEDURE ADD_SINGER (
-        NAME VARCHAR2,
-        COUNTRY VARCHAR2
+        name VARCHAR2,
+        country VARCHAR2
     ) IS
     BEGIN
-        INSERT INTO Grushevskaya_singer (NAME, COUNTRY)
-            VALUES (NAME, COUNTRY);
+        INSERT INTO Grushevskaya_singer (name, country)
+            VALUES (name, country);
         COMMIT;      
-        DBMS_OUTPUT.PUT_LINE('Исполнитель ' || NAME || ' успешно добавлен.');
+        DBMS_OUTPUT.PUT_LINE('Исполнитель ' || name || ' успешно добавлен.');
     EXCEPTION
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_SINGER');
         IF SQLCODE = -02291 THEN
-            DBMS_OUTPUT.PUT_LINE('Нет страны ' || COUNTRY || ' в словаре.');
+            DBMS_OUTPUT.PUT_LINE('Нет страны ' || country || ' в словаре.');
         ELSIF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -1 THEN
@@ -944,34 +945,34 @@ PACKAGE BODY grushevskaya_package AS
     END ADD_SINGER;
         
     PROCEDURE ADD_ALBUM (
-        NAME VARCHAR2,
-        PRICE NUMBER,
-        QUANTITY_IN_STOCK NUMBER,
-        RECORD_ID NUMBER
+        name VARCHAR2,
+        price NUMBER,
+        quantity_in_stock NUMBER,
+        RECORD_id NUMBER
     ) IS
         RECORD_ARR Grushevskaya_record_arr := Grushevskaya_record_arr();
     BEGIN
         RECORD_ARR.EXTEND(30);
-        RECORD_ARR(1) := RECORD_ID;
+        RECORD_ARR(1) := RECORD_id;
         INSERT INTO Grushevskaya_album (
-            ID, 
-            NAME, 
-            PRICE, 
-            QUANTITY_IN_STOCK,
-            QUANTITY_OF_SOLD,
-            RECORD_ARRAY
+            id, 
+            name, 
+            price, 
+            quantity_in_stock,
+            quantity_of_sold,
+            record_array
         ) VALUES (
             Grushevskaya_num_album.NEXTVAL, 
-            NAME, 
-            PRICE, 
-            QUANTITY_IN_STOCK,
+            name, 
+            price, 
+            quantity_in_stock,
             0,
             RECORD_ARR
         );
         COMMIT;      
         DBMS_OUTPUT.PUT_LINE(
-            'Альбом ' || NAME 
-            || ' с ID ' || Grushevskaya_num_album.CURRVAL 
+            'Альбом ' || name 
+            || ' с id ' || Grushevskaya_num_album.CURRVAL 
             || ' успешно добавлен.'
         );
     EXCEPTION
@@ -1001,32 +1002,32 @@ PACKAGE BODY grushevskaya_package AS
     END ADD_ALBUM;
         
     PROCEDURE ADD_ALBUM (
-        NAME VARCHAR2,
-        PRICE NUMBER,
-        QUANTITY_IN_STOCK NUMBER
+        name VARCHAR2,
+        price NUMBER,
+        quantity_in_stock NUMBER
     ) IS
         RECORD_ARR Grushevskaya_record_arr := Grushevskaya_record_arr();
     BEGIN
         RECORD_ARR.EXTEND(30);
         INSERT INTO Grushevskaya_album (
-            ID, 
-            NAME, 
-            PRICE, 
-            QUANTITY_IN_STOCK,
-            QUANTITY_OF_SOLD,
-            RECORD_ARRAY
+            id, 
+            name, 
+            price, 
+            quantity_in_stock,
+            quantity_of_sold,
+            record_array
         ) VALUES (
             Grushevskaya_num_album.NEXTVAL, 
-            NAME, 
-            PRICE, 
-            QUANTITY_IN_STOCK,
+            name, 
+            price, 
+            quantity_in_stock,
             0,
             RECORD_ARR
         );
         COMMIT;      
         DBMS_OUTPUT.PUT_LINE(
-            'Альбом ' || NAME 
-            || ' с ID ' || Grushevskaya_num_album.CURRVAL 
+            'Альбом ' || name 
+            || ' с id ' || Grushevskaya_num_album.CURRVAL 
             || ' успешно добавлен.'
         );
     EXCEPTION
@@ -1054,19 +1055,19 @@ PACKAGE BODY grushevskaya_package AS
     END ADD_ALBUM;
     
     PROCEDURE ADD_RECORD_IN_ALBUM (
-        ALBUM_ID NUMBER, 
-        RECORD_ID NUMBER
+        ALBUM_id NUMBER, 
+        RECORD_id NUMBER
     )IS
         RECORD_SERIAL_NUMBER NUMBER := -1;
         TMP_RECORD_ARR Grushevskaya_record_arr;
     BEGIN        
-        IF RECORD_ID IS NULL THEN
+        IF RECORD_id IS NULL THEN
             DBMS_OUTPUT.PUT_LINE('Нельзя вставлять NULL-значения.');
             RETURN;
         END IF;
-        SELECT RECORD_ARRAY INTO TMP_RECORD_ARR
+        SELECT record_array INTO TMP_RECORD_ARR
             FROM Grushevskaya_album
-            WHERE ID = ALBUM_ID;
+            WHERE id = ALBUM_id;
         FOR i IN REVERSE 1..TMP_RECORD_ARR.COUNT
         LOOP
             IF TMP_RECORD_ARR(i) IS NULL THEN
@@ -1075,21 +1076,21 @@ PACKAGE BODY grushevskaya_package AS
         END LOOP;
         IF RECORD_SERIAL_NUMBER = -1 THEN
             DBMS_OUTPUT.PUT_LINE(
-                'Альбом с ID ' 
-                || ALBUM_ID 
-                || ' не может содержать больше 30 записей. Запись с ID ' 
-                || RECORD_ID 
+                'Альбом с id ' 
+                || ALBUM_id 
+                || ' не может содержать больше 30 записей. Запись с id ' 
+                || RECORD_id 
                 || ' не добавлена.'
             );
         END IF;
-        TMP_RECORD_ARR(RECORD_SERIAL_NUMBER) := RECORD_ID;
+        TMP_RECORD_ARR(RECORD_SERIAL_NUMBER) := RECORD_id;
         UPDATE Grushevskaya_album
-            SET RECORD_ARRAY = TMP_RECORD_ARR
-            WHERE ID = ALBUM_ID;            
+            SET record_array = TMP_RECORD_ARR
+            WHERE id = ALBUM_id;            
         COMMIT;      
         DBMS_OUTPUT.PUT_LINE(
-            'Запись с ID ' || RECORD_ID 
-            || ' успешно добавлена в альбом с ID ' || ALBUM_ID || '.'
+            'Запись с id ' || RECORD_id 
+            || ' успешно добавлена в альбом с id ' || ALBUM_id || '.'
         );
     EXCEPTION
     WHEN grushevskaya_exceptions.Error_album THEN
@@ -1114,9 +1115,9 @@ PACKAGE BODY grushevskaya_package AS
         QUANTITY NUMBER := 0;
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Альбомы в продаже:');
-        FOR ALBUM IN (SELECT * FROM Grushevskaya_album WHERE QUANTITY_IN_STOCK > 0)
+        FOR ALBUM IN (SELECT * FROM Grushevskaya_album WHERE quantity_in_stock > 0)
         LOOP
-            DBMS_OUTPUT.PUT_LINE(ALBUM.NAME);
+            DBMS_OUTPUT.PUT_LINE(ALBUM.name);
             QUANTITY := QUANTITY + 1;
         END LOOP;
         DBMS_OUTPUT.PUT_LINE('Всего альбомов в продаже: ' || QUANTITY || '.');    
@@ -1132,7 +1133,7 @@ PACKAGE BODY grushevskaya_package AS
         DBMS_OUTPUT.PUT_LINE('Все исполнители:');
         FOR SINGER IN (SELECT * FROM Grushevskaya_singer)
         LOOP
-            DBMS_OUTPUT.PUT_LINE(SINGER.NAME);
+            DBMS_OUTPUT.PUT_LINE(SINGER.name);
         END LOOP;  
         DBMS_OUTPUT.PUT_LINE('Конец списка исполнителей. Больше нет.');
     EXCEPTION
@@ -1142,25 +1143,25 @@ PACKAGE BODY grushevskaya_package AS
     END PRINT_SINGERS;
     
     PROCEDURE ADD_ALBUMS_IN_STOCK (
-        ALBUM_ID NUMBER,
+        ALBUM_id NUMBER,
         QUANTITY NUMBER
     ) IS
     BEGIN
         IF QUANTITY <= 0 THEN
             DBMS_OUTPUT.PUT_LINE(
                 'В продажу поступило отрицательное ' 
-                || 'количество альбомов c ID ' 
-                || ALBUM_ID || '. Количество не обновлено.'
+                || 'количество альбомов c id ' 
+                || ALBUM_id || '. Количество не обновлено.'
             );
             RETURN;
         END IF;
         UPDATE Grushevskaya_album
-            SET QUANTITY_IN_STOCK = QUANTITY_IN_STOCK + QUANTITY
-            WHERE ID = ALBUM_ID;
+            SET quantity_in_stock = quantity_in_stock + QUANTITY
+            WHERE id = ALBUM_id;
         COMMIT;
         DBMS_OUTPUT.PUT_LINE(
             'В продажу поступило ' || QUANTITY 
-            || ' альбомов c ID ' || ALBUM_ID || '.'
+            || ' альбомов c id ' || ALBUM_id || '.'
         );
     EXCEPTION
     WHEN OTHERS THEN
@@ -1175,7 +1176,7 @@ PACKAGE BODY grushevskaya_package AS
     END ADD_ALBUMS_IN_STOCK;    
     
     PROCEDURE SELL_ALBUMS(
-        ALBUM_ID NUMBER,
+        ALBUM_id NUMBER,
         QUANTITY NUMBER
     ) IS
         RECORD_ARR Grushevskaya_record_arr;
@@ -1184,14 +1185,14 @@ PACKAGE BODY grushevskaya_package AS
     BEGIN
         IF QUANTITY <= 0 THEN
             DBMS_OUTPUT.PUT_LINE(
-                'Подается отрицательное количество альбомов c ID ' 
-                || ALBUM_ID || '. Количество не обновлено.'
+                'Подается отрицательное количество альбомов c id ' 
+                || ALBUM_id || '. Количество не обновлено.'
             );
             RETURN;
         END IF;
-        SELECT RECORD_ARRAY INTO RECORD_ARR 
+        SELECT record_array INTO RECORD_ARR 
             FROM Grushevskaya_album
-            WHERE ID = ALBUM_ID;
+            WHERE id = ALBUM_id;
         FOR i IN 1..RECORD_ARR.COUNT
         LOOP
             IF NOT RECORD_ARR(i) IS NULL THEN
@@ -1200,31 +1201,31 @@ PACKAGE BODY grushevskaya_package AS
         END LOOP;
         IF NOT FLAG_ONE_RECORD THEN
             DBMS_OUTPUT.PUT_LINE(
-                'Продать альбом c ID ' 
-                || ALBUM_ID || ' нельзя. В альбоме нет треков.'
+                'Продать альбом c id ' 
+                || ALBUM_id || ' нельзя. В альбоме нет треков.'
             );
             RETURN;
         END IF;
-        SELECT QUANTITY_IN_STOCK INTO MAX_QUANTITY 
+        SELECT quantity_in_stock INTO MAX_QUANTITY 
             FROM Grushevskaya_album
-            WHERE ID = ALBUM_ID;
+            WHERE id = ALBUM_id;
         MAX_QUANTITY := LEAST(MAX_QUANTITY, QUANTITY);
         IF MAX_QUANTITY <= 0 THEN
             DBMS_OUTPUT.PUT_LINE(
-                'Продать альбом c ID ' 
-                || ALBUM_ID || ' нельзя. Альбомов нет на складе.'
+                'Продать альбом c id ' 
+                || ALBUM_id || ' нельзя. Альбомов нет на складе.'
             );
             RETURN;
         END IF;
         UPDATE Grushevskaya_album
             SET 
-                QUANTITY_IN_STOCK = QUANTITY_IN_STOCK - MAX_QUANTITY,
-                QUANTITY_OF_SOLD = QUANTITY_OF_SOLD + MAX_QUANTITY
-            WHERE ID = ALBUM_ID;
+                quantity_in_stock = quantity_in_stock - MAX_QUANTITY,
+                quantity_of_sold = quantity_of_sold + MAX_QUANTITY
+            WHERE id = ALBUM_id;
         COMMIT;
         DBMS_OUTPUT.PUT_LINE(
             'Продано ' || MAX_QUANTITY 
-            || ' альбомов c ID ' || ALBUM_ID || '.'
+            || ' альбомов c id ' || ALBUM_id || '.'
         );
     EXCEPTION
     WHEN OTHERS THEN
@@ -1242,16 +1243,16 @@ PACKAGE BODY grushevskaya_package AS
     IS
         DEL_SINGERS_LIST Grushevskaya_singer_tab;
     BEGIN
-        SELECT NAME BULK COLLECT INTO DEL_SINGERS_LIST FROM Grushevskaya_singer;
+        SELECT name BULK COLLECT INTO DEL_SINGERS_LIST FROM Grushevskaya_singer;
         FOR RECORD IN (SELECT * FROM Grushevskaya_record)
         LOOP
-           FOR i IN 1..RECORD.SINGER_LIST.COUNT
+           FOR i IN 1..RECORD.singer_list.COUNT
             LOOP
                 FOR k IN 1..DEL_SINGERS_LIST.COUNT
                 LOOP                   
                     IF NOT DEL_SINGERS_LIST(k) IS NULL
-                       AND NOT RECORD.SINGER_LIST(i) IS NULL
-                       AND DEL_SINGERS_LIST(k) = RECORD.SINGER_LIST(i) THEN
+                       AND NOT RECORD.singer_list(i) IS NULL
+                       AND DEL_SINGERS_LIST(k) = RECORD.singer_list(i) THEN
                         DEL_SINGERS_LIST(k) := NULL;
                     END IF;                
                 END LOOP;
@@ -1261,7 +1262,7 @@ PACKAGE BODY grushevskaya_package AS
         LOOP
             IF NOT DEL_SINGERS_LIST(j) IS NULL THEN
                 DELETE FROM Grushevskaya_singer
-                WHERE NAME = DEL_SINGERS_LIST(j);
+                WHERE name = DEL_SINGERS_LIST(j);
                 DBMS_OUTPUT.PUT_LINE(
                     'Удален исполнитель ' 
                     || DEL_SINGERS_LIST(j) || '.'
@@ -1277,53 +1278,53 @@ PACKAGE BODY grushevskaya_package AS
     END DELETE_SINGERS_WITHOUT_RECORDS;    
     
     PROCEDURE PRINT_ALBUM_RECORDS(
-        ALBUM_ID NUMBER
+        ALBUM_id NUMBER
     ) IS
-        ALBUM_NAME VARCHAR2(100 BYTE);
+        ALBUM_name VARCHAR2(100 BYTE);
         RECORD_ARR Grushevskaya_record_arr;
         RECORD Grushevskaya_record%ROWTYPE;
-        TIME INTERVAL DAY(0) TO SECOND(0) := NUMTODSINTERVAL(0, 'SECOND');
+        time INTERVAL DAY(0) TO SECOND(0) := NUMTODSINTERVAL(0, 'SECOND');
         SINGERS VARCHAR2(300) := '';
     BEGIN
-        SELECT NAME INTO ALBUM_NAME
+        SELECT name INTO ALBUM_name
             FROM Grushevskaya_album
-            WHERE ID = ALBUM_ID;
-        DBMS_OUTPUT.PUT_LINE('Альбом №' || ALBUM_ID || ' с именем ' || ALBUM_NAME);
-        SELECT RECORD_ARRAY INTO RECORD_ARR
+            WHERE id = ALBUM_id;
+        DBMS_OUTPUT.PUT_LINE('Альбом №' || ALBUM_id || ' с именем ' || ALBUM_name);
+        SELECT record_array INTO RECORD_ARR
             FROM Grushevskaya_album
-            WHERE ID = ALBUM_ID;
+            WHERE id = ALBUM_id;
         FOR i IN 1..RECORD_ARR.COUNT
         LOOP
             IF NOT RECORD_ARR(i) IS NULL THEN
                 SELECT * INTO RECORD FROM Grushevskaya_record 
-                    WHERE ID = RECORD_ARR(i);
+                    WHERE id = RECORD_ARR(i);
                 SINGERS := '-';
-                FOR j IN 1..RECORD.SINGER_LIST.COUNT
+                FOR j IN 1..RECORD.singer_list.COUNT
                 LOOP
-                    SINGERS := SINGERS || ' ' || RECORD.SINGER_LIST(j);
+                    SINGERS := SINGERS || ' ' || RECORD.singer_list(j);
                 END LOOP;
                 DBMS_OUTPUT.PUT_LINE(
                     '№' 
                     || LPAD(i, 2, '0')
                     || ' ' 
-                    || RECORD.STYLE
+                    || RECORD.style
                     || ', ' 
-                    || LPAD(EXTRACT(HOUR FROM RECORD.TIME), 2, '0') || ':' 
-                    || LPAD(EXTRACT(MINUTE FROM RECORD.TIME), 2, '0') || ':' 
-                    || LPAD(EXTRACT(SECOND FROM RECORD.TIME), 2, '0')
+                    || LPAD(EXTRACT(HOUR FROM RECORD.time), 2, '0') || ':' 
+                    || LPAD(EXTRACT(MINUTE FROM RECORD.time), 2, '0') || ':' 
+                    || LPAD(EXTRACT(SECOND FROM RECORD.time), 2, '0')
                     || ' ' 
-                    || RECORD.NAME
+                    || RECORD.name
                     || ' ' 
                     || SINGERS
                 );
-                TIME := RECORD.TIME + TIME;
+                time := RECORD.time + time;
             END IF;
         END LOOP;
         DBMS_OUTPUT.PUT_LINE(
             'Общее время звучания: '
-            || LPAD(EXTRACT(HOUR FROM TIME), 2, '0') || ':' 
-            || LPAD(EXTRACT(MINUTE FROM TIME), 2, '0') || ':' 
-            || LPAD(EXTRACT(SECOND FROM TIME), 2, '0')
+            || LPAD(EXTRACT(HOUR FROM time), 2, '0') || ':' 
+            || LPAD(EXTRACT(MINUTE FROM time), 2, '0') || ':' 
+            || LPAD(EXTRACT(SECOND FROM time), 2, '0')
             || '.'
         );        
     EXCEPTION
@@ -1344,14 +1345,14 @@ PACKAGE BODY grushevskaya_package AS
         FOR ALBUM IN (SELECT * FROM Grushevskaya_album)
         LOOP
             DBMS_OUTPUT.PUT_LINE(
-                'Альбомов ID ' 
-                || ALBUM.ID 
+                'Альбомов id ' 
+                || ALBUM.id 
                 || ' с именем ' 
-                || ALBUM.NAME
+                || ALBUM.name
                 || ' продано на сумму: '
-                || ALBUM.PRICE * ALBUM.QUANTITY_OF_SOLD
+                || ALBUM.price * ALBUM.quantity_of_sold
             );
-            TOTAL_INCOME := TOTAL_INCOME + ALBUM.PRICE * ALBUM.QUANTITY_OF_SOLD;
+            TOTAL_INCOME := TOTAL_INCOME + ALBUM.price * ALBUM.quantity_of_sold;
         END LOOP;
         DBMS_OUTPUT.PUT_LINE('Выручка магазина в целом: ' || TOTAL_INCOME || '.');       
     EXCEPTION
@@ -1361,33 +1362,33 @@ PACKAGE BODY grushevskaya_package AS
     END PRINT_INCOME;    
     
     PROCEDURE DELETE_RECORD_FROM_ALBUM(
-        ALBUM_ID NUMBER,
+        ALBUM_id NUMBER,
         RECORD_NUMBER NUMBER
     ) IS
         TMP_RECORD_ARR Grushevskaya_record_arr;
-        TMP_QUANTITY_OF_SOLD NUMBER;
+        TMP_quantity_of_sold NUMBER;
     BEGIN
-        SELECT QUANTITY_OF_SOLD INTO TMP_QUANTITY_OF_SOLD
+        SELECT quantity_of_sold INTO TMP_quantity_of_sold
             FROM Grushevskaya_album
-            WHERE ID = ALBUM_ID;
-        IF TMP_QUANTITY_OF_SOLD > 0 THEN
+            WHERE id = ALBUM_id;
+        IF TMP_quantity_of_sold > 0 THEN
             DBMS_OUTPUT.PUT_LINE(
                 'Удалить трек №' 
                 || RECORD_NUMBER || ' нельзя, так как альбом продан'
             );
             RETURN;
         END IF;
-        SELECT RECORD_ARRAY INTO TMP_RECORD_ARR 
+        SELECT record_array INTO TMP_RECORD_ARR 
             FROM Grushevskaya_album
-            WHERE ID = ALBUM_ID;
+            WHERE id = ALBUM_id;
         FOR i IN RECORD_NUMBER..TMP_RECORD_ARR.COUNT-1
         LOOP
             TMP_RECORD_ARR(i) := TMP_RECORD_ARR(i+1);
         END LOOP;
         TMP_RECORD_ARR(TMP_RECORD_ARR.COUNT) := NULL;
         UPDATE Grushevskaya_album
-            SET RECORD_ARRAY = TMP_RECORD_ARR
-            WHERE ID = ALBUM_ID;
+            SET record_array = TMP_RECORD_ARR
+            WHERE id = ALBUM_id;
         COMMIT;
         DBMS_OUTPUT.PUT_LINE('Трек №' || RECORD_NUMBER || ' удален');            
     EXCEPTION
@@ -1407,28 +1408,28 @@ PACKAGE BODY grushevskaya_package AS
     END DELETE_RECORD_FROM_ALBUM;    
     
     PROCEDURE DELETE_SINGER_FROM_RECORD(
-        RECORD_ID NUMBER,
-        SINGER_NAME VARCHAR2
+        RECORD_id NUMBER,
+        SINGER_name VARCHAR2
     ) IS
-        TMP_SINGER_LIST Grushevskaya_singer_tab;
+        TMP_singer_list Grushevskaya_singer_tab;
         SINGER_NUMBER NUMBER := 0;
     BEGIN
-        SELECT SINGER_LIST INTO TMP_SINGER_LIST 
+        SELECT singer_list INTO TMP_singer_list 
             FROM Grushevskaya_record
-            WHERE ID = RECORD_ID;
-        FOR i IN 1..TMP_SINGER_LIST.COUNT
+            WHERE id = RECORD_id;
+        FOR i IN 1..TMP_singer_list.COUNT
         LOOP
-            IF TMP_SINGER_LIST(i) = SINGER_NAME THEN
+            IF TMP_singer_list(i) = SINGER_name THEN
                 SINGER_NUMBER := i;
             END IF;
         END LOOP;
-        TMP_SINGER_LIST.DELETE(SINGER_NUMBER);        
+        TMP_singer_list.DELETE(SINGER_NUMBER);        
         UPDATE Grushevskaya_record
-            SET SINGER_LIST = TMP_SINGER_LIST
-            WHERE ID = RECORD_ID;
+            SET singer_list = TMP_singer_list
+            WHERE id = RECORD_id;
         COMMIT;
         DBMS_OUTPUT.PUT_LINE(
-            'Исполнитель ' || SINGER_NAME || ' под №' || SINGER_NUMBER || ' удален.'
+            'Исполнитель ' || SINGER_name || ' под №' || SINGER_NUMBER || ' удален.'
         );
     EXCEPTION
     WHEN grushevskaya_exceptions.Error_update_singer_in_record THEN
@@ -1446,118 +1447,118 @@ PACKAGE BODY grushevskaya_package AS
         END IF;        
     END DELETE_SINGER_FROM_RECORD;
         
-    PROCEDURE PRINT_SINGER_STYLE(
-        SINGER_NAME VARCHAR2
+    PROCEDURE PRINT_SINGER_style(
+        SINGER_name VARCHAR2
     ) IS
         COUNT_SINGER_IN_TABLE NUMBER := 0;
-        TYPE SINGER_STYLE IS TABLE OF NUMBER INDEX BY VARCHAR2(100 BYTE);
-        SINGER_STYLE_LIST SINGER_STYLE;
+        TYPE SINGER_style IS TABLE OF NUMBER INDEX BY VARCHAR2(100 BYTE);
+        SINGER_style_LIST SINGER_style;
         CURRENT_ELEM VARCHAR2(100 BYTE);
-        MAX_STYLE VARCHAR2(100 BYTE);
+        MAX_style VARCHAR2(100 BYTE);
     BEGIN
-        SELECT COUNT(NAME) INTO COUNT_SINGER_IN_TABLE 
+        SELECT COUNT(name) INTO COUNT_SINGER_IN_TABLE 
             FROM Grushevskaya_singer
-            WHERE NAME = SINGER_NAME;
+            WHERE name = SINGER_name;
         IF COUNT_SINGER_IN_TABLE = 0 THEN
             DBMS_OUTPUT.PUT_LINE('Исполнитель не найден.');
             RETURN;
         END IF;
         FOR RECORD IN (SELECT * FROM Grushevskaya_record)
         LOOP
-            FOR i IN 1..RECORD.SINGER_LIST.COUNT
+            FOR i IN 1..RECORD.singer_list.COUNT
             LOOP
-                IF RECORD.SINGER_LIST(i) = SINGER_NAME THEN
-                    IF SINGER_STYLE_LIST.EXISTS(RECORD.STYLE) THEN
-                        SINGER_STYLE_LIST(RECORD.STYLE) := 
-                            SINGER_STYLE_LIST(RECORD.STYLE) 
+                IF RECORD.singer_list(i) = SINGER_name THEN
+                    IF SINGER_style_LIST.EXISTS(RECORD.style) THEN
+                        SINGER_style_LIST(RECORD.style) := 
+                            SINGER_style_LIST(RECORD.style) 
                             + 1;
                     ELSE
-                        SINGER_STYLE_LIST(RECORD.STYLE) := 1;
+                        SINGER_style_LIST(RECORD.style) := 1;
                     END IF;
                 END IF;
             END LOOP;
         END LOOP;
-        MAX_STYLE := SINGER_STYLE_LIST.FIRST;
-        CURRENT_ELEM := SINGER_STYLE_LIST.FIRST;
+        MAX_style := SINGER_style_LIST.FIRST;
+        CURRENT_ELEM := SINGER_style_LIST.FIRST;
         WHILE NOT CURRENT_ELEM IS NULL
         LOOP  
-            IF SINGER_STYLE_LIST(CURRENT_ELEM) > SINGER_STYLE_LIST(MAX_STYLE) THEN
-                MAX_STYLE := CURRENT_ELEM;
+            IF SINGER_style_LIST(CURRENT_ELEM) > SINGER_style_LIST(MAX_style) THEN
+                MAX_style := CURRENT_ELEM;
             END IF;
-            CURRENT_ELEM := SINGER_STYLE_LIST.NEXT(CURRENT_ELEM);
+            CURRENT_ELEM := SINGER_style_LIST.NEXT(CURRENT_ELEM);
         END LOOP;
-        IF MAX_STYLE IS NULL THEN
+        IF MAX_style IS NULL THEN
             DBMS_OUTPUT.PUT_LINE('У исполнителя нет записей.');
             RETURN;
         END IF;
         DBMS_OUTPUT.PUT_LINE(
             'Наиболее популярный стиль у ' 
-            || SINGER_NAME || ' - '  || MAX_STYLE || '.'
+            || SINGER_name || ' - '  || MAX_style || '.'
         );       
     EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_SINGER_STYLE');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_SINGER_style');
         PRINT_MSG_EX(SQLCODE);
-    END PRINT_SINGER_STYLE;
+    END PRINT_SINGER_style;
     
-    PROCEDURE PRINT_COUNTRY_STYLE
+    PROCEDURE PRINT_country_style
     IS
-        TYPE SINGER_STYLE IS TABLE OF NUMBER INDEX BY VARCHAR2(100 BYTE);
-        TYPE COUNTRY_STYLE IS TABLE OF SINGER_STYLE INDEX BY VARCHAR2(100 BYTE);
-        COUNTRY_STYLE_LIST COUNTRY_STYLE;
+        TYPE SINGER_style IS TABLE OF NUMBER INDEX BY VARCHAR2(100 BYTE);
+        TYPE COUNTRY_style IS TABLE OF SINGER_style INDEX BY VARCHAR2(100 BYTE);
+        COUNTRY_style_LIST COUNTRY_style;
         TMP_COUNTRY VARCHAR2(100 BYTE);
         CURRENT_COUNTRY VARCHAR2(100 BYTE);
-        CURRENT_STYLE VARCHAR2(100 BYTE);
-        MAX_STYLE VARCHAR2(100 BYTE);
+        CURRENT_style VARCHAR2(100 BYTE);
+        MAX_style VARCHAR2(100 BYTE);
     BEGIN
         FOR RECORD IN (SELECT * FROM Grushevskaya_record)
         LOOP
-            FOR i IN 1..RECORD.SINGER_LIST.COUNT
+            FOR i IN 1..RECORD.singer_list.COUNT
             LOOP
-                SELECT COUNTRY INTO TMP_COUNTRY 
+                SELECT country INTO TMP_country 
                     FROM Grushevskaya_singer 
-                    WHERE NAME =  RECORD.SINGER_LIST(i);
-                IF COUNTRY_STYLE_LIST.EXISTS(TMP_COUNTRY)
-                   AND COUNTRY_STYLE_LIST(TMP_COUNTRY).EXISTS(RECORD.STYLE) THEN
-                    COUNTRY_STYLE_LIST(TMP_COUNTRY)(RECORD.STYLE) := 
-                        COUNTRY_STYLE_LIST(TMP_COUNTRY)(RECORD.STYLE) 
+                    WHERE name =  RECORD.singer_list(i);
+                IF country_style_LIST.EXISTS(TMP_country)
+                   AND country_style_LIST(TMP_country).EXISTS(RECORD.style) THEN
+                    country_style_LIST(TMP_country)(RECORD.style) := 
+                        country_style_LIST(TMP_country)(RECORD.style) 
                         + 1;
                 ELSE
-                    COUNTRY_STYLE_LIST(TMP_COUNTRY)(RECORD.STYLE) := 1;
+                    country_style_LIST(TMP_country)(RECORD.style) := 1;
                 END IF; 
             END LOOP;
         END LOOP;
-        CURRENT_COUNTRY := COUNTRY_STYLE_LIST.FIRST;
-        WHILE NOT CURRENT_COUNTRY IS NULL
+        CURRENT_country := country_style_LIST.FIRST;
+        WHILE NOT CURRENT_country IS NULL
         LOOP
-            MAX_STYLE := COUNTRY_STYLE_LIST(CURRENT_COUNTRY).FIRST;
-            CURRENT_STYLE := COUNTRY_STYLE_LIST(CURRENT_COUNTRY).FIRST;
-            WHILE NOT CURRENT_STYLE IS NULL
+            MAX_style := country_style_LIST(CURRENT_country).FIRST;
+            CURRENT_style := country_style_LIST(CURRENT_country).FIRST;
+            WHILE NOT CURRENT_style IS NULL
             LOOP  
-                IF COUNTRY_STYLE_LIST(CURRENT_COUNTRY)(CURRENT_STYLE) 
-                   > COUNTRY_STYLE_LIST(CURRENT_COUNTRY)(MAX_STYLE) THEN
-                    MAX_STYLE := CURRENT_STYLE;
+                IF country_style_LIST(CURRENT_country)(CURRENT_style) 
+                   > country_style_LIST(CURRENT_country)(MAX_style) THEN
+                    MAX_style := CURRENT_style;
                 END IF;
-                CURRENT_STYLE := COUNTRY_STYLE_LIST(CURRENT_COUNTRY).NEXT(CURRENT_STYLE);
+                CURRENT_style := country_style_LIST(CURRENT_country).NEXT(CURRENT_style);
             END LOOP;
             DBMS_OUTPUT.PUT_LINE(
                 'Наиболее популярный стиль в '  
-                || CURRENT_COUNTRY || ' - ' || MAX_STYLE || '.'
+                || CURRENT_country || ' - ' || MAX_style || '.'
             );
-            CURRENT_COUNTRY := COUNTRY_STYLE_LIST.NEXT(CURRENT_COUNTRY);
+            CURRENT_country := country_style_LIST.NEXT(CURRENT_country);
         END LOOP;       
     EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_COUNTRY_STYLE');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_country_style');
         PRINT_MSG_EX(SQLCODE);
-    END PRINT_COUNTRY_STYLE; 
+    END PRINT_country_style; 
     
     PROCEDURE PRINT_ALBUM_AUTHOR
     IS
-        TYPE ALL_ALBUM_ID IS TABLE OF VARCHAR2(100 BYTE);
-        ALBUM_ID ALL_ALBUM_ID;
+        TYPE ALL_ALBUM_id IS TABLE OF VARCHAR2(100 BYTE);
+        ALBUM_id ALL_ALBUM_id;
         TYPE ALBUM_SINGER IS TABLE OF NUMBER INDEX BY VARCHAR2(100 BYTE);
-        ALBUM_SINGER_LIST ALBUM_SINGER;
+        ALBUM_singer_list ALBUM_SINGER;
         SINGERS Grushevskaya_singer_tab;
         RECORD_COUNT NUMBER;
         CURRENT_SINGER VARCHAR(100 BYTE);
@@ -1567,51 +1568,51 @@ PACKAGE BODY grushevskaya_package AS
         FOR ALBUM IN (SELECT * FROM Grushevskaya_album)
         LOOP
             RECORD_COUNT := 0;
-            ALBUM_SINGER_LIST.DELETE;
-            FOR i IN 1..ALBUM.RECORD_ARRAY.COUNT
+            ALBUM_singer_list.DELETE;
+            FOR i IN 1..ALBUM.record_array.COUNT
             LOOP
-                IF NOT ALBUM.RECORD_ARRAY(i) IS NULL THEN
+                IF NOT ALBUM.record_array(i) IS NULL THEN
                     RECORD_COUNT := RECORD_COUNT + 1;
-                    SELECT SINGER_LIST INTO SINGERS
+                    SELECT singer_list INTO SINGERS
                         FROM Grushevskaya_record
-                        WHERE ID = ALBUM.RECORD_ARRAY(i);
+                        WHERE id = ALBUM.record_array(i);
                     FOR j IN 1..SINGERS.COUNT
                     LOOP
-                        IF ALBUM_SINGER_LIST.EXISTS(SINGERS(j))THEN
-                            ALBUM_SINGER_LIST(SINGERS(j)) := 
-                                ALBUM_SINGER_LIST(SINGERS(j)) 
+                        IF ALBUM_singer_list.EXISTS(SINGERS(j))THEN
+                            ALBUM_singer_list(SINGERS(j)) := 
+                                ALBUM_singer_list(SINGERS(j)) 
                                 + 1;
                         ELSE
-                            ALBUM_SINGER_LIST(SINGERS(j)) := 1;
+                            ALBUM_singer_list(SINGERS(j)) := 1;
                         END IF;
                     END LOOP;
                 END IF;
             END LOOP;
             FLAG_GROUP := FALSE;
-            CURRENT_SINGER := ALBUM_SINGER_LIST.FIRST;
+            CURRENT_SINGER := ALBUM_singer_list.FIRST;
             WHILE NOT CURRENT_SINGER IS NULL
             LOOP
-                IF ALBUM_SINGER_LIST(CURRENT_SINGER) <> RECORD_COUNT THEN
+                IF ALBUM_singer_list(CURRENT_SINGER) <> RECORD_COUNT THEN
                     FLAG_GROUP := TRUE;
                 END IF;
-                CURRENT_SINGER := ALBUM_SINGER_LIST.NEXT(CURRENT_SINGER);
+                CURRENT_SINGER := ALBUM_singer_list.NEXT(CURRENT_SINGER);
             END LOOP;
             DBMS_OUTPUT.PUT_LINE(
-                'Авторство альбома ' || ALBUM.NAME || ' с ID ' || ALBUM.ID || 
+                'Авторство альбома ' || ALBUM.name || ' с id ' || ALBUM.id || 
                 '.'
             );
             IF FLAG_GROUP THEN
                 DBMS_OUTPUT.PUT_LINE('Коллективный сборник.');
             ELSE
                 DBMS_OUTPUT.PUT_LINE('Исполнители:');
-                CURRENT_SINGER := ALBUM_SINGER_LIST.FIRST;
+                CURRENT_SINGER := ALBUM_singer_list.FIRST;
                 IF CURRENT_SINGER IS NULL THEN
                     DBMS_OUTPUT.PUT_LINE('Исполнителей в альбоме нет.');
                 END IF;
                 WHILE NOT CURRENT_SINGER IS NULL
                 LOOP
                     DBMS_OUTPUT.PUT_LINE(CURRENT_SINGER);
-                    CURRENT_SINGER := ALBUM_SINGER_LIST.NEXT(CURRENT_SINGER);
+                    CURRENT_SINGER := ALBUM_singer_list.NEXT(CURRENT_SINGER);
                 END LOOP;
             END IF; 
         END LOOP;        

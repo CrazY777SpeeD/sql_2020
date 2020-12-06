@@ -395,16 +395,16 @@ END;
 -- нужно проверить нет ли у него записей.
 -- Если есть, то удалять нельзя.
 CREATE OR REPLACE 
-TRIGGER GRUSHEVSKAYA_TR_ON_SINGERS_DEL
+TRIGGER Grushevskaya_tr_on_singers_del
 BEFORE DELETE ON Grushevskaya_singer
 FOR EACH ROW
 BEGIN
-    FOR RECORD_ROW IN (SELECT * FROM Grushevskaya_record)
+    FOR record_row IN (SELECT * FROM Grushevskaya_record)
     LOOP
-        FOR i IN 1..RECORD_ROW.singer_list.COUNT
+        FOR i IN 1..record_row.singer_list.COUNT
         LOOP
-            IF RECORD_ROW.singer_list(i) = :OLD.name THEN                
-                DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_SINGERS_DEL');
+            IF record_row.singer_list(i) = :OLD.name THEN                
+                DBMS_OUTPUT.PUT_LINE('EXCEPTION IN Grushevskaya_tr_on_singers_del');
                 DBMS_OUTPUT.PUT_LINE(
                     'Исполнителя с идентификатором ' 
                     || :OLD.name 
@@ -421,34 +421,34 @@ END;
 -- нужно обновить его имя для всех записей
 -- и обновить саму запись
 CREATE OR REPLACE 
-TRIGGER GRUSHEVSKAYA_TR_ON_SINGERS_UDP
+TRIGGER Grushevskaya_tr_on_singers_upd
 FOR UPDATE OF name ON Grushevskaya_singer
 COMPOUND TRIGGER
-    TYPE CHANGES_ARR IS TABLE OF Varchar2(100 BYTE) INDEX BY PLS_INTEGER;
-    SINGERS_CHANGES CHANGES_ARR;
+    TYPE Changes_arr IS TABLE OF Varchar2(100 BYTE) INDEX BY Pls_integer;
+    singers_changes Changes_arr;
 AFTER EACH ROW IS
     BEGIN
-        SINGERS_CHANGES(:OLD.name) := :NEW.name;
+        singers_changes(:OLD.name) := :NEW.name;
     END AFTER EACH ROW;
 AFTER STATEMENT IS
         list_name Grushevskaya_singer_tab;
-        FLAG Boolean := false;
+        flag Boolean := false;
     BEGIN
-        FOR RECORD_ROW IN (SELECT * FROM Grushevskaya_record)
+        FOR record_row IN (SELECT * FROM Grushevskaya_record)
         LOOP
-            FLAG := false;
-            list_name := RECORD_ROW.singer_list;
+            flag := false;
+            list_name := record_row.singer_list;
             FOR i IN 1..list_name.COUNT 
             LOOP
-                IF SINGERS_CHANGES.EXISTS(list_name(i)) THEN
-                    list_name(i) := SINGERS_CHANGES(list_name(i));
-                    FLAG := true;
+                IF singers_changes.EXISTS(list_name(i)) THEN
+                    list_name(i) := singers_changes(list_name(i));
+                    flag := true;
                 END IF;
             END LOOP;
-            IF FLAG = true THEN
+            IF flag = true THEN
                 UPDATE Grushevskaya_record
                     SET singer_list = SET(list_name)
-                    WHERE id = RECORD_ROW.id;
+                    WHERE id = record_row.id;
             END IF;
         END LOOP;
     END AFTER STATEMENT;
@@ -464,35 +464,35 @@ END;
 -- Если нет, то либо отменить втавку, 
 -- либо "откатить" обновление.
 CREATE OR REPLACE 
-TRIGGER GRUSHEVSKAYA_TR_ON_ALBUM
+TRIGGER Grushevskaya_tr_on_album
 BEFORE INSERT OR UPDATE ON Grushevskaya_album
 FOR EACH ROW
 DECLARE
-    TYPE UNIQUE_RECORDS IS TABLE OF Number INDEX BY Varchar(100);
-    LIST_UNIQUE_RECORDS UNIQUE_RECORDS;
-    UNIQUE_RECORDS_Varray Grushevskaya_record_arr := Grushevskaya_record_arr();
-    CURRENT_UNIQUE_RECORD Varchar2(100 BYTE);
-    TYPE Grushevskaya_record_TAB IS TABLE OF Number(10, 0);
-    LIST_id Grushevskaya_record_TAB;    
+    TYPE Unique_records IS TABLE OF Number INDEX BY Varchar(100);
+    list_unique_records Unique_records;
+    unique_records_varray Grushevskaya_record_arr := Grushevskaya_record_arr();
+    current_unique_record Varchar2(100 BYTE);
+    TYPE Grushevskaya_record_tab IS TABLE OF Number(10, 0);
+    list_id Grushevskaya_record_tab;    
 BEGIN
     IF UPDATING('record_array') THEN
         -- Удаление дубликатов из Varray
         FOR k IN 1..:NEW.record_array.COUNT
         LOOP
             IF NOT :NEW.record_array(k) IS null THEN
-                IF NOT LIST_UNIQUE_RECORDS.EXISTS(:NEW.record_array(k)) THEN
-                    LIST_UNIQUE_RECORDS(:NEW.record_array(k)) := k;
+                IF NOT list_unique_records.EXISTS(:NEW.record_array(k)) THEN
+                    list_unique_records(:NEW.record_array(k)) := k;
                 END IF;                
             END IF;
         END LOOP;
-        UNIQUE_RECORDS_Varray.EXTEND(30);
-        CURRENT_UNIQUE_RECORD := LIST_UNIQUE_RECORDS.FIRST;
-        WHILE NOT CURRENT_UNIQUE_RECORD IS null
+        unique_records_varray.EXTEND(30);
+        current_unique_record := list_unique_records.FIRST;
+        WHILE NOT current_unique_record IS null
         LOOP
-            UNIQUE_RECORDS_Varray(LIST_UNIQUE_RECORDS(CURRENT_UNIQUE_RECORD)) := CURRENT_UNIQUE_RECORD;
-            CURRENT_UNIQUE_RECORD := LIST_UNIQUE_RECORDS.NEXT(CURRENT_UNIQUE_RECORD);
+            unique_records_varray(list_unique_records(current_unique_record)) := current_unique_record;
+            current_unique_record := list_unique_records.NEXT(current_unique_record);
         END LOOP;
-        :NEW.record_array := UNIQUE_RECORDS_Varray;
+        :NEW.record_array := unique_records_varray;
         -- Если альбом продан, то добавлять треки нельзя.    
         IF :OLD.quantity_of_sold > 0 THEN
             FOR j IN 1..:OLD.record_array.COUNT
@@ -507,7 +507,7 @@ BEGIN
                     :NEW.quantity_in_stock := :OLD.quantity_in_stock;
                     :NEW.quantity_of_sold := :OLD.quantity_of_sold;
                     :NEW.record_array := :OLD.record_array;                               
-                    DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
+                    DBMS_OUTPUT.PUT_LINE('WARNING IN Grushevskaya_tr_on_album');
                     DBMS_OUTPUT.PUT_LINE(
                         'Альбом с идентификатором ' 
                         || :OLD.id 
@@ -522,7 +522,7 @@ BEGIN
                     :NEW.quantity_in_stock := :OLD.quantity_in_stock;
                     :NEW.quantity_of_sold := :OLD.quantity_of_sold;
                     :NEW.record_array := :OLD.record_array;                               
-                    DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
+                    DBMS_OUTPUT.PUT_LINE('WARNING IN Grushevskaya_tr_on_album');
                     DBMS_OUTPUT.PUT_LINE(
                         'Альбом с идентификатором ' 
                         || :OLD.id 
@@ -538,13 +538,13 @@ BEGIN
     -- проверить, что все записи существуют.
     -- Если нет, то либо отменить втавку, 
     -- либо "откатить" обновление.
-    SELECT id BULK COLLECT INTO LIST_id FROM Grushevskaya_record;
+    SELECT id BULK COLLECT INTO list_id FROM Grushevskaya_record;
     FOR i IN 1..:NEW.record_array.COUNT
     LOOP
        IF NOT :NEW.record_array(i) IS null
-          AND NOT :NEW.record_array(i) MEMBER LIST_id THEN
+          AND NOT :NEW.record_array(i) MEMBER list_id THEN
             IF INSERTING THEN                               
-                DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_ALBUM');
+                DBMS_OUTPUT.PUT_LINE('EXCEPTION IN Grushevskaya_tr_on_album');
                 DBMS_OUTPUT.PUT_LINE('Некорректный список записей.');
                 RAISE grushevskaya_exceptions.Error_album;
             ELSE
@@ -554,7 +554,7 @@ BEGIN
                 :NEW.quantity_in_stock := :OLD.quantity_in_stock;
                 :NEW.quantity_of_sold := :OLD.quantity_of_sold;
                 :NEW.record_array := :OLD.record_array;                          
-                DBMS_OUTPUT.PUT_LINE('WARNING IN GRUSHEVSKAYA_TR_ON_ALBUM');
+                DBMS_OUTPUT.PUT_LINE('WARNING IN Grushevskaya_tr_on_album');
                 DBMS_OUTPUT.PUT_LINE(
                     'Альбом с идентификатором ' 
                     || :OLD.id 
@@ -570,7 +570,7 @@ END;
 -- Перед удалением записи проверить нет ли ее в альбомах.
 -- Если есть, то удалять нельзя.
 CREATE OR REPLACE 
-TRIGGER GRUSHEVSKAYA_TR_ON_RECORD_DEL
+TRIGGER Grushevskaya_tr_on_record_del
 BEFORE DELETE ON Grushevskaya_record
 FOR EACH ROW
 BEGIN
@@ -579,7 +579,7 @@ BEGIN
         FOR i IN 1..album_row.record_array.COUNT
         LOOP
             IF album_row.record_array(i) = :OLD.id THEN                               
-                DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORD_DEL');
+                DBMS_OUTPUT.PUT_LINE('EXCEPTION IN Grushevskaya_tr_on_record_del');
                 DBMS_OUTPUT.PUT_LINE(
                     'Запиь с идентификатором ' 
                     || :OLD.id 
@@ -596,33 +596,33 @@ END;
 -- нужно обновить все ее id во всех альбомах
 -- и обновить сами альбомы.
 CREATE OR REPLACE 
-TRIGGER GRUSHEVSKAYA_TR_ON_RECORD_UDP
+TRIGGER Grushevskaya_tr_on_record_udp
 FOR UPDATE OF id ON Grushevskaya_record
 COMPOUND TRIGGER
-    TYPE CHANGES_ARR IS TABLE OF Number(10,0) INDEX BY PLS_INTEGER;
-    RECORD_CHANGES CHANGES_ARR;
+    TYPE Changes_arr IS TABLE OF Number(10,0) INDEX BY Pls_integer;
+    record_changes Changes_arr;
     AFTER EACH ROW IS
     BEGIN
-        RECORD_CHANGES(:OLD.id) := :NEW.id;
+        record_changes(:OLD.id) := :NEW.id;
     END AFTER EACH ROW;
     AFTER STATEMENT IS
-        id_ARR Grushevskaya_record_arr;
-        FLAG Boolean := false;
+        id_arr Grushevskaya_record_arr;
+        flag Boolean := false;
     BEGIN
         FOR album_row IN (SELECT * FROM Grushevskaya_album)
         LOOP
-            FLAG := false;
-            id_ARR := album_row.record_array;
-            FOR i IN 1..id_ARR.COUNT 
+            flag := false;
+            id_arr := album_row.record_array;
+            FOR i IN 1..id_arr.COUNT 
             LOOP
-                IF RECORD_CHANGES.EXISTS(id_ARR(i)) THEN
-                    id_ARR(i) := RECORD_CHANGES(id_ARR(i));
-                    FLAG := true;
+                IF record_changes.EXISTS(id_arr(i)) THEN
+                    id_arr(i) := record_changes(id_arr(i));
+                    flag := true;
                 END IF;
             END LOOP;
-            IF FLAG = true THEN
+            IF flag = true THEN
                 UPDATE Grushevskaya_album
-                    SET record_array = id_ARR
+                    SET record_array = id_arr
                     WHERE id = album_row.id;
             END IF;
         END LOOP;
@@ -635,12 +635,12 @@ END;
 CREATE OR REPLACE 
 PACKAGE grushevskaya_package AS
     -- Добавить страну в словарь.
-    PROCEDURE ADD_IN_DICT_country (
+    PROCEDURE add_in_dict_country (
         -- Название страны
         name Varchar2
     );
     -- Добавить стиль в словарь.
-    PROCEDURE ADD_IN_DICT_style (
+    PROCEDURE add_in_dict_style (
         -- Название стиля
         name Varchar2
     );
@@ -648,31 +648,31 @@ PACKAGE grushevskaya_package AS
     -- Минимальный функционал
     
     -- 1) Добавить запись (изначально указывается один исполнитель).
-    PROCEDURE ADD_RECORD (
+    PROCEDURE add_record (
         -- Название
         name Varchar2, 
         -- Количество часов звучания
-        HOURS Number,
+        hours Number,
         -- Количество минут звучания
-        MINUTES Number,
+        minutes Number,
         -- Количество секунд звучания
-        SECONDS Number,
+        seconds Number,
         -- Стиль из словаря
         style Varchar2,
         -- Имя исполнителя
-        SINGER Varchar2
+        singer Varchar2
     );
     -- 2) Добавить исполнителя для записи 
     -- (если указанная запись не добавлена ни в один альбом 
     --  - Условие проверяется на уровне триггера).
-    PROCEDURE ADD_SINGER_IN_RECORD (
+    PROCEDURE add_singer_in_record (
         -- id записи
-        RECORD_id Number,
+        record_id Number,
         -- Имя исполнителя
-        SINGER_NAME Varchar2
+        singer_name Varchar2
     );
     -- 3) Добавить исполнителя.
-    PROCEDURE ADD_SINGER (
+    PROCEDURE add_singer (
         -- Имя (ФИО)
         name Varchar2, 
         -- Страна из словаря
@@ -680,7 +680,7 @@ PACKAGE grushevskaya_package AS
     );
     -- 4) Добавить альбом (изначально указывается один трек или ни одного).
     -- Реализация для добавления альбома с одной записью.
-    PROCEDURE ADD_ALBUM (
+    PROCEDURE add_album (
         -- Название
         name Varchar2,
         -- Цена (>= 0)
@@ -688,11 +688,11 @@ PACKAGE grushevskaya_package AS
         -- Количество на складе (>= 0)
         quantity_in_stock Number,
         -- id добавляемой записи
-        RECORD_id Number
+        record_id Number
     );
     -- 4) Добавить альбом (изначально указывается один трек или ни одного).
     -- Реализация для добавления альбома без записей.
-    PROCEDURE ADD_ALBUM (
+    PROCEDURE add_album (
         -- Название
         name Varchar2,
         -- Цена (>= 0)
@@ -703,21 +703,21 @@ PACKAGE grushevskaya_package AS
     -- 5) Добавить трек в альбом 
     -- (если не продано ни одного экземпляра
     --  - Условие проверяется на уровне триггера).
-    PROCEDURE ADD_RECORD_IN_ALBUM (
+    PROCEDURE add_record_in_album (
         -- id альбома
-        ALBUM_id Number,
+        album_id Number,
         -- id добавляемой записи 
-        RECORD_id Number
+        record_id Number
     );
     -- 6) Список альбомов в продаже (количество на складе больше 0).
-    PROCEDURE PRINT_ALBUMS_IN_STOCK;
+    PROCEDURE print_albums_in_stock;
     -- 7) Список исполнителей.
-    PROCEDURE PRINT_SINGERS;
+    PROCEDURE PRINT_singerS;
     -- 8) Поставка альбома
     -- (количество на складе увеличивается на указанное значение).
-    PROCEDURE ADD_ALBUMS_IN_STOCK (
+    PROCEDURE add_albumS_IN_STOCK (
         -- id альбома
-        ALBUM_id Number,
+        album_id Number,
         -- Количество
         QUANTITY Number
     );
@@ -727,18 +727,18 @@ PACKAGE grushevskaya_package AS
     --  - Условие проверяется в самой функции). 
     PROCEDURE SELL_ALBUMS(
         -- id альбома
-        ALBUM_id Number,
+        album_id Number,
         -- Количество
         QUANTITY Number
     );
     -- 10) Удалить исполнителей, у которых нет ни одной записи.
-    PROCEDURE DELETE_SINGERS_WITHOUT_RECORDS;
+    PROCEDURE DELETE_singerS_WITHOUT_RECORDS;
     
     -- Основной функционал
     
     -- 11) Трек-лист указанного альбома 
     -- с указанием суммарного времени звучания альбома.
-    PROCEDURE PRINT_ALBUM_RECORDS(ALBUM_id Number);
+    PROCEDURE PRINT_ALBUM_RECORDS(album_id Number);
     -- 12) Выручка магазина 
     -- (суммарная стоимость проданных альбомов 
     -- по каждому в отдельности 
@@ -750,7 +750,7 @@ PACKAGE grushevskaya_package AS
     --  - Условие проверяется на уровне триггера).
     PROCEDURE DELETE_RECORD_FROM_ALBUM(
         -- id альбома
-        ALBUM_id Number,
+        album_id Number,
         -- Номер звучания записи в альбоме
         RECORD_Number Number
     );
@@ -758,17 +758,17 @@ PACKAGE grushevskaya_package AS
     -- (если запись не входит ни в один альбом 
     -- и если этот исполнитель не единственный
     --  - Условия проверяются на уровне триггера). 
-    PROCEDURE DELETE_SINGER_FROM_RECORD(
+    PROCEDURE DELETE_singer_FROM_RECORD(
         -- id записи
-        RECORD_id Number,
+        record_id Number,
         -- Имя исполнителя        
-        SINGER_name Varchar2
+        singer_name Varchar2
     );
     -- 15) Определить предпочитаемый музыкальный стиль указанного исполнителя 
     -- (стиль, в котором записано большинство его треков). 
-    PROCEDURE PRINT_SINGER_style(
+    PROCEDURE PRINT_singer_style(
         -- Имя исполнителя
-        SINGER_name Varchar2
+        singer_name Varchar2
     );
     -- 16) Определить предпочитаемый музыкальный стиль 
     -- по каждой стране происхождения исполнителей.
@@ -791,7 +791,7 @@ PACKAGE BODY grushevskaya_package AS
         DBMS_OUTPUT.PUT_LINE('Сообщение: ' || SQLERRM(SQLCODE));        
     END PRINT_MSG_EX;
     
-    PROCEDURE ADD_IN_DICT_country (
+    PROCEDURE add_in_dict_country (
         name Varchar2
     )IS
     BEGIN
@@ -800,7 +800,7 @@ PACKAGE BODY grushevskaya_package AS
         DBMS_OUTPUT.PUT_LINE('Страна ' || name || ' успешно добавлена.');
     EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_IN_DICT_country');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN add_in_dict_country');
         IF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -1 THEN
@@ -810,9 +810,9 @@ PACKAGE BODY grushevskaya_package AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_IN_DICT_country;
+    END add_in_dict_country;
     
-    PROCEDURE ADD_IN_DICT_style (
+    PROCEDURE add_in_dict_style (
         name Varchar2
     )IS
     BEGIN
@@ -821,7 +821,7 @@ PACKAGE BODY grushevskaya_package AS
         DBMS_OUTPUT.PUT_LINE('Стиль ' || name || ' успешно добавлен.');
     EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_IN_DICT_style');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN add_in_dict_style');
         IF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -1 THEN
@@ -831,28 +831,28 @@ PACKAGE BODY grushevskaya_package AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_IN_DICT_style;
+    END add_in_dict_style;
     
-    PROCEDURE ADD_RECORD(
+    PROCEDURE add_record(
         name Varchar2,
-        HOURS Number,
-        MINUTES Number,
-        SECONDS Number,
+        hours Number,
+        minutes Number,
+        seconds Number,
         style Varchar2,
-        SINGER Varchar2
+        singer Varchar2
     ) IS
         time INTERVAL DAY(0) TO SECOND(0);
     BEGIN
-        time := NUMTODSINTERVAL(HOURS, 'HOUR') 
-            + NUMTODSINTERVAL(MINUTES, 'MINUTE') 
-            + NUMTODSINTERVAL(SECONDS, 'SECOND');
+        time := NUMTODSINTERVAL(hours, 'HOUR') 
+            + NUMTODSINTERVAL(minutes, 'MINUTE') 
+            + NUMTODSINTERVAL(seconds, 'SECOND');
         INSERT INTO Grushevskaya_record (id, name, time, style, singer_list)
             VALUES (
             Grushevskaya_num_record.NEXTVAL, 
             name, 
             time, 
             style, 
-            Grushevskaya_singer_tab(SINGER)
+            Grushevskaya_singer_tab(singer)
         );
         COMMIT;        
         DBMS_OUTPUT.PUT_LINE(
@@ -866,7 +866,7 @@ PACKAGE BODY grushevskaya_package AS
     WHEN grushevskaya_exceptions.Warning_update THEN
         RETURN;
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_RECORD');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN add_record');
         IF SQLCODE = -02291 THEN
             DBMS_OUTPUT.PUT_LINE('Нет стиля ' || style || ' в словаре.');
         ELSIF SQLCODE = -12899 THEN
@@ -880,36 +880,36 @@ PACKAGE BODY grushevskaya_package AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_RECORD; 
+    END add_record; 
     
-    PROCEDURE ADD_SINGER_IN_RECORD (
-        RECORD_id Number,
-        SINGER_name Varchar2
+    PROCEDURE add_singer_in_record (
+        record_id Number,
+        singer_name Varchar2
     ) IS
         TMP_singer_list Grushevskaya_singer_tab;
     BEGIN
-        IF SINGER_name IS null THEN
+        IF singer_name IS null THEN
             DBMS_OUTPUT.PUT_LINE('Нельзя вставлять null-значения.');
             RETURN;
         END IF;
         SELECT singer_list INTO TMP_singer_list 
             FROM Grushevskaya_record
-            WHERE id = RECORD_id;
+            WHERE id = record_id;
         TMP_singer_list.EXTEND;
-        TMP_singer_list(TMP_singer_list.LAST) := SINGER_name;
+        TMP_singer_list(TMP_singer_list.LAST) := singer_name;
         UPDATE Grushevskaya_record
             SET singer_list = TMP_singer_list
-            WHERE id = RECORD_id;
+            WHERE id = record_id;
         COMMIT;        
         DBMS_OUTPUT.PUT_LINE(
-            'Исполнитель ' || SINGER_name 
-            || ' успешно добавлен в запись с id ' || RECORD_id || '.'
+            'Исполнитель ' || singer_name 
+            || ' успешно добавлен в запись с id ' || record_id || '.'
         );
     EXCEPTION
     WHEN grushevskaya_exceptions.Warning_update THEN
         RETURN;
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_SINGER_IN_RECORD');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN add_singer_in_record');
         IF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = 100 THEN
@@ -917,9 +917,9 @@ PACKAGE BODY grushevskaya_package AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_SINGER_IN_RECORD;
+    END add_singer_in_record;
     
-    PROCEDURE ADD_SINGER (
+    PROCEDURE add_singer (
         name Varchar2,
         country Varchar2
     ) IS
@@ -930,7 +930,7 @@ PACKAGE BODY grushevskaya_package AS
         DBMS_OUTPUT.PUT_LINE('Исполнитель ' || name || ' успешно добавлен.');
     EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_SINGER');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN add_singer');
         IF SQLCODE = -02291 THEN
             DBMS_OUTPUT.PUT_LINE('Нет страны ' || country || ' в словаре.');
         ELSIF SQLCODE = -12899 THEN
@@ -942,18 +942,18 @@ PACKAGE BODY grushevskaya_package AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_SINGER;
+    END add_singer;
         
-    PROCEDURE ADD_ALBUM (
+    PROCEDURE add_album (
         name Varchar2,
         price Number,
         quantity_in_stock Number,
-        RECORD_id Number
+        record_id Number
     ) IS
         RECORD_ARR Grushevskaya_record_arr := Grushevskaya_record_arr();
     BEGIN
         RECORD_ARR.EXTEND(30);
-        RECORD_ARR(1) := RECORD_id;
+        RECORD_ARR(1) := record_id;
         INSERT INTO Grushevskaya_album (
             id, 
             name, 
@@ -981,7 +981,7 @@ PACKAGE BODY grushevskaya_package AS
     WHEN grushevskaya_exceptions.Warning_update THEN
         RETURN;
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUM');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN add_album');
         IF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -6532 THEN
@@ -999,9 +999,9 @@ PACKAGE BODY grushevskaya_package AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_ALBUM;
+    END add_album;
         
-    PROCEDURE ADD_ALBUM (
+    PROCEDURE add_album (
         name Varchar2,
         price Number,
         quantity_in_stock Number
@@ -1036,7 +1036,7 @@ PACKAGE BODY grushevskaya_package AS
     WHEN grushevskaya_exceptions.Warning_update THEN
         RETURN;
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUM');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN add_album');
         IF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -6532 THEN
@@ -1052,22 +1052,22 @@ PACKAGE BODY grushevskaya_package AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_ALBUM;
+    END add_album;
     
-    PROCEDURE ADD_RECORD_IN_ALBUM (
-        ALBUM_id Number, 
-        RECORD_id Number
+    PROCEDURE add_record_in_album (
+        album_id Number, 
+        record_id Number
     )IS
         RECORD_SERIAL_Number Number := -1;
         TMP_RECORD_ARR Grushevskaya_record_arr;
     BEGIN        
-        IF RECORD_id IS null THEN
+        IF record_id IS null THEN
             DBMS_OUTPUT.PUT_LINE('Нельзя вставлять null-значения.');
             RETURN;
         END IF;
         SELECT record_array INTO TMP_RECORD_ARR
             FROM Grushevskaya_album
-            WHERE id = ALBUM_id;
+            WHERE id = album_id;
         FOR i IN REVERSE 1..TMP_RECORD_ARR.COUNT
         LOOP
             IF TMP_RECORD_ARR(i) IS null THEN
@@ -1077,20 +1077,20 @@ PACKAGE BODY grushevskaya_package AS
         IF RECORD_SERIAL_Number = -1 THEN
             DBMS_OUTPUT.PUT_LINE(
                 'Альбом с id ' 
-                || ALBUM_id 
+                || album_id 
                 || ' не может содержать больше 30 записей. Запись с id ' 
-                || RECORD_id 
+                || record_id 
                 || ' не добавлена.'
             );
         END IF;
-        TMP_RECORD_ARR(RECORD_SERIAL_Number) := RECORD_id;
+        TMP_RECORD_ARR(RECORD_SERIAL_Number) := record_id;
         UPDATE Grushevskaya_album
             SET record_array = TMP_RECORD_ARR
-            WHERE id = ALBUM_id;            
+            WHERE id = album_id;            
         COMMIT;      
         DBMS_OUTPUT.PUT_LINE(
-            'Запись с id ' || RECORD_id 
-            || ' успешно добавлена в альбом с id ' || ALBUM_id || '.'
+            'Запись с id ' || record_id 
+            || ' успешно добавлена в альбом с id ' || album_id || '.'
         );
     EXCEPTION
     WHEN grushevskaya_exceptions.Error_album THEN
@@ -1098,7 +1098,7 @@ PACKAGE BODY grushevskaya_package AS
     WHEN grushevskaya_exceptions.Warning_update THEN
         RETURN;
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_RECORD_IN_ALBUM');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN add_record_in_album');
         IF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = -6532 THEN
@@ -1108,9 +1108,9 @@ PACKAGE BODY grushevskaya_package AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;
-    END ADD_RECORD_IN_ALBUM;
+    END add_record_in_album;
     
-    PROCEDURE PRINT_ALBUMS_IN_STOCK 
+    PROCEDURE print_albums_in_stock 
     IS
         QUANTITY Number := 0;
     BEGIN
@@ -1123,27 +1123,27 @@ PACKAGE BODY grushevskaya_package AS
         DBMS_OUTPUT.PUT_LINE('Всего альбомов в продаже: ' || QUANTITY || '.');    
     EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_ALBUMS_IN_STOCK');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN print_albums_in_stock');
         PRINT_MSG_EX(SQLCODE);
-    END PRINT_ALBUMS_IN_STOCK;
+    END print_albums_in_stock;
     
-    PROCEDURE PRINT_SINGERS
+    PROCEDURE PRINT_singerS
     IS
     BEGIN
         DBMS_OUTPUT.PUT_LINE('Все исполнители:');
-        FOR SINGER IN (SELECT * FROM Grushevskaya_singer)
+        FOR singer IN (SELECT * FROM Grushevskaya_singer)
         LOOP
-            DBMS_OUTPUT.PUT_LINE(SINGER.name);
+            DBMS_OUTPUT.PUT_LINE(singer.name);
         END LOOP;  
         DBMS_OUTPUT.PUT_LINE('Конец списка исполнителей. Больше нет.');
     EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_SINGERS');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN PRINT_singerS');
         PRINT_MSG_EX(SQLCODE);
-    END PRINT_SINGERS;
+    END PRINT_singerS;
     
-    PROCEDURE ADD_ALBUMS_IN_STOCK (
-        ALBUM_id Number,
+    PROCEDURE add_albumS_IN_STOCK (
+        album_id Number,
         QUANTITY Number
     ) IS
     BEGIN
@@ -1151,21 +1151,21 @@ PACKAGE BODY grushevskaya_package AS
             DBMS_OUTPUT.PUT_LINE(
                 'В продажу поступило отрицательное ' 
                 || 'количество альбомов c id ' 
-                || ALBUM_id || '. Количество не обновлено.'
+                || album_id || '. Количество не обновлено.'
             );
             RETURN;
         END IF;
         UPDATE Grushevskaya_album
             SET quantity_in_stock = quantity_in_stock + QUANTITY
-            WHERE id = ALBUM_id;
+            WHERE id = album_id;
         COMMIT;
         DBMS_OUTPUT.PUT_LINE(
             'В продажу поступило ' || QUANTITY 
-            || ' альбомов c id ' || ALBUM_id || '.'
+            || ' альбомов c id ' || album_id || '.'
         );
     EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUMS_IN_STOCK');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN add_albumS_IN_STOCK');
         IF SQLCODE = -12899 THEN
             DBMS_OUTPUT.PUT_LINE('Значение для одного из столбцов слишком велико.');
         ELSIF SQLCODE = 100 THEN
@@ -1173,47 +1173,47 @@ PACKAGE BODY grushevskaya_package AS
         ELSE
             PRINT_MSG_EX(SQLCODE);
         END IF;        
-    END ADD_ALBUMS_IN_STOCK;    
+    END add_albumS_IN_STOCK;    
     
     PROCEDURE SELL_ALBUMS(
-        ALBUM_id Number,
+        album_id Number,
         QUANTITY Number
     ) IS
         RECORD_ARR Grushevskaya_record_arr;
-        FLAG_ONE_RECORD Boolean := false;
+        flag_ONE_RECORD Boolean := false;
         MAX_QUANTITY Number;
     BEGIN
         IF QUANTITY <= 0 THEN
             DBMS_OUTPUT.PUT_LINE(
                 'Подается отрицательное количество альбомов c id ' 
-                || ALBUM_id || '. Количество не обновлено.'
+                || album_id || '. Количество не обновлено.'
             );
             RETURN;
         END IF;
         SELECT record_array INTO RECORD_ARR 
             FROM Grushevskaya_album
-            WHERE id = ALBUM_id;
+            WHERE id = album_id;
         FOR i IN 1..RECORD_ARR.COUNT
         LOOP
             IF NOT RECORD_ARR(i) IS null THEN
-                FLAG_ONE_RECORD := true;
+                flag_ONE_RECORD := true;
             END IF;
         END LOOP;
-        IF NOT FLAG_ONE_RECORD THEN
+        IF NOT flag_ONE_RECORD THEN
             DBMS_OUTPUT.PUT_LINE(
                 'Продать альбом c id ' 
-                || ALBUM_id || ' нельзя. В альбоме нет треков.'
+                || album_id || ' нельзя. В альбоме нет треков.'
             );
             RETURN;
         END IF;
         SELECT quantity_in_stock INTO MAX_QUANTITY 
             FROM Grushevskaya_album
-            WHERE id = ALBUM_id;
+            WHERE id = album_id;
         MAX_QUANTITY := LEAST(MAX_QUANTITY, QUANTITY);
         IF MAX_QUANTITY <= 0 THEN
             DBMS_OUTPUT.PUT_LINE(
                 'Продать альбом c id ' 
-                || ALBUM_id || ' нельзя. Альбомов нет на складе.'
+                || album_id || ' нельзя. Альбомов нет на складе.'
             );
             RETURN;
         END IF;
@@ -1221,11 +1221,11 @@ PACKAGE BODY grushevskaya_package AS
             SET 
                 quantity_in_stock = quantity_in_stock - MAX_QUANTITY,
                 quantity_of_sold = quantity_of_sold + MAX_QUANTITY
-            WHERE id = ALBUM_id;
+            WHERE id = album_id;
         COMMIT;
         DBMS_OUTPUT.PUT_LINE(
             'Продано ' || MAX_QUANTITY 
-            || ' альбомов c id ' || ALBUM_id || '.'
+            || ' альбомов c id ' || album_id || '.'
         );
     EXCEPTION
     WHEN OTHERS THEN
@@ -1239,33 +1239,33 @@ PACKAGE BODY grushevskaya_package AS
         END IF;       
     END SELL_ALBUMS;
     
-    PROCEDURE DELETE_SINGERS_WITHOUT_RECORDS
+    PROCEDURE DELETE_singerS_WITHOUT_RECORDS
     IS
-        DEL_SINGERS_LIST Grushevskaya_singer_tab;
+        DEL_singerS_LIST Grushevskaya_singer_tab;
     BEGIN
-        SELECT name BULK COLLECT INTO DEL_SINGERS_LIST FROM Grushevskaya_singer;
+        SELECT name BULK COLLECT INTO DEL_singerS_LIST FROM Grushevskaya_singer;
         FOR RECORD IN (SELECT * FROM Grushevskaya_record)
         LOOP
            FOR i IN 1..RECORD.singer_list.COUNT
             LOOP
-                FOR k IN 1..DEL_SINGERS_LIST.COUNT
+                FOR k IN 1..DEL_singerS_LIST.COUNT
                 LOOP                   
-                    IF NOT DEL_SINGERS_LIST(k) IS null
+                    IF NOT DEL_singerS_LIST(k) IS null
                        AND NOT RECORD.singer_list(i) IS null
-                       AND DEL_SINGERS_LIST(k) = RECORD.singer_list(i) THEN
-                        DEL_SINGERS_LIST(k) := null;
+                       AND DEL_singerS_LIST(k) = RECORD.singer_list(i) THEN
+                        DEL_singerS_LIST(k) := null;
                     END IF;                
                 END LOOP;
             END LOOP;
         END LOOP;
-        FOR j IN 1..DEL_SINGERS_LIST.COUNT
+        FOR j IN 1..DEL_singerS_LIST.COUNT
         LOOP
-            IF NOT DEL_SINGERS_LIST(j) IS null THEN
+            IF NOT DEL_singerS_LIST(j) IS null THEN
                 DELETE FROM Grushevskaya_singer
-                WHERE name = DEL_SINGERS_LIST(j);
+                WHERE name = DEL_singerS_LIST(j);
                 DBMS_OUTPUT.PUT_LINE(
                     'Удален исполнитель ' 
-                    || DEL_SINGERS_LIST(j) || '.'
+                    || DEL_singerS_LIST(j) || '.'
                 );
             END IF;
         END LOOP;
@@ -1273,35 +1273,35 @@ PACKAGE BODY grushevskaya_package AS
         DBMS_OUTPUT.PUT_LINE('Исполнители без записей удалены успешно.');
     EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN DELETE_SINGERS_WITHOUT_RECORDS');
+        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN DELETE_singerS_WITHOUT_RECORDS');
         PRINT_MSG_EX(SQLCODE);
-    END DELETE_SINGERS_WITHOUT_RECORDS;    
+    END DELETE_singerS_WITHOUT_RECORDS;    
     
     PROCEDURE PRINT_ALBUM_RECORDS(
-        ALBUM_id Number
+        album_id Number
     ) IS
         ALBUM_name Varchar2(100 BYTE);
         RECORD_ARR Grushevskaya_record_arr;
         RECORD Grushevskaya_record%ROWTYPE;
         time INTERVAL DAY(0) TO SECOND(0) := NUMTODSINTERVAL(0, 'SECOND');
-        SINGERS Varchar2(300) := '';
+        singerS Varchar2(300) := '';
     BEGIN
         SELECT name INTO ALBUM_name
             FROM Grushevskaya_album
-            WHERE id = ALBUM_id;
-        DBMS_OUTPUT.PUT_LINE('Альбом №' || ALBUM_id || ' с именем ' || ALBUM_name);
+            WHERE id = album_id;
+        DBMS_OUTPUT.PUT_LINE('Альбом №' || album_id || ' с именем ' || ALBUM_name);
         SELECT record_array INTO RECORD_ARR
             FROM Grushevskaya_album
-            WHERE id = ALBUM_id;
+            WHERE id = album_id;
         FOR i IN 1..RECORD_ARR.COUNT
         LOOP
             IF NOT RECORD_ARR(i) IS null THEN
                 SELECT * INTO RECORD FROM Grushevskaya_record 
                     WHERE id = RECORD_ARR(i);
-                SINGERS := '-';
+                singerS := '-';
                 FOR j IN 1..RECORD.singer_list.COUNT
                 LOOP
-                    SINGERS := SINGERS || ' ' || RECORD.singer_list(j);
+                    singerS := singerS || ' ' || RECORD.singer_list(j);
                 END LOOP;
                 DBMS_OUTPUT.PUT_LINE(
                     '№' 
@@ -1315,7 +1315,7 @@ PACKAGE BODY grushevskaya_package AS
                     || ' ' 
                     || RECORD.name
                     || ' ' 
-                    || SINGERS
+                    || singerS
                 );
                 time := RECORD.time + time;
             END IF;
@@ -1362,7 +1362,7 @@ PACKAGE BODY grushevskaya_package AS
     END PRINT_INCOME;    
     
     PROCEDURE DELETE_RECORD_FROM_ALBUM(
-        ALBUM_id Number,
+        album_id Number,
         RECORD_Number Number
     ) IS
         TMP_RECORD_ARR Grushevskaya_record_arr;
@@ -1370,7 +1370,7 @@ PACKAGE BODY grushevskaya_package AS
     BEGIN
         SELECT quantity_of_sold INTO TMP_quantity_of_sold
             FROM Grushevskaya_album
-            WHERE id = ALBUM_id;
+            WHERE id = album_id;
         IF TMP_quantity_of_sold > 0 THEN
             DBMS_OUTPUT.PUT_LINE(
                 'Удалить трек №' 
@@ -1380,7 +1380,7 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
         SELECT record_array INTO TMP_RECORD_ARR 
             FROM Grushevskaya_album
-            WHERE id = ALBUM_id;
+            WHERE id = album_id;
         FOR i IN RECORD_Number..TMP_RECORD_ARR.COUNT-1
         LOOP
             TMP_RECORD_ARR(i) := TMP_RECORD_ARR(i+1);
@@ -1388,7 +1388,7 @@ PACKAGE BODY grushevskaya_package AS
         TMP_RECORD_ARR(TMP_RECORD_ARR.COUNT) := null;
         UPDATE Grushevskaya_album
             SET record_array = TMP_RECORD_ARR
-            WHERE id = ALBUM_id;
+            WHERE id = album_id;
         COMMIT;
         DBMS_OUTPUT.PUT_LINE('Трек №' || RECORD_Number || ' удален');            
     EXCEPTION
@@ -1407,29 +1407,29 @@ PACKAGE BODY grushevskaya_package AS
         END IF;    
     END DELETE_RECORD_FROM_ALBUM;    
     
-    PROCEDURE DELETE_SINGER_FROM_RECORD(
-        RECORD_id Number,
-        SINGER_name Varchar2
+    PROCEDURE DELETE_singer_FROM_RECORD(
+        record_id Number,
+        singer_name Varchar2
     ) IS
         TMP_singer_list Grushevskaya_singer_tab;
-        SINGER_Number Number := 0;
+        singer_Number Number := 0;
     BEGIN
         SELECT singer_list INTO TMP_singer_list 
             FROM Grushevskaya_record
-            WHERE id = RECORD_id;
+            WHERE id = record_id;
         FOR i IN 1..TMP_singer_list.COUNT
         LOOP
-            IF TMP_singer_list(i) = SINGER_name THEN
+            IF TMP_singer_list(i) = singer_name THEN
                 SINGER_Number := i;
             END IF;
         END LOOP;
         TMP_singer_list.DELETE(SINGER_Number);        
         UPDATE Grushevskaya_record
             SET singer_list = TMP_singer_list
-            WHERE id = RECORD_id;
+            WHERE id = record_id;
         COMMIT;
         DBMS_OUTPUT.PUT_LINE(
-            'Исполнитель ' || SINGER_name || ' под №' || SINGER_Number || ' удален.'
+            'Исполнитель ' || singer_name || ' под №' || SINGER_Number || ' удален.'
         );
     EXCEPTION
     WHEN grushevskaya_exceptions.Error_update_singer_in_record THEN
@@ -1448,7 +1448,7 @@ PACKAGE BODY grushevskaya_package AS
     END DELETE_SINGER_FROM_RECORD;
         
     PROCEDURE PRINT_SINGER_style(
-        SINGER_name Varchar2
+        singer_name Varchar2
     ) IS
         COUNT_SINGER_IN_TABLE Number := 0;
         TYPE SINGER_style IS TABLE OF Number INDEX BY Varchar2(100 BYTE);
@@ -1458,7 +1458,7 @@ PACKAGE BODY grushevskaya_package AS
     BEGIN
         SELECT COUNT(name) INTO COUNT_SINGER_IN_TABLE 
             FROM Grushevskaya_singer
-            WHERE name = SINGER_name;
+            WHERE name = singer_name;
         IF COUNT_SINGER_IN_TABLE = 0 THEN
             DBMS_OUTPUT.PUT_LINE('Исполнитель не найден.');
             RETURN;
@@ -1467,7 +1467,7 @@ PACKAGE BODY grushevskaya_package AS
         LOOP
             FOR i IN 1..RECORD.singer_list.COUNT
             LOOP
-                IF RECORD.singer_list(i) = SINGER_name THEN
+                IF RECORD.singer_list(i) = singer_name THEN
                     IF SINGER_style_LIST.EXISTS(RECORD.style) THEN
                         SINGER_style_LIST(RECORD.style) := 
                             SINGER_style_LIST(RECORD.style) 
@@ -1493,7 +1493,7 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
         DBMS_OUTPUT.PUT_LINE(
             'Наиболее популярный стиль у ' 
-            || SINGER_name || ' - '  || MAX_style || '.'
+            || singer_name || ' - '  || MAX_style || '.'
         );       
     EXCEPTION
     WHEN OTHERS THEN
@@ -1555,14 +1555,14 @@ PACKAGE BODY grushevskaya_package AS
     
     PROCEDURE PRINT_ALBUM_AUTHOR
     IS
-        TYPE ALL_ALBUM_id IS TABLE OF Varchar2(100 BYTE);
-        ALBUM_id ALL_ALBUM_id;
+        TYPE ALL_album_id IS TABLE OF Varchar2(100 BYTE);
+        album_id ALL_album_id;
         TYPE ALBUM_SINGER IS TABLE OF Number INDEX BY Varchar2(100 BYTE);
         ALBUM_singer_list ALBUM_SINGER;
         SINGERS Grushevskaya_singer_tab;
         RECORD_COUNT Number;
         CURRENT_SINGER Varchar(100 BYTE);
-        FLAG_GROUP Boolean;
+        flag_GROUP Boolean;
     BEGIN   
         DBMS_OUTPUT.PUT_LINE('Авторство альбомов.');
         FOR ALBUM IN (SELECT * FROM Grushevskaya_album)
@@ -1588,12 +1588,12 @@ PACKAGE BODY grushevskaya_package AS
                     END LOOP;
                 END IF;
             END LOOP;
-            FLAG_GROUP := false;
+            flag_GROUP := false;
             CURRENT_SINGER := ALBUM_singer_list.FIRST;
             WHILE NOT CURRENT_SINGER IS null
             LOOP
                 IF ALBUM_singer_list(CURRENT_SINGER) <> RECORD_COUNT THEN
-                    FLAG_GROUP := true;
+                    flag_GROUP := true;
                 END IF;
                 CURRENT_SINGER := ALBUM_singer_list.NEXT(CURRENT_SINGER);
             END LOOP;
@@ -1601,7 +1601,7 @@ PACKAGE BODY grushevskaya_package AS
                 'Авторство альбома ' || ALBUM.name || ' с id ' || ALBUM.id || 
                 '.'
             );
-            IF FLAG_GROUP THEN
+            IF flag_GROUP THEN
                 DBMS_OUTPUT.PUT_LINE('Коллективный сборник.');
             ELSE
                 DBMS_OUTPUT.PUT_LINE('Исполнители:');

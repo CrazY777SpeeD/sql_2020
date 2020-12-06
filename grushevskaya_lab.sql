@@ -1451,7 +1451,7 @@ PACKAGE BODY grushevskaya_package AS
     PROCEDURE print_singer_style (
         singer_name VARCHAR2
     ) IS
-        count_singer_in_table Number := 0;
+        count_singer_in_table NUMBER := 0;
         TYPE Singer_style IS TABLE OF NUMBER INDEX BY VARCHAR2(100 BYTE);
         singer_style_list Singer_style;
         current_elem VARCHAR2(100 BYTE);

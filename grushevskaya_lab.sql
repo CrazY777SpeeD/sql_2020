@@ -17,13 +17,12 @@ DROP PACKAGE grushevskaya_package;
 
 CREATE OR REPLACE 
 PACKAGE grushevskaya_exceptions AS
-    INVALIDE_TYPE_FIELDS EXCEPTION;
-    WARNING_UPDATE EXCEPTION;
-    ERROR_RECORD EXCEPTION;
-    ERROR_UPDATE_SINGER_IN_RECORD EXCEPTION;
-    ERROR_SINGER_DEL EXCEPTION;
-    ERROR_ALBUM EXCEPTION;
-    ERROR_RECORD_DEL EXCEPTION;
+    Warning_update EXCEPTION;
+    Error_record EXCEPTION;
+    Error_update_singer_in_record EXCEPTION;
+    Error_singer_del EXCEPTION;
+    Error_album EXCEPTION;
+    Error_record_del EXCEPTION;
 END;
 /
 
@@ -297,7 +296,7 @@ BEGIN
     IF :NEW.SINGER_LIST IS NULL THEN
        DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORDS');
        DBMS_OUTPUT.PUT_LINE('SINGER_LIST не должен быть пустым (NULL).'); 
-       RAISE grushevskaya_exceptions.ERROR_RECORD;
+       RAISE grushevskaya_exceptions.Error_record;
     END IF;
     -- ”даление пустот во вл.таб.
     FOR i IN 1..:NEW.SINGER_LIST.COUNT
@@ -312,7 +311,7 @@ BEGIN
         IF INSERTING THEN
            DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORDS');
            DBMS_OUTPUT.PUT_LINE('SINGER_LIST не должен быть пустым (EMPTY).'); 
-           RAISE grushevskaya_exceptions.ERROR_RECORD;
+           RAISE grushevskaya_exceptions.Error_record;
         END IF;
         IF UPDATING THEN
             :NEW.ID := :OLD.ID;
@@ -330,7 +329,7 @@ BEGIN
                 '—писок исполнителей обновл€ть нельз€,' 
                 || ' так как исполнитель хот€ бы один должен быть.'
             );
-            RAISE grushevskaya_exceptions.WARNING_UPDATE;
+            RAISE grushevskaya_exceptions.Warning_update;
         END IF;
     END IF;
     -- «апись уже содержитс€ в одном из альбомов => обновл€ть исп. нельз€    
@@ -361,7 +360,7 @@ BEGIN
                 '—писок исполнителей обновл€ть нельз€,' 
                 || ' так как запись уже содержитс€ в одном из альбомов.'
             );
-            RAISE grushevskaya_exceptions.WARNING_UPDATE;
+            RAISE grushevskaya_exceptions.Warning_update;
         END IF;
     END IF;
     -- ѕроверка внеш.кл.
@@ -372,7 +371,7 @@ BEGIN
         IF INSERTING THEN            
             DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_RECORDS');
             DBMS_OUTPUT.PUT_LINE('Ќекорректный список исполнителей.');
-            RAISE grushevskaya_exceptions.ERROR_RECORD;
+            RAISE grushevskaya_exceptions.Error_record;
         ELSE
             :NEW.ID := :OLD.ID;
             :NEW.NAME := :OLD.NAME;
@@ -385,7 +384,7 @@ BEGIN
                 || :OLD.ID 
                 || ' не была обновлена из-за нарушени€ внешнего ключа (исполнители).'
             );
-            RAISE grushevskaya_exceptions.WARNING_UPDATE;
+            RAISE grushevskaya_exceptions.Warning_update;
         END IF;
     END IF;
 END;
@@ -410,7 +409,7 @@ BEGIN
                     || :OLD.NAME 
                     || ' удал€ть нельз€ - у него есть треки.'
                 );
-                RAISE grushevskaya_exceptions.ERROR_SINGER_DEL;
+                RAISE grushevskaya_exceptions.Error_singer_del;
             END IF;
         END LOOP;
     END LOOP;
@@ -513,7 +512,7 @@ BEGIN
                         || :OLD.ID 
                         || ' не был обновлен. Ќельз€ добавл€ть треки, если альбом продан.'
                     );
-                    RAISE grushevskaya_exceptions.WARNING_UPDATE;
+                    RAISE grushevskaya_exceptions.Warning_update;
                 END IF;
                 IF :NEW.RECORD_ARRAY(j) <> :OLD.RECORD_ARRAY(j) THEN
                     :NEW.ID := :OLD.ID;
@@ -528,7 +527,7 @@ BEGIN
                         || :OLD.ID 
                         || ' не был обновлен. Ќельз€ добавл€ть треки, если альбом продан.'
                     );
-                    RAISE grushevskaya_exceptions.WARNING_UPDATE;
+                    RAISE grushevskaya_exceptions.Warning_update;
                 END IF;
             END LOOP;
         END IF;
@@ -546,7 +545,7 @@ BEGIN
             IF INSERTING THEN                               
                 DBMS_OUTPUT.PUT_LINE('EXCEPTION IN GRUSHEVSKAYA_TR_ON_ALBUM');
                 DBMS_OUTPUT.PUT_LINE('Ќекорректный список записей.');
-                RAISE grushevskaya_exceptions.ERROR_ALBUM;
+                RAISE grushevskaya_exceptions.Error_album;
             ELSE
                 :NEW.ID := :OLD.ID;
                 :NEW.NAME := :OLD.NAME;
@@ -560,7 +559,7 @@ BEGIN
                     || :OLD.ID 
                     || ' не был обновлен из-за нарушени€ внешнего ключа (записи).'
                 );
-                RAISE grushevskaya_exceptions.WARNING_UPDATE;
+                RAISE grushevskaya_exceptions.Warning_update;
             END IF;
         END IF;
     END LOOP;    
@@ -585,7 +584,7 @@ BEGIN
                     || :OLD.ID 
                     || ' удал€ть нельз€ - она есть в альбоме.'
                 );
-                RAISE grushevskaya_exceptions.ERROR_RECORD_DEL;
+                RAISE grushevskaya_exceptions.Error_record_del;
             END IF;
         END LOOP;
     END LOOP;
@@ -861,9 +860,9 @@ PACKAGE BODY grushevskaya_package AS
             || ' успешно добавлена.'
         );
     EXCEPTION
-    WHEN grushevskaya_exceptions.ERROR_RECORD THEN
+    WHEN grushevskaya_exceptions.Error_record THEN
         RETURN;
-    WHEN grushevskaya_exceptions.WARNING_UPDATE THEN
+    WHEN grushevskaya_exceptions.Warning_update THEN
         RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_RECORD');
@@ -906,7 +905,7 @@ PACKAGE BODY grushevskaya_package AS
             || ' успешно добавлен в запись с ID ' || RECORD_ID || '.'
         );
     EXCEPTION
-    WHEN grushevskaya_exceptions.WARNING_UPDATE THEN
+    WHEN grushevskaya_exceptions.Warning_update THEN
         RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_SINGER_IN_RECORD');
@@ -976,9 +975,9 @@ PACKAGE BODY grushevskaya_package AS
             || ' успешно добавлен.'
         );
     EXCEPTION
-    WHEN grushevskaya_exceptions.ERROR_ALBUM THEN
+    WHEN grushevskaya_exceptions.Error_album THEN
         RETURN;
-    WHEN grushevskaya_exceptions.WARNING_UPDATE THEN
+    WHEN grushevskaya_exceptions.Warning_update THEN
         RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUM');
@@ -1031,9 +1030,9 @@ PACKAGE BODY grushevskaya_package AS
             || ' успешно добавлен.'
         );
     EXCEPTION
-    WHEN grushevskaya_exceptions.ERROR_ALBUM THEN
+    WHEN grushevskaya_exceptions.Error_album THEN
         RETURN;
-    WHEN grushevskaya_exceptions.WARNING_UPDATE THEN
+    WHEN grushevskaya_exceptions.Warning_update THEN
         RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_ALBUM');
@@ -1093,9 +1092,9 @@ PACKAGE BODY grushevskaya_package AS
             || ' успешно добавлена в альбом с ID ' || ALBUM_ID || '.'
         );
     EXCEPTION
-    WHEN grushevskaya_exceptions.ERROR_ALBUM THEN
+    WHEN grushevskaya_exceptions.Error_album THEN
         RETURN;
-    WHEN grushevskaya_exceptions.WARNING_UPDATE THEN
+    WHEN grushevskaya_exceptions.Warning_update THEN
         RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN ADD_RECORD_IN_ALBUM');
@@ -1392,9 +1391,9 @@ PACKAGE BODY grushevskaya_package AS
         COMMIT;
         DBMS_OUTPUT.PUT_LINE('“рек є' || RECORD_NUMBER || ' удален');            
     EXCEPTION
-    WHEN grushevskaya_exceptions.ERROR_ALBUM THEN
+    WHEN grushevskaya_exceptions.Error_album THEN
         RETURN;
-    WHEN grushevskaya_exceptions.WARNING_UPDATE THEN
+    WHEN grushevskaya_exceptions.Warning_update THEN
         RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN DELETE_RECORD_FROM_ALBUM');
@@ -1432,9 +1431,9 @@ PACKAGE BODY grushevskaya_package AS
             '»сполнитель ' || SINGER_NAME || ' под є' || SINGER_NUMBER || ' удален.'
         );
     EXCEPTION
-    WHEN grushevskaya_exceptions.ERROR_UPDATE_SINGER_IN_RECORD THEN
+    WHEN grushevskaya_exceptions.Error_update_singer_in_record THEN
         RETURN;
-    WHEN grushevskaya_exceptions.WARNING_UPDATE THEN
+    WHEN grushevskaya_exceptions.Warning_update THEN
         RETURN;
     WHEN OTHERS THEN
         DBMS_OUTPUT.PUT_LINE('EXCEPTION IN DELETE_SINGER_FROM_RECORD');

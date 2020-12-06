@@ -51,7 +51,7 @@ CREATE SEQUENCE Grushevskaya_num_album
 
 CREATE TABLE Grushevskaya_dict_country(
     -- название страны
-    name Varchar2(100 BYTE)
+    name VARCHAR2(100 BYTE)
         PRIMARY KEY
         NOT null
 );
@@ -66,9 +66,9 @@ INSERT INTO Grushevskaya_dict_country (name) VALUES ('Швеция');
 
 CREATE TABLE Grushevskaya_singer(
     -- имя, псевдоним или название группы
-    name Varchar2(100 BYTE),
+    name VARCHAR2(100 BYTE),
     -- страна
-    country Varchar2(100 BYTE)
+    country VARCHAR2(100 BYTE)
 );
 /
 -- Тестовые данные
@@ -106,7 +106,7 @@ ALTER TABLE Grushevskaya_singer
 
 CREATE TABLE Grushevskaya_dict_style(
     -- название стиля
-    name Varchar2(100 BYTE)
+    name VARCHAR2(100 BYTE)
         PRIMARY KEY
         NOT null
 );
@@ -126,20 +126,20 @@ INSERT INTO Grushevskaya_dict_style (name) VALUES ('Хард-рок');
 
 /
 -- Вложенная таблица исполнителей
-CREATE TYPE Grushevskaya_singer_tab AS TABLE OF Varchar2(100 BYTE);
+CREATE TYPE Grushevskaya_singer_tab AS TABLE OF VARCHAR2(100 BYTE);
 /
 -- record – запись 
 -- (идентификатор, название, время звучания, 
 -- стиль, список исполнителей)
 CREATE TABLE Grushevskaya_record (
     -- идентификатор
-    id Number(10,0),
+    id NUMBER(10,0),
     -- название
-    name Varchar2(100 BYTE),
+    name VARCHAR2(100 BYTE),
     -- время звучания
     time INTERVAL DAY (0) TO SECOND (0),
     -- стиль
-    style Varchar2(100 BYTE),
+    style VARCHAR2(100 BYTE),
     -- список исполнителей
     singer_list Grushevskaya_singer_tab
 ) NESTED TABLE Singer_list
@@ -219,22 +219,22 @@ ALTER TABLE Grushevskaya_record
 -- ALBUM
 
 -- Вложенный массив записей
-CREATE TYPE Grushevskaya_record_arr AS Varray(30) OF Number(10,0);
+CREATE TYPE Grushevskaya_record_arr AS Varray(30) OF NUMBER(10,0);
 /
 -- ALBUM – альбом (идентификатор, название, стоимость, 
 -- количество на складе, количество проданных экземпляров,
 -- список записей)
 CREATE TABLE Grushevskaya_album (
     -- идентификатор    
-    id Number(10, 0),
+    id NUMBER(10, 0),
     -- название
-    name Varchar2(100 BYTE),
+    name VARCHAR2(100 BYTE),
     -- стоимость
-    price Number(6,2),
+    price NUMBER(6,2),
     -- количество на складе
-    quantity_in_stock Number(5, 0),
+    quantity_in_stock NUMBER(5, 0),
     -- количество проданных экземпляров
-    quantity_of_sold Number(5, 0),
+    quantity_of_sold NUMBER(5, 0),
     -- список (массив) записей
     record_array Grushevskaya_record_arr
 );
@@ -291,7 +291,7 @@ BEFORE INSERT OR UPDATE ON Grushevskaya_record
 FOR EACH ROW
 DECLARE
     list_name Grushevskaya_singer_tab;
-    flag_record_uses Boolean := false;
+    flag_record_uses BOOLEAN := false;
 BEGIN
     -- Проверка на null поля singer_list
     IF :NEW.singer_list IS null THEN
@@ -424,7 +424,7 @@ CREATE OR REPLACE
 TRIGGER Grushevskaya_tr_on_singers_upd
 FOR UPDATE OF name ON Grushevskaya_singer
 COMPOUND TRIGGER
-    TYPE Changes_arr IS TABLE OF Varchar2(100 BYTE) INDEX BY Pls_integer;
+    TYPE Changes_arr IS TABLE OF VARCHAR2(100 BYTE) INDEX BY PLS_INTEGER;
     singers_changes Changes_arr;
 AFTER EACH ROW IS
     BEGIN
@@ -432,7 +432,7 @@ AFTER EACH ROW IS
     END AFTER EACH ROW;
 AFTER STATEMENT IS
         list_name Grushevskaya_singer_tab;
-        flag Boolean := false;
+        flag BOOLEAN := false;
     BEGIN
         FOR record_row IN (SELECT * FROM Grushevskaya_record)
         LOOP
@@ -468,11 +468,11 @@ TRIGGER Grushevskaya_tr_on_album
 BEFORE INSERT OR UPDATE ON Grushevskaya_album
 FOR EACH ROW
 DECLARE
-    TYPE Unique_records IS TABLE OF Number INDEX BY Varchar(100);
+    TYPE Unique_records IS TABLE OF NUMBER INDEX BY VARCHAR2(100);
     list_unique_records Unique_records;
     unique_records_varray Grushevskaya_record_arr := Grushevskaya_record_arr();
-    current_unique_record Varchar2(100 BYTE);
-    TYPE Grushevskaya_record_tab IS TABLE OF Number(10, 0);
+    current_unique_record VARCHAR2(100 BYTE);
+    TYPE Grushevskaya_record_tab IS TABLE OF NUMBER(10, 0);
     list_id Grushevskaya_record_tab;    
 BEGIN
     IF UPDATING('record_array') THEN
@@ -599,7 +599,7 @@ CREATE OR REPLACE
 TRIGGER Grushevskaya_tr_on_record_udp
 FOR UPDATE OF id ON Grushevskaya_record
 COMPOUND TRIGGER
-    TYPE Changes_arr IS TABLE OF Number(10,0) INDEX BY Pls_integer;
+    TYPE Changes_arr IS TABLE OF NUMBER(10,0) INDEX BY PLS_INTEGER;
     record_changes Changes_arr;
     AFTER EACH ROW IS
     BEGIN
@@ -607,7 +607,7 @@ COMPOUND TRIGGER
     END AFTER EACH ROW;
     AFTER STATEMENT IS
         id_arr Grushevskaya_record_arr;
-        flag Boolean := false;
+        flag BOOLEAN := false;
     BEGIN
         FOR album_row IN (SELECT * FROM Grushevskaya_album)
         LOOP
@@ -637,12 +637,12 @@ PACKAGE grushevskaya_package AS
     -- Добавить страну в словарь.
     PROCEDURE add_in_dict_country (
         -- Название страны
-        name Varchar2
+        name VARCHAR2
     );
     -- Добавить стиль в словарь.
     PROCEDURE add_in_dict_style (
         -- Название стиля
-        name Varchar2
+        name VARCHAR2
     );
     
     -- Минимальный функционал
@@ -650,64 +650,64 @@ PACKAGE grushevskaya_package AS
     -- 1) Добавить запись (изначально указывается один исполнитель).
     PROCEDURE add_record (
         -- Название
-        name Varchar2, 
+        name VARCHAR2, 
         -- Количество часов звучания
-        hours Number,
+        hours NUMBER,
         -- Количество минут звучания
-        minutes Number,
+        minutes NUMBER,
         -- Количество секунд звучания
-        seconds Number,
+        seconds NUMBER,
         -- Стиль из словаря
-        style Varchar2,
+        style VARCHAR2,
         -- Имя исполнителя
-        singer Varchar2
+        singer VARCHAR2
     );
     -- 2) Добавить исполнителя для записи 
     -- (если указанная запись не добавлена ни в один альбом 
     --  - Условие проверяется на уровне триггера).
     PROCEDURE add_singer_in_record (
         -- id записи
-        record_id Number,
+        record_id NUMBER,
         -- Имя исполнителя
-        singer_name Varchar2
+        singer_name VARCHAR2
     );
     -- 3) Добавить исполнителя.
     PROCEDURE add_singer (
         -- Имя (ФИО)
-        name Varchar2, 
+        name VARCHAR2, 
         -- Страна из словаря
-        country Varchar2
+        country VARCHAR2
     );
     -- 4) Добавить альбом (изначально указывается один трек или ни одного).
     -- Реализация для добавления альбома с одной записью.
     PROCEDURE add_album (
         -- Название
-        name Varchar2,
+        name VARCHAR2,
         -- Цена (>= 0)
-        price Number,
+        price NUMBER,
         -- Количество на складе (>= 0)
-        quantity_in_stock Number,
+        quantity_in_stock NUMBER,
         -- id добавляемой записи
-        record_id Number
+        record_id NUMBER
     );
     -- 4) Добавить альбом (изначально указывается один трек или ни одного).
     -- Реализация для добавления альбома без записей.
     PROCEDURE add_album (
         -- Название
-        name Varchar2,
+        name VARCHAR2,
         -- Цена (>= 0)
-        price Number,
+        price NUMBER,
         -- Количество на складе (>= 0)
-        quantity_in_stock Number
+        quantity_in_stock NUMBER
     );
     -- 5) Добавить трек в альбом 
     -- (если не продано ни одного экземпляра
     --  - Условие проверяется на уровне триггера).
     PROCEDURE add_record_in_album (
         -- id альбома
-        album_id Number,
+        album_id NUMBER,
         -- id добавляемой записи 
-        record_id Number
+        record_id NUMBER
     );
     -- 6) Список альбомов в продаже (количество на складе больше 0).
     PROCEDURE print_albums_in_stock;
@@ -717,9 +717,9 @@ PACKAGE grushevskaya_package AS
     -- (количество на складе увеличивается на указанное значение).
     PROCEDURE add_albums_in_stock (
         -- id альбома
-        album_id Number,
+        album_id NUMBER,
         -- Количество
-        quantity Number
+        quantity NUMBER
     );
     -- 9) Продать альбом 
     -- (количество на складе уменьшается, проданных – увеличивается; 
@@ -727,9 +727,9 @@ PACKAGE grushevskaya_package AS
     --  - Условие проверяется в самой функции). 
     PROCEDURE sell_albums (
         -- id альбома
-        album_id Number,
+        album_id NUMBER,
         -- Количество
-        quantity Number
+        quantity NUMBER
     );
     -- 10) Удалить исполнителей, у которых нет ни одной записи.
     PROCEDURE delete_singers_without_records;
@@ -738,7 +738,7 @@ PACKAGE grushevskaya_package AS
     
     -- 11) Трек-лист указанного альбома 
     -- с указанием суммарного времени звучания альбома.
-    PROCEDURE print_album_records(album_id Number);
+    PROCEDURE print_album_records(album_id NUMBER);
     -- 12) Выручка магазина 
     -- (суммарная стоимость проданных альбомов 
     -- по каждому в отдельности 
@@ -750,9 +750,9 @@ PACKAGE grushevskaya_package AS
     --  - Условие проверяется на уровне триггера).
     PROCEDURE delete_record_from_album (
         -- id альбома
-        album_id Number,
+        album_id NUMBER,
         -- Номер звучания записи в альбоме
-        record_number Number
+        record_number NUMBER
     );
     -- 14) Удалить исполнителя из записи 
     -- (если запись не входит ни в один альбом 
@@ -760,15 +760,15 @@ PACKAGE grushevskaya_package AS
     --  - Условия проверяются на уровне триггера). 
     PROCEDURE delete_singer_from_record (
         -- id записи
-        record_id Number,
+        record_id NUMBER,
         -- Имя исполнителя        
-        singer_name Varchar2
+        singer_name VARCHAR2
     );
     -- 15) Определить предпочитаемый музыкальный стиль указанного исполнителя 
     -- (стиль, в котором записано большинство его треков). 
     PROCEDURE print_singer_style (
         -- Имя исполнителя
-        singer_name Varchar2
+        singer_name VARCHAR2
     );
     -- 16) Определить предпочитаемый музыкальный стиль 
     -- по каждой стране происхождения исполнителей.
@@ -784,7 +784,7 @@ END;
 /
 CREATE OR REPLACE
 PACKAGE BODY grushevskaya_package AS
-    PROCEDURE print_msg_ex(sqlcode Number) IS
+    PROCEDURE print_msg_ex(sqlcode NUMBER) IS
     BEGIN
         dbms_output.put_line('Ой. Неизвестное исключение.');
         dbms_output.put_line('Код: ' || sqlcode);
@@ -792,7 +792,7 @@ PACKAGE BODY grushevskaya_package AS
     END print_msg_ex;
     
     PROCEDURE add_in_dict_country (
-        name Varchar2
+        name VARCHAR2
     )IS
     BEGIN
         INSERT INTO Grushevskaya_dict_country (name) VALUES (name);
@@ -813,7 +813,7 @@ PACKAGE BODY grushevskaya_package AS
     END add_in_dict_country;
     
     PROCEDURE add_in_dict_style (
-        name Varchar2
+        name VARCHAR2
     )IS
     BEGIN
         INSERT INTO Grushevskaya_dict_style (name) VALUES (name);
@@ -834,12 +834,12 @@ PACKAGE BODY grushevskaya_package AS
     END add_in_dict_style;
     
     PROCEDURE add_record(
-        name Varchar2,
-        hours Number,
-        minutes Number,
-        seconds Number,
-        style Varchar2,
-        singer Varchar2
+        name VARCHAR2,
+        hours NUMBER,
+        minutes NUMBER,
+        seconds NUMBER,
+        style VARCHAR2,
+        singer VARCHAR2
     ) IS
         time INTERVAL DAY(0) TO SECOND(0);
     BEGIN
@@ -883,8 +883,8 @@ PACKAGE BODY grushevskaya_package AS
     END add_record; 
     
     PROCEDURE add_singer_in_record (
-        record_id Number,
-        singer_name Varchar2
+        record_id NUMBER,
+        singer_name VARCHAR2
     ) IS
         tmp_singer_list Grushevskaya_singer_tab;
     BEGIN
@@ -920,8 +920,8 @@ PACKAGE BODY grushevskaya_package AS
     END add_singer_in_record;
     
     PROCEDURE add_singer (
-        name Varchar2,
-        country Varchar2
+        name VARCHAR2,
+        country VARCHAR2
     ) IS
     BEGIN
         INSERT INTO Grushevskaya_singer (name, country)
@@ -945,10 +945,10 @@ PACKAGE BODY grushevskaya_package AS
     END add_singer;
         
     PROCEDURE add_album (
-        name Varchar2,
-        price Number,
-        quantity_in_stock Number,
-        record_id Number
+        name VARCHAR2,
+        price NUMBER,
+        quantity_in_stock NUMBER,
+        record_id NUMBER
     ) IS
         record_arr Grushevskaya_record_arr := Grushevskaya_record_arr();
     BEGIN
@@ -1002,9 +1002,9 @@ PACKAGE BODY grushevskaya_package AS
     END add_album;
         
     PROCEDURE add_album (
-        name Varchar2,
-        price Number,
-        quantity_in_stock Number
+        name VARCHAR2,
+        price NUMBER,
+        quantity_in_stock NUMBER
     ) IS
         record_arr Grushevskaya_record_arr := Grushevskaya_record_arr();
     BEGIN
@@ -1055,10 +1055,10 @@ PACKAGE BODY grushevskaya_package AS
     END add_album;
     
     PROCEDURE add_record_in_album (
-        album_id Number, 
-        record_id Number
+        album_id NUMBER, 
+        record_id NUMBER
     )IS
-        record_serial_number Number := -1;
+        record_serial_number NUMBER := -1;
         tmp_record_arr Grushevskaya_record_arr;
     BEGIN        
         IF record_id IS null THEN
@@ -1112,7 +1112,7 @@ PACKAGE BODY grushevskaya_package AS
     
     PROCEDURE print_albums_in_stock 
     IS
-        quantity Number := 0;
+        quantity NUMBER := 0;
     BEGIN
         dbms_output.put_line('Альбомы в продаже:');
         FOR album IN (SELECT * FROM Grushevskaya_album WHERE quantity_in_stock > 0)
@@ -1143,8 +1143,8 @@ PACKAGE BODY grushevskaya_package AS
     END print_singers;
     
     PROCEDURE add_albums_in_stock (
-        album_id Number,
-        quantity Number
+        album_id NUMBER,
+        quantity NUMBER
     ) IS
     BEGIN
         IF quantity <= 0 THEN
@@ -1176,12 +1176,12 @@ PACKAGE BODY grushevskaya_package AS
     END add_albums_in_stock;    
     
     PROCEDURE sell_albums(
-        album_id Number,
-        quantity Number
+        album_id NUMBER,
+        quantity NUMBER
     ) IS
         record_arr Grushevskaya_record_arr;
-        flag_one_record Boolean := false;
-        max_quantity Number;
+        flag_one_record BOOLEAN := false;
+        max_quantity NUMBER;
     BEGIN
         IF quantity <= 0 THEN
             dbms_output.put_line(
@@ -1278,13 +1278,13 @@ PACKAGE BODY grushevskaya_package AS
     END delete_singers_without_records;    
     
     PROCEDURE print_album_records(
-        album_id Number
+        album_id NUMBER
     ) IS
-        album_name Varchar2(100 BYTE);
+        album_name VARCHAR2(100 BYTE);
         record_arr Grushevskaya_record_arr;
         record Grushevskaya_record%ROWTYPE;
         time INTERVAL DAY(0) TO SECOND(0) := NUMTODSINTERVAL(0, 'SECOND');
-        singers Varchar2(300) := '';
+        singers VARCHAR2(300) := '';
     BEGIN
         SELECT name INTO album_name
             FROM Grushevskaya_album
@@ -1339,7 +1339,7 @@ PACKAGE BODY grushevskaya_package AS
     
     PROCEDURE print_income
     IS
-        total_income Number := 0;
+        total_income NUMBER := 0;
     BEGIN
         dbms_output.put_line('Выручка магазина');
         FOR album IN (SELECT * FROM Grushevskaya_album)
@@ -1362,11 +1362,11 @@ PACKAGE BODY grushevskaya_package AS
     END print_income;    
     
     PROCEDURE delete_record_from_album (
-        album_id Number,
-        record_number Number
+        album_id NUMBER,
+        record_number NUMBER
     ) IS
         tmp_record_arr Grushevskaya_record_arr;
-        tmp_quantity_of_sold Number;
+        tmp_quantity_of_sold NUMBER;
     BEGIN
         SELECT quantity_of_sold INTO tmp_quantity_of_sold
             FROM Grushevskaya_album
@@ -1409,11 +1409,11 @@ PACKAGE BODY grushevskaya_package AS
     END delete_record_from_album;    
     
     PROCEDURE delete_singer_from_record (
-        record_id Number,
-        singer_name Varchar2
+        record_id NUMBER,
+        singer_name VARCHAR2
     ) IS
         tmp_singer_list Grushevskaya_singer_tab;
-        singer_number Number := 0;
+        singer_number NUMBER := 0;
     BEGIN
         SELECT singer_list INTO tmp_singer_list 
             FROM Grushevskaya_record
@@ -1449,13 +1449,13 @@ PACKAGE BODY grushevskaya_package AS
     END delete_singer_from_record;
         
     PROCEDURE print_singer_style (
-        singer_name Varchar2
+        singer_name VARCHAR2
     ) IS
         count_singer_in_table Number := 0;
-        TYPE Singer_style IS TABLE OF Number INDEX BY Varchar2(100 BYTE);
+        TYPE Singer_style IS TABLE OF NUMBER INDEX BY VARCHAR2(100 BYTE);
         singer_style_list Singer_style;
-        current_elem Varchar2(100 BYTE);
-        max_style Varchar2(100 BYTE);
+        current_elem VARCHAR2(100 BYTE);
+        max_style VARCHAR2(100 BYTE);
     BEGIN
         SELECT COUNT(name) INTO count_singer_in_table 
             FROM Grushevskaya_singer
@@ -1504,13 +1504,13 @@ PACKAGE BODY grushevskaya_package AS
     
     PROCEDURE print_country_style
     IS
-        TYPE Singer_style IS TABLE OF Number INDEX BY Varchar2(100 BYTE);
-        TYPE Country_style IS TABLE OF Singer_style INDEX BY Varchar2(100 BYTE);
+        TYPE Singer_style IS TABLE OF NUMBER INDEX BY VARCHAR2(100 BYTE);
+        TYPE Country_style IS TABLE OF Singer_style INDEX BY VARCHAR2(100 BYTE);
         country_style_list Country_style;
-        tmp_country Varchar2(100 BYTE);
-        current_country Varchar2(100 BYTE);
-        current_style Varchar2(100 BYTE);
-        max_style Varchar2(100 BYTE);
+        tmp_country VARCHAR2(100 BYTE);
+        current_country VARCHAR2(100 BYTE);
+        current_style VARCHAR2(100 BYTE);
+        max_style VARCHAR2(100 BYTE);
     BEGIN
         FOR record IN (SELECT * FROM Grushevskaya_record)
         LOOP
@@ -1556,14 +1556,14 @@ PACKAGE BODY grushevskaya_package AS
     
     PROCEDURE print_album_author
     IS
-        TYPE All_album_id IS TABLE OF Varchar2(100 BYTE);
+        TYPE All_album_id IS TABLE OF VARCHAR2(100 BYTE);
         album_id All_album_id;
-        TYPE Album_singer IS TABLE OF Number INDEX BY Varchar2(100 BYTE);
+        TYPE Album_singer IS TABLE OF NUMBER INDEX BY VARCHAR2(100 BYTE);
         album_singer_list Album_singer;
         singers Grushevskaya_singer_tab;
         record_count Number;
-        current_singer Varchar(100 BYTE);
-        flag_group Boolean;
+        current_singer VARCHAR2(100 BYTE);
+        flag_group BOOLEAN;
     BEGIN   
         dbms_output.put_line('Авторство альбомов.');
         FOR album IN (SELECT * FROM Grushevskaya_album)

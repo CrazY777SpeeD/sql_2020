@@ -784,6 +784,7 @@ END;
 /
 CREATE OR REPLACE
 PACKAGE BODY grushevskaya_package AS
+    -- Вывести сообщение об ошибке.
     PROCEDURE print_msg_ex(sqlcode NUMBER) 
     IS
     BEGIN
@@ -792,6 +793,7 @@ PACKAGE BODY grushevskaya_package AS
         dbms_output.put_line('Сообщение: ' || SQLERRM(sqlcode));        
     END print_msg_ex;
     
+    -- Добавить страну в словарь.
     PROCEDURE add_in_dict_country(
         name VARCHAR2
     ) IS
@@ -813,6 +815,7 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_in_dict_country;
     
+    -- Добавить стиль в словарь.
     PROCEDURE add_in_dict_style(
         name VARCHAR2
     ) IS
@@ -834,6 +837,7 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_in_dict_style;
     
+    -- 1) Добавить запись (изначально указывается один исполнитель).
     PROCEDURE add_record(
         name VARCHAR2,
         hours NUMBER,
@@ -844,6 +848,7 @@ PACKAGE BODY grushevskaya_package AS
     ) IS
         time INTERVAL DAY(0) TO SECOND(0);
     BEGIN
+        -- Время записи
         time := NUMTODSINTERVAL(hours, 'HOUR') 
             + NUMTODSINTERVAL(minutes, 'MINUTE') 
             + NUMTODSINTERVAL(seconds, 'SECOND');
@@ -883,21 +888,28 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_record; 
     
+    -- 2) Добавить исполнителя для записи 
+    -- (если указанная запись не добавлена ни в один альбом 
+    --  - Условие проверяется на уровне триггера).
     PROCEDURE add_singer_in_record(
         record_id NUMBER,
         singer_name VARCHAR2
     ) IS
         tmp_singer_list Grushevskaya_singer_tab;
     BEGIN
+        -- Проверка на null
         IF singer_name IS null THEN
             dbms_output.put_line('Нельзя вставлять null-значения.');
             RETURN;
         END IF;
+        -- Увеличение исходного списка исполнителей на одно значение
+        -- и добавление исполнителя
         SELECT singer_list INTO tmp_singer_list 
             FROM Grushevskaya_record
             WHERE id = record_id;
         tmp_singer_list.EXTEND;
         tmp_singer_list(tmp_singer_list.LAST) := singer_name;
+        -- Обновление
         UPDATE Grushevskaya_record
             SET singer_list = tmp_singer_list
             WHERE id = record_id;
@@ -920,6 +932,7 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_singer_in_record;
     
+    -- 3) Добавить исполнителя.
     PROCEDURE add_singer(
         name VARCHAR2,
         country VARCHAR2
@@ -945,6 +958,8 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_singer;
         
+    -- 4) Добавить альбом (изначально указывается один трек или ни одного).
+    -- Реализация для добавления альбома с одной записью.
     PROCEDURE add_album(
         name VARCHAR2,
         price NUMBER,
@@ -953,8 +968,10 @@ PACKAGE BODY grushevskaya_package AS
     ) IS
         record_arr Grushevskaya_record_arr := Grushevskaya_record_arr();
     BEGIN
+        -- Создание списка треков и добавление трека
         record_arr.EXTEND(30);
         record_arr(1) := record_id;
+        -- Вставка нового альбома в таблицу
         INSERT INTO Grushevskaya_album (
             id, 
             name, 
@@ -1002,6 +1019,8 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_album;
         
+    -- 4) Добавить альбом (изначально указывается один трек или ни одного).
+    -- Реализация для добавления альбома без записей.
     PROCEDURE add_album(
         name VARCHAR2,
         price NUMBER,
@@ -1009,7 +1028,9 @@ PACKAGE BODY grushevskaya_package AS
     ) IS
         record_arr Grushevskaya_record_arr := Grushevskaya_record_arr();
     BEGIN
+        -- Создание списка треков
         record_arr.EXTEND(30);
+        -- Вставка нового альбома в таблице
         INSERT INTO Grushevskaya_album (
             id, 
             name, 
@@ -1055,26 +1076,33 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_album;
     
+    -- 5) Добавить трек в альбом 
+    -- (если не продано ни одного экземпляра
+    --  - Условие проверяется на уровне триггера).
     PROCEDURE add_record_in_album(
         album_id NUMBER, 
         record_id NUMBER
     ) IS
         record_serial_number NUMBER := -1;
         tmp_record_arr Grushevskaya_record_arr;
-    BEGIN        
+    BEGIN   
+        -- Проверка на null     
         IF record_id IS null THEN
             dbms_output.put_line('Нельзя вставлять null-значения.');
             RETURN;
         END IF;
+        -- Список треков
         SELECT record_array INTO tmp_record_arr
             FROM Grushevskaya_album
             WHERE id = album_id;
+        -- Поиск места для вставки
         FOR i IN REVERSE 1..tmp_record_arr.COUNT
         LOOP
             IF tmp_record_arr(i) IS null THEN
                 record_serial_number := i;
             END IF;
         END LOOP;
+        -- Проверка наличия места для вставки
         IF record_serial_number = -1 THEN
             dbms_output.put_line(
                 'Альбом с id ' 
@@ -1084,7 +1112,9 @@ PACKAGE BODY grushevskaya_package AS
                 || ' не добавлена.'
             );
         END IF;
+        -- Добавление трека
         tmp_record_arr(record_serial_number) := record_id;
+        -- Обновление альбома
         UPDATE Grushevskaya_album
             SET record_array = tmp_record_arr
             WHERE id = album_id;            
@@ -1111,6 +1141,7 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END add_record_in_album;
     
+    -- 6) Список альбомов в продаже (количество на складе больше 0).
     PROCEDURE print_albums_in_stock 
     IS
         quantity NUMBER := 0;
@@ -1128,6 +1159,7 @@ PACKAGE BODY grushevskaya_package AS
         print_msg_ex(sqlcode);
     END print_albums_in_stock;
     
+    -- 7) Список исполнителей.
     PROCEDURE print_singers
     IS
     BEGIN
@@ -1143,11 +1175,14 @@ PACKAGE BODY grushevskaya_package AS
         print_msg_ex(sqlcode);
     END print_singers;
     
+    -- 8) Поставка альбома
+    -- (количество на складе увеличивается на указанное значение).
     PROCEDURE add_albums_in_stock (
         album_id NUMBER,
         quantity NUMBER
     ) IS
     BEGIN
+        -- Проверка значения
         IF quantity <= 0 THEN
             dbms_output.put_line(
                 'В продажу поступило отрицательное ' 
@@ -1156,6 +1191,7 @@ PACKAGE BODY grushevskaya_package AS
             );
             RETURN;
         END IF;
+        -- Обновление количества
         UPDATE Grushevskaya_album
             SET quantity_in_stock = quantity_in_stock + quantity
             WHERE id = album_id;
@@ -1176,6 +1212,10 @@ PACKAGE BODY grushevskaya_package AS
         END IF;        
     END add_albums_in_stock;    
     
+    -- 9) Продать альбом 
+    -- (количество на складе уменьшается, проданных – увеличивается; 
+    -- продать можно только альбомы, в которых есть хотя бы один трек
+    --  - Условие проверяется в самой функции). 
     PROCEDURE sell_albums(
         album_id NUMBER,
         quantity NUMBER
@@ -1184,6 +1224,7 @@ PACKAGE BODY grushevskaya_package AS
         flag_one_record BOOLEAN := false;
         max_quantity NUMBER;
     BEGIN
+        -- Проверка значения
         IF quantity <= 0 THEN
             dbms_output.put_line(
                 'Подается отрицательное количество альбомов c id ' 
@@ -1191,9 +1232,11 @@ PACKAGE BODY grushevskaya_package AS
             );
             RETURN;
         END IF;
+        -- Список треков альбома
         SELECT record_array INTO record_arr 
             FROM Grushevskaya_album
             WHERE id = album_id;
+        -- Проверка альбома на наличие хотя бы одного трека
         FOR i IN 1..record_arr.COUNT
         LOOP
             IF NOT record_arr(i) IS null THEN
@@ -1207,6 +1250,8 @@ PACKAGE BODY grushevskaya_package AS
             );
             RETURN;
         END IF;
+        -- Продажа заявленного количества 
+        -- или максимально возможного
         SELECT quantity_in_stock INTO max_quantity 
             FROM Grushevskaya_album
             WHERE id = album_id;
@@ -1218,6 +1263,7 @@ PACKAGE BODY grushevskaya_package AS
             );
             RETURN;
         END IF;
+        -- Обновление количества
         UPDATE Grushevskaya_album
             SET 
                 quantity_in_stock = quantity_in_stock - max_quantity,
@@ -1240,11 +1286,17 @@ PACKAGE BODY grushevskaya_package AS
         END IF;       
     END sell_albums;
     
+    -- 10) Удалить исполнителей, у которых нет ни одной записи.
     PROCEDURE delete_singers_without_records
     IS
         del_singers_list Grushevskaya_singer_tab;
     BEGIN
+        -- Список всех исполнителей на удаление
         SELECT name BULK COLLECT INTO del_singers_list FROM Grushevskaya_singer;
+        -- Просматриваем каждый трек.
+        -- В каждом треке просматриваем исполнителей.
+        -- Каждого из исполнителей убираем из списка на удаление,
+        -- "затерев" его имя null-значением
         FOR record IN (SELECT * FROM Grushevskaya_record)
         LOOP
            FOR i IN 1..record.singer_list.COUNT
@@ -1259,6 +1311,7 @@ PACKAGE BODY grushevskaya_package AS
                 END LOOP;
             END LOOP;
         END LOOP;
+        -- Удаляем исполнителей без треков
         FOR j IN 1..del_singers_list.COUNT
         LOOP
             IF NOT del_singers_list(j) IS null THEN
@@ -1278,6 +1331,8 @@ PACKAGE BODY grushevskaya_package AS
         print_msg_ex(sqlcode);
     END delete_singers_without_records;    
     
+    -- 11) Трек-лист указанного альбома 
+    -- с указанием суммарного времени звучания альбома.
     PROCEDURE print_album_records(
         album_id NUMBER
     ) IS
@@ -1287,23 +1342,30 @@ PACKAGE BODY grushevskaya_package AS
         time INTERVAL DAY(0) TO SECOND(0) := NUMTODSINTERVAL(0, 'SECOND');
         singers VARCHAR2(300) := '';
     BEGIN
+        -- Имя альбома
         SELECT name INTO album_name
             FROM Grushevskaya_album
             WHERE id = album_id;
         dbms_output.put_line('Альбом №' || album_id || ' с именем ' || album_name);
+        -- Список треков
         SELECT record_array INTO record_arr
             FROM Grushevskaya_album
             WHERE id = album_id;
+        -- Вывод информации о треках на экран.
+        -- Подсчет суммарного времени звучания.
         FOR i IN 1..record_arr.COUNT
         LOOP
             IF NOT record_arr(i) IS null THEN
+                -- Вся информация о треке
                 SELECT * INTO record FROM Grushevskaya_record 
                     WHERE id = record_arr(i);
+                -- Список исполнителей
                 singers := '-';
                 FOR j IN 1..record.singer_list.COUNT
                 LOOP
                     singers := singers || ' ' || record.singer_list(j);
                 END LOOP;
+                -- Вывод информации
                 dbms_output.put_line(
                     '№' 
                     || LPAD(i, 2, '0')
@@ -1321,6 +1383,7 @@ PACKAGE BODY grushevskaya_package AS
                 time := record.time + time;
             END IF;
         END LOOP;
+        -- Общее время звучания
         dbms_output.put_line(
             'Общее время звучания: '
             || LPAD(EXTRACT(hour FROM time), 2, '0') || ':' 
@@ -1338,6 +1401,10 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
     END print_album_records;
     
+    -- 12) Выручка магазина 
+    -- (суммарная стоимость проданных альбомов 
+    -- по каждому в отдельности 
+    -- и по магазину в целом).
     PROCEDURE print_income
     IS
         total_income NUMBER := 0;
@@ -1362,6 +1429,10 @@ PACKAGE BODY grushevskaya_package AS
         print_msg_ex(sqlcode);
     END print_income;    
     
+    -- 13) Удалить трек с указанным номером из альбома 
+    -- с пересчётом остальных номеров 
+    -- (если не продано ни одного экземпляра альбома
+    --  - Условие проверяется на уровне триггера).
     PROCEDURE delete_record_from_album(
         album_id NUMBER,
         record_number NUMBER
@@ -1369,6 +1440,7 @@ PACKAGE BODY grushevskaya_package AS
         tmp_record_arr Grushevskaya_record_arr;
         tmp_quantity_of_sold NUMBER;
     BEGIN
+        -- Проверка альбома на проданные экземпляры
         SELECT quantity_of_sold INTO tmp_quantity_of_sold
             FROM Grushevskaya_album
             WHERE id = album_id;
@@ -1380,14 +1452,19 @@ PACKAGE BODY grushevskaya_package AS
             );
             RETURN;
         END IF;
+        -- Список треков альбома
         SELECT record_array INTO tmp_record_arr 
             FROM Grushevskaya_album
             WHERE id = album_id;
+        -- Перестановка треков с "замещением" места
+        -- удаляемого трека. 
+        -- Последнее место в списке - null
         FOR i IN record_number..tmp_record_arr.COUNT - 1
         LOOP
             tmp_record_arr(i) := tmp_record_arr(i + 1);
         END LOOP;
         tmp_record_arr(tmp_record_arr.COUNT) := null;
+        -- Обновление списка треков
         UPDATE Grushevskaya_album
             SET record_array = tmp_record_arr
             WHERE id = album_id;
@@ -1409,6 +1486,10 @@ PACKAGE BODY grushevskaya_package AS
         END IF;    
     END delete_record_from_album;    
     
+    -- 14) Удалить исполнителя из записи 
+    -- (если запись не входит ни в один альбом 
+    -- и если этот исполнитель не единственный
+    --  - Условия проверяются на уровне триггера). 
     PROCEDURE delete_singer_from_record(
         record_id NUMBER,
         singer_name VARCHAR2
@@ -1416,6 +1497,8 @@ PACKAGE BODY grushevskaya_package AS
         tmp_singer_list Grushevskaya_singer_tab;
         singer_number NUMBER := 0;
     BEGIN
+        -- Поиск номера места удаляемого исполнителя 
+        -- в списке исполнителей трека
         SELECT singer_list INTO tmp_singer_list 
             FROM Grushevskaya_record
             WHERE id = record_id;
@@ -1425,7 +1508,9 @@ PACKAGE BODY grushevskaya_package AS
                 singer_number := i;
             END IF;
         END LOOP;
-        tmp_singer_list.DELETE(singer_number);        
+        -- Удаление исполнителя из списка
+        tmp_singer_list.DELETE(singer_number);
+        -- Обновление списка исполнителей        
         UPDATE Grushevskaya_record
             SET singer_list = tmp_singer_list
             WHERE id = record_id;
@@ -1449,6 +1534,8 @@ PACKAGE BODY grushevskaya_package AS
         END IF;        
     END delete_singer_from_record;
         
+    -- 15) Определить предпочитаемый музыкальный стиль указанного исполнителя 
+    -- (стиль, в котором записано большинство его треков). 
     PROCEDURE print_singer_style(
         singer_name VARCHAR2
     ) IS
@@ -1458,6 +1545,7 @@ PACKAGE BODY grushevskaya_package AS
         current_elem VARCHAR2(100 BYTE);
         max_style VARCHAR2(100 BYTE);
     BEGIN
+        -- Проверка исполнителя на наличие в таблице исполнителей
         SELECT COUNT(name) INTO count_singer_in_table 
             FROM Grushevskaya_singer
             WHERE name = singer_name;
@@ -1465,6 +1553,11 @@ PACKAGE BODY grushevskaya_package AS
             dbms_output.put_line('Исполнитель не найден.');
             RETURN;
         END IF;
+        -- Для каждого трека из таблицы треков
+        -- просматривается список исполнителей.
+        -- Если присутствует заявленный исполнитель,
+        -- то стиль трека учитывается, т.е.
+        -- счетчик стиля увеличивается на 1
         FOR record IN (SELECT * FROM Grushevskaya_record)
         LOOP
             FOR i IN 1..record.singer_list.COUNT
@@ -1480,6 +1573,7 @@ PACKAGE BODY grushevskaya_package AS
                 END IF;
             END LOOP;
         END LOOP;
+        -- Поиск стиля с максимальным количеством
         max_style := singer_style_list.FIRST;
         current_elem := singer_style_list.FIRST;
         WHILE NOT current_elem IS null
@@ -1489,10 +1583,13 @@ PACKAGE BODY grushevskaya_package AS
             END IF;
             current_elem := singer_style_list.NEXT(current_elem);
         END LOOP;
+        -- Если стиль с максимальным количеством треков не определен,
+        -- то у исполнителя нет треков
         IF max_style IS null THEN
             dbms_output.put_line('У исполнителя нет записей.');
             RETURN;
         END IF;
+        -- Вывод наиболее популярного стиля
         dbms_output.put_line(
             'Наиболее популярный стиль у ' 
             || singer_name || ' - '  || max_style || '.'
@@ -1503,6 +1600,8 @@ PACKAGE BODY grushevskaya_package AS
         print_msg_ex(sqlcode);
     END print_singer_style;
     
+    -- 16) Определить предпочитаемый музыкальный стиль 
+    -- по каждой стране происхождения исполнителей.
     PROCEDURE print_country_style
     IS
         TYPE Singer_style IS TABLE OF NUMBER INDEX BY VARCHAR2(100 BYTE);
@@ -1512,7 +1611,12 @@ PACKAGE BODY grushevskaya_package AS
         current_country VARCHAR2(100 BYTE);
         current_style VARCHAR2(100 BYTE);
         max_style VARCHAR2(100 BYTE);
-    BEGIN
+    BEGIN        
+        -- Для каждого трека из таблицы треков
+        -- просматривается список исполнителей.
+        -- Страна каждого исполнителя 
+        -- и стиль трека учитывается, т.е.
+        -- счетчик стиля страны исполнителя увеличивается на 1
         FOR record IN (SELECT * FROM Grushevskaya_record)
         LOOP
             FOR i IN 1..record.singer_list.COUNT
@@ -1530,6 +1634,8 @@ PACKAGE BODY grushevskaya_package AS
                 END IF; 
             END LOOP;
         END LOOP;
+        -- Поиск наиболее популярного стиля по каждой стране.
+        -- Вывод информации на экран
         current_country := country_style_list.FIRST;
         WHILE NOT current_country IS null
         LOOP
@@ -1555,6 +1661,12 @@ PACKAGE BODY grushevskaya_package AS
         print_msg_ex(sqlcode);
     END print_country_style; 
     
+    -- 17) Определить авторство альбомов 
+    -- (для каждого альбома выводится 
+    -- исполнитель или список исполнителей,
+    -- если все треки этого альбома записаны 
+    -- одним множеством исполнителей; 
+    -- в противном случае выводится «Коллективный сборник»).
     PROCEDURE print_album_author
     IS
         TYPE All_album_id IS TABLE OF VARCHAR2(100 BYTE);
@@ -1567,9 +1679,12 @@ PACKAGE BODY grushevskaya_package AS
         flag_group BOOLEAN;
     BEGIN   
         dbms_output.put_line('Авторство альбомов.');
+        -- Просмотр и определение авторства каждого альбома
         FOR album IN (SELECT * FROM Grushevskaya_album)
         LOOP
+            -- Количество не null треков в альбоме
             record_count := 0;
+            -- Подсчет участия каждого исполнителя в треках альбома
             album_singer_list.DELETE;
             FOR i IN 1..album.record_array.COUNT
             LOOP
@@ -1590,6 +1705,11 @@ PACKAGE BODY grushevskaya_package AS
                     END LOOP;
                 END IF;
             END LOOP;
+            -- Определение авторства.
+            -- Если какой-то исполнитель участвовал в треках альбома
+            -- меньшее количество раз, чем количество треков,
+            -- то тогда это "Коллективный сборник".
+            -- Иначе выводится список исполнителей, если он не null.
             flag_group := false;
             current_singer := album_singer_list.FIRST;
             WHILE NOT current_singer IS null
@@ -1610,6 +1730,7 @@ PACKAGE BODY grushevskaya_package AS
                 current_singer := album_singer_list.FIRST;
                 IF current_singer IS null THEN
                     dbms_output.put_line('Исполнителей в альбоме нет.');
+                    RETURN;
                 END IF;
                 WHILE NOT current_singer IS null
                 LOOP

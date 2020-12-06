@@ -1408,12 +1408,12 @@ PACKAGE BODY grushevskaya_package AS
         END IF;    
     END delete_record_from_album;    
     
-    PROCEDURE delete_singer_from_record(
+    PROCEDURE delete_singer_from_record (
         record_id Number,
         singer_name Varchar2
     ) IS
         tmp_singer_list Grushevskaya_singer_tab;
-        singer_Number Number := 0;
+        singer_number Number := 0;
     BEGIN
         SELECT singer_list INTO tmp_singer_list 
             FROM Grushevskaya_record
@@ -1421,16 +1421,16 @@ PACKAGE BODY grushevskaya_package AS
         FOR i IN 1..tmp_singer_list.COUNT
         LOOP
             IF tmp_singer_list(i) = singer_name THEN
-                SINGER_Number := i;
+                singer_number := i;
             END IF;
         END LOOP;
-        tmp_singer_list.DELETE(SINGER_Number);        
+        tmp_singer_list.DELETE(singer_number);        
         UPDATE Grushevskaya_record
             SET singer_list = tmp_singer_list
             WHERE id = record_id;
         COMMIT;
         dbms_output.put_line(
-            'Исполнитель ' || singer_name || ' под №' || SINGER_Number || ' удален.'
+            'Исполнитель ' || singer_name || ' под №' || singer_number || ' удален.'
         );
     EXCEPTION
     WHEN grushevskaya_exceptions.Error_update_singer_in_record THEN
@@ -1448,45 +1448,45 @@ PACKAGE BODY grushevskaya_package AS
         END IF;        
     END delete_singer_from_record;
         
-    PROCEDURE print_singer_style(
+    PROCEDURE print_singer_style (
         singer_name Varchar2
     ) IS
-        COUNT_SINGER_IN_TABLE Number := 0;
-        TYPE SINGER_style IS TABLE OF Number INDEX BY Varchar2(100 BYTE);
-        SINGER_style_LIST SINGER_style;
-        CURRENT_ELEM Varchar2(100 BYTE);
+        count_singer_in_table Number := 0;
+        TYPE Singer_style IS TABLE OF Number INDEX BY Varchar2(100 BYTE);
+        singer_style_list Singer_style;
+        current_elem Varchar2(100 BYTE);
         max_style Varchar2(100 BYTE);
     BEGIN
-        SELECT COUNT(name) INTO COUNT_SINGER_IN_TABLE 
+        SELECT COUNT(name) INTO count_singer_in_table 
             FROM Grushevskaya_singer
             WHERE name = singer_name;
-        IF COUNT_SINGER_IN_TABLE = 0 THEN
+        IF count_singer_in_table = 0 THEN
             dbms_output.put_line('Исполнитель не найден.');
             RETURN;
         END IF;
-        FOR RECORD IN (SELECT * FROM Grushevskaya_record)
+        FOR record IN (SELECT * FROM Grushevskaya_record)
         LOOP
-            FOR i IN 1..RECORD.singer_list.COUNT
+            FOR i IN 1..record.singer_list.COUNT
             LOOP
-                IF RECORD.singer_list(i) = singer_name THEN
-                    IF SINGER_style_LIST.EXISTS(RECORD.style) THEN
-                        SINGER_style_LIST(RECORD.style) := 
-                            SINGER_style_LIST(RECORD.style) 
+                IF record.singer_list(i) = singer_name THEN
+                    IF singer_style_list.EXISTS(record.style) THEN
+                        singer_style_list(record.style) := 
+                            singer_style_list(record.style) 
                             + 1;
                     ELSE
-                        SINGER_style_LIST(RECORD.style) := 1;
+                        singer_style_list(record.style) := 1;
                     END IF;
                 END IF;
             END LOOP;
         END LOOP;
-        max_style := SINGER_style_LIST.FIRST;
-        CURRENT_ELEM := SINGER_style_LIST.FIRST;
-        WHILE NOT CURRENT_ELEM IS null
+        max_style := singer_style_list.FIRST;
+        current_elem := singer_style_list.FIRST;
+        WHILE NOT current_elem IS null
         LOOP  
-            IF SINGER_style_LIST(CURRENT_ELEM) > SINGER_style_LIST(max_style) THEN
-                max_style := CURRENT_ELEM;
+            IF singer_style_list(current_elem) > singer_style_list(max_style) THEN
+                max_style := current_elem;
             END IF;
-            CURRENT_ELEM := SINGER_style_LIST.NEXT(CURRENT_ELEM);
+            current_elem := singer_style_list.NEXT(current_elem);
         END LOOP;
         IF max_style IS null THEN
             dbms_output.put_line('У исполнителя нет записей.');
@@ -1504,49 +1504,49 @@ PACKAGE BODY grushevskaya_package AS
     
     PROCEDURE print_country_style
     IS
-        TYPE SINGER_style IS TABLE OF Number INDEX BY Varchar2(100 BYTE);
-        TYPE COUNTRY_style IS TABLE OF SINGER_style INDEX BY Varchar2(100 BYTE);
-        COUNTRY_style_LIST COUNTRY_style;
-        tmp_COUNTRY Varchar2(100 BYTE);
-        CURRENT_COUNTRY Varchar2(100 BYTE);
-        CURRENT_style Varchar2(100 BYTE);
+        TYPE Singer_style IS TABLE OF Number INDEX BY Varchar2(100 BYTE);
+        TYPE Country_style IS TABLE OF Singer_style INDEX BY Varchar2(100 BYTE);
+        country_style_list Country_style;
+        tmp_country Varchar2(100 BYTE);
+        current_country Varchar2(100 BYTE);
+        current_style Varchar2(100 BYTE);
         max_style Varchar2(100 BYTE);
     BEGIN
-        FOR RECORD IN (SELECT * FROM Grushevskaya_record)
+        FOR record IN (SELECT * FROM Grushevskaya_record)
         LOOP
-            FOR i IN 1..RECORD.singer_list.COUNT
+            FOR i IN 1..record.singer_list.COUNT
             LOOP
                 SELECT country INTO tmp_country 
                     FROM Grushevskaya_singer 
-                    WHERE name =  RECORD.singer_list(i);
-                IF country_style_LIST.EXISTS(tmp_country)
-                   AND country_style_LIST(tmp_country).EXISTS(RECORD.style) THEN
-                    country_style_LIST(tmp_country)(RECORD.style) := 
-                        country_style_LIST(tmp_country)(RECORD.style) 
+                    WHERE name =  record.singer_list(i);
+                IF country_style_list.EXISTS(tmp_country)
+                   AND country_style_list(tmp_country).EXISTS(record.style) THEN
+                    country_style_list(tmp_country)(record.style) := 
+                        country_style_list(tmp_country)(record.style) 
                         + 1;
                 ELSE
-                    country_style_LIST(tmp_country)(RECORD.style) := 1;
+                    country_style_list(tmp_country)(record.style) := 1;
                 END IF; 
             END LOOP;
         END LOOP;
-        CURRENT_country := country_style_LIST.FIRST;
-        WHILE NOT CURRENT_country IS null
+        current_country := country_style_list.FIRST;
+        WHILE NOT current_country IS null
         LOOP
-            max_style := country_style_LIST(CURRENT_country).FIRST;
-            CURRENT_style := country_style_LIST(CURRENT_country).FIRST;
-            WHILE NOT CURRENT_style IS null
+            max_style := country_style_list(current_country).FIRST;
+            current_style := country_style_list(current_country).FIRST;
+            WHILE NOT current_style IS null
             LOOP  
-                IF country_style_LIST(CURRENT_country)(CURRENT_style) 
-                   > country_style_LIST(CURRENT_country)(max_style) THEN
-                    max_style := CURRENT_style;
+                IF country_style_list(current_country)(current_style) 
+                   > country_style_list(current_country)(max_style) THEN
+                    max_style := current_style;
                 END IF;
-                CURRENT_style := country_style_LIST(CURRENT_country).NEXT(CURRENT_style);
+                current_style := country_style_list(current_country).NEXT(current_style);
             END LOOP;
             dbms_output.put_line(
                 'Наиболее популярный стиль в '  
-                || CURRENT_country || ' - ' || max_style || '.'
+                || current_country || ' - ' || max_style || '.'
             );
-            CURRENT_country := country_style_LIST.NEXT(CURRENT_country);
+            current_country := country_style_list.NEXT(current_country);
         END LOOP;       
     EXCEPTION
     WHEN OTHERS THEN
@@ -1556,64 +1556,64 @@ PACKAGE BODY grushevskaya_package AS
     
     PROCEDURE print_album_author
     IS
-        TYPE ALL_album_id IS TABLE OF Varchar2(100 BYTE);
-        album_id ALL_album_id;
-        TYPE ALBUM_SINGER IS TABLE OF Number INDEX BY Varchar2(100 BYTE);
-        ALBUM_singer_list ALBUM_SINGER;
+        TYPE All_album_id IS TABLE OF Varchar2(100 BYTE);
+        album_id All_album_id;
+        TYPE Album_singer IS TABLE OF Number INDEX BY Varchar2(100 BYTE);
+        album_singer_list Album_singer;
         singers Grushevskaya_singer_tab;
-        RECORD_COUNT Number;
-        CURRENT_SINGER Varchar(100 BYTE);
-        flag_GROUP Boolean;
+        record_count Number;
+        current_singer Varchar(100 BYTE);
+        flag_group Boolean;
     BEGIN   
         dbms_output.put_line('Авторство альбомов.');
-        FOR ALBUM IN (SELECT * FROM Grushevskaya_album)
+        FOR album IN (SELECT * FROM Grushevskaya_album)
         LOOP
-            RECORD_COUNT := 0;
-            ALBUM_singer_list.DELETE;
-            FOR i IN 1..ALBUM.record_array.COUNT
+            record_count := 0;
+            album_singer_list.DELETE;
+            FOR i IN 1..album.record_array.COUNT
             LOOP
-                IF NOT ALBUM.record_array(i) IS null THEN
-                    RECORD_COUNT := RECORD_COUNT + 1;
+                IF NOT album.record_array(i) IS null THEN
+                    record_count := record_count + 1;
                     SELECT singer_list INTO singers
                         FROM Grushevskaya_record
-                        WHERE id = ALBUM.record_array(i);
+                        WHERE id = album.record_array(i);
                     FOR j IN 1..singers.COUNT
                     LOOP
-                        IF ALBUM_singer_list.EXISTS(singers(j))THEN
-                            ALBUM_singer_list(singers(j)) := 
-                                ALBUM_singer_list(singers(j)) 
+                        IF album_singer_list.EXISTS(singers(j))THEN
+                            album_singer_list(singers(j)) := 
+                                album_singer_list(singers(j)) 
                                 + 1;
                         ELSE
-                            ALBUM_singer_list(singers(j)) := 1;
+                            album_singer_list(singers(j)) := 1;
                         END IF;
                     END LOOP;
                 END IF;
             END LOOP;
-            flag_GROUP := false;
-            CURRENT_SINGER := ALBUM_singer_list.FIRST;
-            WHILE NOT CURRENT_SINGER IS null
+            flag_group := false;
+            current_singer := album_singer_list.FIRST;
+            WHILE NOT current_singer IS null
             LOOP
-                IF ALBUM_singer_list(CURRENT_SINGER) <> RECORD_COUNT THEN
-                    flag_GROUP := true;
+                IF album_singer_list(current_singer) <> record_count THEN
+                    flag_group := true;
                 END IF;
-                CURRENT_SINGER := ALBUM_singer_list.NEXT(CURRENT_SINGER);
+                current_singer := album_singer_list.NEXT(current_singer);
             END LOOP;
             dbms_output.put_line(
-                'Авторство альбома ' || ALBUM.name || ' с id ' || ALBUM.id || 
-                '.'
+                'Авторство альбома ' || album.name 
+                || ' с id ' || album.id || '.'
             );
-            IF flag_GROUP THEN
+            IF flag_group THEN
                 dbms_output.put_line('Коллективный сборник.');
             ELSE
                 dbms_output.put_line('Исполнители:');
-                CURRENT_SINGER := ALBUM_singer_list.FIRST;
-                IF CURRENT_SINGER IS null THEN
+                current_singer := album_singer_list.FIRST;
+                IF current_singer IS null THEN
                     dbms_output.put_line('Исполнителей в альбоме нет.');
                 END IF;
-                WHILE NOT CURRENT_SINGER IS null
+                WHILE NOT current_singer IS null
                 LOOP
-                    dbms_output.put_line(CURRENT_SINGER);
-                    CURRENT_SINGER := ALBUM_singer_list.NEXT(CURRENT_SINGER);
+                    dbms_output.put_line(current_singer);
+                    current_singer := album_singer_list.NEXT(current_singer);
                 END LOOP;
             END IF; 
         END LOOP;        

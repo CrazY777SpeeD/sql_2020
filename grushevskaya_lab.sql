@@ -1561,7 +1561,7 @@ PACKAGE BODY grushevskaya_package AS
         TYPE Album_singer IS TABLE OF NUMBER INDEX BY VARCHAR2(100 BYTE);
         album_singer_list Album_singer;
         singers Grushevskaya_singer_tab;
-        record_count Number;
+        record_count NUMBER;
         current_singer VARCHAR2(100 BYTE);
         flag_group BOOLEAN;
     BEGIN   

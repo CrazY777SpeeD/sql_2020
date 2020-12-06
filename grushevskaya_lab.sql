@@ -1180,8 +1180,8 @@ PACKAGE BODY grushevskaya_package AS
         quantity Number
     ) IS
         record_arr Grushevskaya_record_arr;
-        flag_ONE_RECORD Boolean := false;
-        MAX_quantity Number;
+        flag_one_record Boolean := false;
+        max_quantity Number;
     BEGIN
         IF quantity <= 0 THEN
             dbms_output.put_line(
@@ -1196,21 +1196,21 @@ PACKAGE BODY grushevskaya_package AS
         FOR i IN 1..record_arr.COUNT
         LOOP
             IF NOT record_arr(i) IS null THEN
-                flag_ONE_RECORD := true;
+                flag_one_record := true;
             END IF;
         END LOOP;
-        IF NOT flag_ONE_RECORD THEN
+        IF NOT flag_one_record THEN
             dbms_output.put_line(
                 'Продать альбом c id ' 
                 || album_id || ' нельзя. В альбоме нет треков.'
             );
             RETURN;
         END IF;
-        SELECT quantity_in_stock INTO MAX_quantity 
+        SELECT quantity_in_stock INTO max_quantity 
             FROM Grushevskaya_album
             WHERE id = album_id;
-        MAX_quantity := LEAST(MAX_quantity, quantity);
-        IF MAX_quantity <= 0 THEN
+        max_quantity := LEAST(max_quantity, quantity);
+        IF max_quantity <= 0 THEN
             dbms_output.put_line(
                 'Продать альбом c id ' 
                 || album_id || ' нельзя. Альбомов нет на складе.'
@@ -1219,12 +1219,12 @@ PACKAGE BODY grushevskaya_package AS
         END IF;
         UPDATE Grushevskaya_album
             SET 
-                quantity_in_stock = quantity_in_stock - MAX_quantity,
-                quantity_of_sold = quantity_of_sold + MAX_quantity
+                quantity_in_stock = quantity_in_stock - max_quantity,
+                quantity_of_sold = quantity_of_sold + max_quantity
             WHERE id = album_id;
         COMMIT;
         dbms_output.put_line(
-            'Продано ' || MAX_quantity 
+            'Продано ' || max_quantity 
             || ' альбомов c id ' || album_id || '.'
         );
     EXCEPTION
@@ -1241,31 +1241,31 @@ PACKAGE BODY grushevskaya_package AS
     
     PROCEDURE delete_singers_without_records
     IS
-        DEL_singerS_LIST Grushevskaya_singer_tab;
+        del_singers_list Grushevskaya_singer_tab;
     BEGIN
-        SELECT name BULK COLLECT INTO DEL_singerS_LIST FROM Grushevskaya_singer;
-        FOR RECORD IN (SELECT * FROM Grushevskaya_record)
+        SELECT name BULK COLLECT INTO del_singers_list FROM Grushevskaya_singer;
+        FOR record IN (SELECT * FROM Grushevskaya_record)
         LOOP
-           FOR i IN 1..RECORD.singer_list.COUNT
+           FOR i IN 1..record.singer_list.COUNT
             LOOP
-                FOR k IN 1..DEL_singerS_LIST.COUNT
+                FOR k IN 1..del_singers_list.COUNT
                 LOOP                   
-                    IF NOT DEL_singerS_LIST(k) IS null
-                       AND NOT RECORD.singer_list(i) IS null
-                       AND DEL_singerS_LIST(k) = RECORD.singer_list(i) THEN
-                        DEL_singerS_LIST(k) := null;
+                    IF NOT del_singers_list(k) IS null
+                       AND NOT record.singer_list(i) IS null
+                       AND del_singers_list(k) = record.singer_list(i) THEN
+                        del_singers_list(k) := null;
                     END IF;                
                 END LOOP;
             END LOOP;
         END LOOP;
-        FOR j IN 1..DEL_singerS_LIST.COUNT
+        FOR j IN 1..del_singers_list.COUNT
         LOOP
-            IF NOT DEL_singerS_LIST(j) IS null THEN
+            IF NOT del_singers_list(j) IS null THEN
                 DELETE FROM Grushevskaya_singer
-                WHERE name = DEL_singerS_LIST(j);
+                WHERE name = del_singers_list(j);
                 dbms_output.put_line(
                     'Удален исполнитель ' 
-                    || DEL_singerS_LIST(j) || '.'
+                    || del_singers_list(j) || '.'
                 );
             END IF;
         END LOOP;
@@ -1280,51 +1280,51 @@ PACKAGE BODY grushevskaya_package AS
     PROCEDURE print_album_records(
         album_id Number
     ) IS
-        ALBUM_name Varchar2(100 BYTE);
+        album_name Varchar2(100 BYTE);
         record_arr Grushevskaya_record_arr;
-        RECORD Grushevskaya_record%ROWTYPE;
+        record Grushevskaya_record%ROWTYPE;
         time INTERVAL DAY(0) TO SECOND(0) := NUMTODSINTERVAL(0, 'SECOND');
-        singerS Varchar2(300) := '';
+        singers Varchar2(300) := '';
     BEGIN
-        SELECT name INTO ALBUM_name
+        SELECT name INTO album_name
             FROM Grushevskaya_album
             WHERE id = album_id;
-        dbms_output.put_line('Альбом №' || album_id || ' с именем ' || ALBUM_name);
+        dbms_output.put_line('Альбом №' || album_id || ' с именем ' || album_name);
         SELECT record_array INTO record_arr
             FROM Grushevskaya_album
             WHERE id = album_id;
         FOR i IN 1..record_arr.COUNT
         LOOP
             IF NOT record_arr(i) IS null THEN
-                SELECT * INTO RECORD FROM Grushevskaya_record 
+                SELECT * INTO record FROM Grushevskaya_record 
                     WHERE id = record_arr(i);
-                singerS := '-';
-                FOR j IN 1..RECORD.singer_list.COUNT
+                singers := '-';
+                FOR j IN 1..record.singer_list.COUNT
                 LOOP
-                    singerS := singerS || ' ' || RECORD.singer_list(j);
+                    singers := singers || ' ' || record.singer_list(j);
                 END LOOP;
                 dbms_output.put_line(
                     '№' 
                     || LPAD(i, 2, '0')
                     || ' ' 
-                    || RECORD.style
+                    || record.style
                     || ', ' 
-                    || LPAD(EXTRACT(HOUR FROM RECORD.time), 2, '0') || ':' 
-                    || LPAD(EXTRACT(MINUTE FROM RECORD.time), 2, '0') || ':' 
-                    || LPAD(EXTRACT(SECOND FROM RECORD.time), 2, '0')
+                    || LPAD(EXTRACT(hour FROM record.time), 2, '0') || ':' 
+                    || LPAD(EXTRACT(minute FROM record.time), 2, '0') || ':' 
+                    || LPAD(EXTRACT(second FROM record.time), 2, '0')
                     || ' ' 
-                    || RECORD.name
+                    || record.name
                     || ' ' 
-                    || singerS
+                    || singers
                 );
-                time := RECORD.time + time;
+                time := record.time + time;
             END IF;
         END LOOP;
         dbms_output.put_line(
             'Общее время звучания: '
-            || LPAD(EXTRACT(HOUR FROM time), 2, '0') || ':' 
-            || LPAD(EXTRACT(MINUTE FROM time), 2, '0') || ':' 
-            || LPAD(EXTRACT(SECOND FROM time), 2, '0')
+            || LPAD(EXTRACT(hour FROM time), 2, '0') || ':' 
+            || LPAD(EXTRACT(minute FROM time), 2, '0') || ':' 
+            || LPAD(EXTRACT(second FROM time), 2, '0')
             || '.'
         );        
     EXCEPTION
@@ -1339,22 +1339,22 @@ PACKAGE BODY grushevskaya_package AS
     
     PROCEDURE print_income
     IS
-        TOTAL_INCOME Number := 0;
+        total_income Number := 0;
     BEGIN
         dbms_output.put_line('Выручка магазина');
-        FOR ALBUM IN (SELECT * FROM Grushevskaya_album)
+        FOR album IN (SELECT * FROM Grushevskaya_album)
         LOOP
             dbms_output.put_line(
                 'Альбомов id ' 
-                || ALBUM.id 
+                || album.id 
                 || ' с именем ' 
-                || ALBUM.name
+                || album.name
                 || ' продано на сумму: '
-                || ALBUM.price * ALBUM.quantity_of_sold
+                || album.price * album.quantity_of_sold
             );
-            TOTAL_INCOME := TOTAL_INCOME + ALBUM.price * ALBUM.quantity_of_sold;
+            total_income := total_income + album.price * album.quantity_of_sold;
         END LOOP;
-        dbms_output.put_line('Выручка магазина в целом: ' || TOTAL_INCOME || '.');       
+        dbms_output.put_line('Выручка магазина в целом: ' || total_income || '.');       
     EXCEPTION
     WHEN OTHERS THEN
         dbms_output.put_line('EXCEPTION IN print_income');
@@ -1374,16 +1374,17 @@ PACKAGE BODY grushevskaya_package AS
         IF tmp_quantity_of_sold > 0 THEN
             dbms_output.put_line(
                 'Удалить трек №' 
-                || record_number || ' нельзя, так как альбом продан'
+                || record_number 
+                || ' нельзя, так как альбом продан'
             );
             RETURN;
         END IF;
         SELECT record_array INTO tmp_record_arr 
             FROM Grushevskaya_album
             WHERE id = album_id;
-        FOR i IN record_number..tmp_record_arr.COUNT-1
+        FOR i IN record_number..tmp_record_arr.COUNT - 1
         LOOP
-            tmp_record_arr(i) := tmp_record_arr(i+1);
+            tmp_record_arr(i) := tmp_record_arr(i + 1);
         END LOOP;
         tmp_record_arr(tmp_record_arr.COUNT) := null;
         UPDATE Grushevskaya_album
@@ -1454,7 +1455,7 @@ PACKAGE BODY grushevskaya_package AS
         TYPE SINGER_style IS TABLE OF Number INDEX BY Varchar2(100 BYTE);
         SINGER_style_LIST SINGER_style;
         CURRENT_ELEM Varchar2(100 BYTE);
-        MAX_style Varchar2(100 BYTE);
+        max_style Varchar2(100 BYTE);
     BEGIN
         SELECT COUNT(name) INTO COUNT_SINGER_IN_TABLE 
             FROM Grushevskaya_singer
@@ -1478,22 +1479,22 @@ PACKAGE BODY grushevskaya_package AS
                 END IF;
             END LOOP;
         END LOOP;
-        MAX_style := SINGER_style_LIST.FIRST;
+        max_style := SINGER_style_LIST.FIRST;
         CURRENT_ELEM := SINGER_style_LIST.FIRST;
         WHILE NOT CURRENT_ELEM IS null
         LOOP  
-            IF SINGER_style_LIST(CURRENT_ELEM) > SINGER_style_LIST(MAX_style) THEN
-                MAX_style := CURRENT_ELEM;
+            IF SINGER_style_LIST(CURRENT_ELEM) > SINGER_style_LIST(max_style) THEN
+                max_style := CURRENT_ELEM;
             END IF;
             CURRENT_ELEM := SINGER_style_LIST.NEXT(CURRENT_ELEM);
         END LOOP;
-        IF MAX_style IS null THEN
+        IF max_style IS null THEN
             dbms_output.put_line('У исполнителя нет записей.');
             RETURN;
         END IF;
         dbms_output.put_line(
             'Наиболее популярный стиль у ' 
-            || singer_name || ' - '  || MAX_style || '.'
+            || singer_name || ' - '  || max_style || '.'
         );       
     EXCEPTION
     WHEN OTHERS THEN
@@ -1509,7 +1510,7 @@ PACKAGE BODY grushevskaya_package AS
         tmp_COUNTRY Varchar2(100 BYTE);
         CURRENT_COUNTRY Varchar2(100 BYTE);
         CURRENT_style Varchar2(100 BYTE);
-        MAX_style Varchar2(100 BYTE);
+        max_style Varchar2(100 BYTE);
     BEGIN
         FOR RECORD IN (SELECT * FROM Grushevskaya_record)
         LOOP
@@ -1531,19 +1532,19 @@ PACKAGE BODY grushevskaya_package AS
         CURRENT_country := country_style_LIST.FIRST;
         WHILE NOT CURRENT_country IS null
         LOOP
-            MAX_style := country_style_LIST(CURRENT_country).FIRST;
+            max_style := country_style_LIST(CURRENT_country).FIRST;
             CURRENT_style := country_style_LIST(CURRENT_country).FIRST;
             WHILE NOT CURRENT_style IS null
             LOOP  
                 IF country_style_LIST(CURRENT_country)(CURRENT_style) 
-                   > country_style_LIST(CURRENT_country)(MAX_style) THEN
-                    MAX_style := CURRENT_style;
+                   > country_style_LIST(CURRENT_country)(max_style) THEN
+                    max_style := CURRENT_style;
                 END IF;
                 CURRENT_style := country_style_LIST(CURRENT_country).NEXT(CURRENT_style);
             END LOOP;
             dbms_output.put_line(
                 'Наиболее популярный стиль в '  
-                || CURRENT_country || ' - ' || MAX_style || '.'
+                || CURRENT_country || ' - ' || max_style || '.'
             );
             CURRENT_country := country_style_LIST.NEXT(CURRENT_country);
         END LOOP;       
@@ -1559,7 +1560,7 @@ PACKAGE BODY grushevskaya_package AS
         album_id ALL_album_id;
         TYPE ALBUM_SINGER IS TABLE OF Number INDEX BY Varchar2(100 BYTE);
         ALBUM_singer_list ALBUM_SINGER;
-        SINGERS Grushevskaya_singer_tab;
+        singers Grushevskaya_singer_tab;
         RECORD_COUNT Number;
         CURRENT_SINGER Varchar(100 BYTE);
         flag_GROUP Boolean;
@@ -1573,17 +1574,17 @@ PACKAGE BODY grushevskaya_package AS
             LOOP
                 IF NOT ALBUM.record_array(i) IS null THEN
                     RECORD_COUNT := RECORD_COUNT + 1;
-                    SELECT singer_list INTO SINGERS
+                    SELECT singer_list INTO singers
                         FROM Grushevskaya_record
                         WHERE id = ALBUM.record_array(i);
-                    FOR j IN 1..SINGERS.COUNT
+                    FOR j IN 1..singers.COUNT
                     LOOP
-                        IF ALBUM_singer_list.EXISTS(SINGERS(j))THEN
-                            ALBUM_singer_list(SINGERS(j)) := 
-                                ALBUM_singer_list(SINGERS(j)) 
+                        IF ALBUM_singer_list.EXISTS(singers(j))THEN
+                            ALBUM_singer_list(singers(j)) := 
+                                ALBUM_singer_list(singers(j)) 
                                 + 1;
                         ELSE
-                            ALBUM_singer_list(SINGERS(j)) := 1;
+                            ALBUM_singer_list(singers(j)) := 1;
                         END IF;
                     END LOOP;
                 END IF;

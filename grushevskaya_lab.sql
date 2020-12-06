@@ -51,9 +51,7 @@ CREATE SEQUENCE Grushevskaya_num_album
 
 CREATE TABLE Grushevskaya_dict_country(
     -- название страны
-    name VARCHAR2(100 BYTE)
-        PRIMARY KEY
-        NOT null
+    name VARCHAR2(100 BYTE) PRIMARY KEY NOT null
 );
 /
 INSERT INTO Grushevskaya_dict_country (name) VALUES ('Великобритания');
@@ -72,18 +70,18 @@ CREATE TABLE Grushevskaya_singer(
 );
 /
 -- Тестовые данные
-INSERT INTO Grushevskaya_singer (name,country) VALUES ('Майкл Джексон','США');
-INSERT INTO Grushevskaya_singer (name,country) VALUES ('Пол Маккартни','Великобритания');
-INSERT INTO Grushevskaya_singer (name,country) VALUES ('Backstreet Boys','США');
-INSERT INTO Grushevskaya_singer (name,country) VALUES ('ABBA','Швеция');
-INSERT INTO Grushevskaya_singer (name,country) VALUES ('Валентина Толкунова','Россия');
-INSERT INTO Grushevskaya_singer (name,country) VALUES ('Лев Лещенко','Россия');
-INSERT INTO Grushevskaya_singer (name,country) VALUES ('Иванов Иван','Россия');
-INSERT INTO Grushevskaya_singer (name,country) VALUES ('Сидоров Алексей','Россия');
-INSERT INTO Grushevskaya_singer (name,country) VALUES ('Петров Петр','Россия');
-INSERT INTO Grushevskaya_singer (name,country) VALUES ('Иосиф Кобзон','Россия');
-INSERT INTO Grushevskaya_singer (name,country) VALUES ('Майя Кристалинская','СССР');
-INSERT INTO Grushevskaya_singer (name,country) VALUES ('Эдуард Хиль','Россия');
+INSERT INTO Grushevskaya_singer (name, country) VALUES ('Майкл Джексон', 'США');
+INSERT INTO Grushevskaya_singer (name, country) VALUES ('Пол Маккартни', 'Великобритания');
+INSERT INTO Grushevskaya_singer (name, country) VALUES ('Backstreet Boys', 'США');
+INSERT INTO Grushevskaya_singer (name, country) VALUES ('ABBA', 'Швеция');
+INSERT INTO Grushevskaya_singer (name, country) VALUES ('Валентина Толкунова', 'Россия');
+INSERT INTO Grushevskaya_singer (name, country) VALUES ('Лев Лещенко', 'Россия');
+INSERT INTO Grushevskaya_singer (name, country) VALUES ('Иванов Иван', 'Россия');
+INSERT INTO Grushevskaya_singer (name, country) VALUES ('Сидоров Алексей', 'Россия');
+INSERT INTO Grushevskaya_singer (name, country) VALUES ('Петров Петр', 'Россия');
+INSERT INTO Grushevskaya_singer (name, country) VALUES ('Иосиф Кобзон', 'Россия');
+INSERT INTO Grushevskaya_singer (name, country) VALUES ('Майя Кристалинская', 'СССР');
+INSERT INTO Grushevskaya_singer (name, country) VALUES ('Эдуард Хиль', 'Россия');
 /
 -- Ограничения на SINGER
 ALTER TABLE Grushevskaya_singer 
@@ -106,9 +104,7 @@ ALTER TABLE Grushevskaya_singer
 
 CREATE TABLE Grushevskaya_dict_style(
     -- название стиля
-    name VARCHAR2(100 BYTE)
-        PRIMARY KEY
-        NOT null
+    name VARCHAR2(100 BYTE) PRIMARY KEY NOT null
 );
 /
 -- Тестовые данные
@@ -133,7 +129,7 @@ CREATE TYPE Grushevskaya_singer_tab AS TABLE OF VARCHAR2(100 BYTE);
 -- стиль, список исполнителей)
 CREATE TABLE Grushevskaya_record(
     -- идентификатор
-    id NUMBER(10,0),
+    id NUMBER(10, 0),
     -- название
     name VARCHAR2(100 BYTE),
     -- время звучания
@@ -146,53 +142,53 @@ CREATE TABLE Grushevskaya_record(
     STORE AS Grushevskaya_singer_list;
 /
 -- Тестовые данные
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('1','Wanna Be Startin’ Somethin’','+00 00:06:30.000000','Постдиско', Grushevskaya_singer_tab('Майкл Джексон'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('2','Baby Be Mine','+00 00:04:20.000000','Поп-музыка', Grushevskaya_singer_tab('Майкл Джексон'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('3','The Girl Is Mine','+00 00:03:41.000000','Софт-рок', Grushevskaya_singer_tab('Майкл Джексон', 'Пол Маккартни'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('4','Thriller','+00 00:05:58.000000','Фанк', Grushevskaya_singer_tab('Майкл Джексон'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('5','Beat It','+00 00:04:18.000000','Хард-рок', Grushevskaya_singer_tab('Майкл Джексон'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('6','Billie Jean','+00 00:04:50.000000','Фанк', Grushevskaya_singer_tab('Майкл Джексон'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('7','Human Nature','+00 00:04:06.000000','Ритм-н-блюз', Grushevskaya_singer_tab('Майкл Джексон'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('8','Pretty Young Thing','+00 00:03:58.000000','Джаз', Grushevskaya_singer_tab('Майкл Джексон'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('9','The Lady in My Life','+00 00:05:00.000000','Ритм-н-блюз', Grushevskaya_singer_tab('Майкл Джексон'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('10','Larger than life','+00 00:03:52.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('11','I want it that way','+00 00:03:33.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('12','Show me the meaning of being lonely','+00 00:03:54.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('13','It’s gotta be you','+00 00:02:56.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('14','I need you tonight','+00 00:04:23.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('15','Don’t want you back','+00 00:03:25.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('16','Don’t wanna lose you now','+00 00:03:54.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('17','The one','+00 00:03:46.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('18','Back to your heart','+00 00:04:21.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('19','Spanish eyes','+00 00:03:53.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('20','No one else comes close','+00 00:03:42.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('21','The perfect fan','+00 00:04:13.000000','Поп-музыка', Grushevskaya_singer_tab('Backstreet Boys'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('22','Dancing Queen','+00 00:03:51.000000','Диско', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('23','Knowing Me, Knowing You','+00 00:04:03.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('24','Take a Chance on Me','+00 00:04:06.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('25','Mamma Mia','+00 00:03:33.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('26','Lay All Your Love on Me','+00 00:04:35.000000','Диско', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('27','Super Trouper','+00 00:04:13.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('28','I Have a Dream','+00 00:04:42.000000','Баллада', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('29','The Winner Takes It All','+00 00:04:54.000000','Баллада', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('30','Money, Money, Money','+00 00:03:05.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('31','SOS','+00 00:03:23.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('32','Chiquitita','+00 00:05:26.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('33','Fernando','+00 00:04:14.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('34','Voulez-Vous','+00 00:05:09.000000','Диско', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('35','Gimme! Gimme! Gimme!','+00 00:04:46.000000','Диско', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('36','Does Your Mother Know','+00 00:03:15.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('37','One of Us','+00 00:03:56.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('38','The Name of the Game','+00 00:04:51.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('39','Thank You for the Music','+00 00:03:51.000000','Баллада', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('40','Waterloo','+00 00:02:42.000000','Поп-музыка', Grushevskaya_singer_tab('ABBA'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('41','Старт даёт Москва','+00 00:02:52.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('42','Добрые приметы','+00 00:02:16.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('43','Олимпийский Мишка','+00 00:03:32.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('44','Вальс влюблённых','+00 00:02:34.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('45','Ночной звонок','+00 00:04:54.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('46','Осень','+00 00:03:49.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко'));
-INSERT INTO Grushevskaya_record (id,name,time,style,singer_list) VALUES ('47','Песня остаётся с человеком','+00 00:03:49.000000','Поп-музыка', Grushevskaya_singer_tab('Валентина Толкунова', 'Лев Лещенко', 'Иосиф Кобзон', 'Майя Кристалинская', 'Эдуард Хиль'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('1', 'Wanna Be Startin’ Somethin’', '+00 00:06:30.000000', 'Постдиско',  Grushevskaya_singer_tab('Майкл Джексон'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('2', 'Baby Be Mine', '+00 00:04:20.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Майкл Джексон'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('3', 'The Girl Is Mine', '+00 00:03:41.000000', 'Софт-рок',  Grushevskaya_singer_tab('Майкл Джексон',  'Пол Маккартни'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('4', 'Thriller', '+00 00:05:58.000000', 'Фанк',  Grushevskaya_singer_tab('Майкл Джексон'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('5', 'Beat It', '+00 00:04:18.000000', 'Хард-рок',  Grushevskaya_singer_tab('Майкл Джексон'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('6', 'Billie Jean', '+00 00:04:50.000000', 'Фанк',  Grushevskaya_singer_tab('Майкл Джексон'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('7', 'Human Nature', '+00 00:04:06.000000', 'Ритм-н-блюз',  Grushevskaya_singer_tab('Майкл Джексон'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('8', 'Pretty Young Thing', '+00 00:03:58.000000', 'Джаз',  Grushevskaya_singer_tab('Майкл Джексон'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('9', 'The Lady in My Life', '+00 00:05:00.000000', 'Ритм-н-блюз',  Grushevskaya_singer_tab('Майкл Джексон'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('10', 'Larger than life', '+00 00:03:52.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Backstreet Boys'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('11', 'I want it that way', '+00 00:03:33.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Backstreet Boys'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('12', 'Show me the meaning of being lonely', '+00 00:03:54.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Backstreet Boys'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('13', 'It’s gotta be you', '+00 00:02:56.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Backstreet Boys'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('14', 'I need you tonight', '+00 00:04:23.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Backstreet Boys'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('15', 'Don’t want you back', '+00 00:03:25.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Backstreet Boys'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('16', 'Don’t wanna lose you now', '+00 00:03:54.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Backstreet Boys'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('17', 'The one', '+00 00:03:46.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Backstreet Boys'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('18', 'Back to your heart', '+00 00:04:21.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Backstreet Boys'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('19', 'Spanish eyes', '+00 00:03:53.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Backstreet Boys'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('20', 'No one else comes close', '+00 00:03:42.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Backstreet Boys'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('21', 'The perfect fan', '+00 00:04:13.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Backstreet Boys'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('22', 'Dancing Queen', '+00 00:03:51.000000', 'Диско',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('23', 'Knowing Me, Knowing You', '+00 00:04:03.000000', 'Поп-музыка',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('24', 'Take a Chance on Me', '+00 00:04:06.000000', 'Поп-музыка',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('25', 'Mamma Mia', '+00 00:03:33.000000', 'Поп-музыка',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('26', 'Lay All Your Love on Me', '+00 00:04:35.000000', 'Диско',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('27', 'Super Trouper', '+00 00:04:13.000000', 'Поп-музыка',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('28', 'I Have a Dream', '+00 00:04:42.000000', 'Баллада',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('29', 'The Winner Takes It All', '+00 00:04:54.000000', 'Баллада',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('30', 'Money, Money, Money', '+00 00:03:05.000000', 'Поп-музыка',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('31', 'SOS', '+00 00:03:23.000000', 'Поп-музыка',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('32', 'Chiquitita', '+00 00:05:26.000000', 'Поп-музыка',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('33', 'Fernando', '+00 00:04:14.000000', 'Поп-музыка',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('34', 'Voulez-Vous', '+00 00:05:09.000000', 'Диско',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('35', 'Gimme! Gimme! Gimme!', '+00 00:04:46.000000', 'Диско',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('36', 'Does Your Mother Know', '+00 00:03:15.000000', 'Поп-музыка',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('37', 'One of Us', '+00 00:03:56.000000', 'Поп-музыка',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('38', 'The Name of the Game', '+00 00:04:51.000000', 'Поп-музыка',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('39', 'Thank You for the Music', '+00 00:03:51.000000', 'Баллада',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('40', 'Waterloo', '+00 00:02:42.000000', 'Поп-музыка',  Grushevskaya_singer_tab('ABBA'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('41', 'Старт даёт Москва', '+00 00:02:52.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Валентина Толкунова',  'Лев Лещенко'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('42', 'Добрые приметы', '+00 00:02:16.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Валентина Толкунова',  'Лев Лещенко'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('43', 'Олимпийский Мишка', '+00 00:03:32.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Валентина Толкунова',  'Лев Лещенко'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('44', 'Вальс влюблённых', '+00 00:02:34.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Валентина Толкунова',  'Лев Лещенко'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('45', 'Ночной звонок', '+00 00:04:54.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Валентина Толкунова',  'Лев Лещенко'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('46', 'Осень', '+00 00:03:49.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Валентина Толкунова',  'Лев Лещенко'));
+INSERT INTO Grushevskaya_record (id, name, time, style, singer_list) VALUES ('47', 'Песня остаётся с человеком', '+00 00:03:49.000000', 'Поп-музыка',  Grushevskaya_singer_tab('Валентина Толкунова',  'Лев Лещенко',  'Иосиф Кобзон',  'Майя Кристалинская',  'Эдуард Хиль'));
 /
 -- Ограничения на RECORD
 ALTER TABLE Grushevskaya_record 
@@ -219,7 +215,7 @@ ALTER TABLE Grushevskaya_record
 -- ALBUM
 
 -- Вложенный массив записей
-CREATE TYPE Grushevskaya_record_arr AS Varray(30) OF NUMBER(10,0);
+CREATE TYPE Grushevskaya_record_arr AS Varray(30) OF NUMBER(10, 0);
 /
 -- ALBUM – альбом (идентификатор, название, стоимость, 
 -- количество на складе, количество проданных экземпляров,
@@ -230,7 +226,7 @@ CREATE TABLE Grushevskaya_album (
     -- название
     name VARCHAR2(100 BYTE),
     -- стоимость
-    price NUMBER(6,2),
+    price NUMBER(6, 2),
     -- количество на складе
     quantity_in_stock NUMBER(5, 0),
     -- количество проданных экземпляров
@@ -240,12 +236,12 @@ CREATE TABLE Grushevskaya_album (
 );
 /
 -- Тестовые данные
-INSERT INTO Grushevskaya_album (id,name,price,quantity_in_stock,quantity_of_sold,record_array) VALUES ('1','Thriller','792,5','188','37', Grushevskaya_record_arr(1, 2, 3, 4, 5, 6, 7, 8, 9, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
-INSERT INTO Grushevskaya_album (id,name,price,quantity_in_stock,quantity_of_sold,record_array) VALUES ('2','Millennium','836,24','33','42', Grushevskaya_record_arr(11, 13, 14, 15, 16, 17, 18, 19, 20, 21, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
-INSERT INTO Grushevskaya_album (id,name,price,quantity_in_stock,quantity_of_sold,record_array) VALUES ('3','ABBA Gold: Greatest Hits','921,34','199','142', Grushevskaya_record_arr(22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, null, null, null, null, null, null, null, null, null, null, null));
-INSERT INTO Grushevskaya_album (id,name,price,quantity_in_stock,quantity_of_sold,record_array) VALUES ('4','Валентина Толкунова и Лев Лещенко','127,99','44','7', Grushevskaya_record_arr(41, 42, 43, 44, 45, 46, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
-INSERT INTO Grushevskaya_album (id,name,price,quantity_in_stock,quantity_of_sold,record_array) VALUES ('5','Разное','87,99','10','0', Grushevskaya_record_arr(3, 4, 8, 12, 16, 17, 23, 29, 32, 38, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
-INSERT INTO Grushevskaya_album (id,name,price,quantity_in_stock,quantity_of_sold,record_array) VALUES ('6','Пустой альбом','0','0','0', Grushevskaya_record_arr(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+INSERT INTO Grushevskaya_album (id, name, price, quantity_in_stock, quantity_of_sold, record_array) VALUES ('1', 'Thriller', '792,5', '188', '37',  Grushevskaya_record_arr(1,  2,  3,  4,  5,  6,  7,  8,  9,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null));
+INSERT INTO Grushevskaya_album (id, name, price, quantity_in_stock, quantity_of_sold, record_array) VALUES ('2', 'Millennium', '836,24', '33', '42',  Grushevskaya_record_arr(11,  13,  14,  15,  16,  17,  18,  19,  20,  21,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null));
+INSERT INTO Grushevskaya_album (id, name, price, quantity_in_stock, quantity_of_sold, record_array) VALUES ('3', 'ABBA Gold: Greatest Hits', '921,34', '199', '142',  Grushevskaya_record_arr(22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,  40,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null));
+INSERT INTO Grushevskaya_album (id, name, price, quantity_in_stock, quantity_of_sold, record_array) VALUES ('4', 'Валентина Толкунова и Лев Лещенко', '127,99', '44', '7',  Grushevskaya_record_arr(41,  42,  43,  44,  45,  46,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null));
+INSERT INTO Grushevskaya_album (id, name, price, quantity_in_stock, quantity_of_sold, record_array) VALUES ('5', 'Разное', '87,99', '10', '0',  Grushevskaya_record_arr(3,  4,  8,  12,  16,  17,  23,  29,  32,  38,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null));
+INSERT INTO Grushevskaya_album (id, name, price, quantity_in_stock, quantity_of_sold, record_array) VALUES ('6', 'Пустой альбом', '0', '0', '0',  Grushevskaya_record_arr(null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null,  null));
 /
 -- Ограничения на ALBUM
 ALTER TABLE Grushevskaya_album 
@@ -599,7 +595,7 @@ CREATE OR REPLACE
 TRIGGER Grushevskaya_tr_on_record_udp
 FOR UPDATE OF id ON Grushevskaya_record
 COMPOUND TRIGGER
-    TYPE Changes_arr IS TABLE OF NUMBER(10,0) INDEX BY PLS_INTEGER;
+    TYPE Changes_arr IS TABLE OF NUMBER(10, 0) INDEX BY PLS_INTEGER;
     record_changes Changes_arr;
     AFTER EACH ROW IS
     BEGIN

@@ -16,10 +16,10 @@ BEGIN
     GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_RECORDS(ALBUM_ID => 6);
     
     GRUSHEVSKAYA_PACKAGE.PRINT_SINGER_STYLE(
-        SINGER_NAME => 'Ã‡ÈÍÎ ƒÊÂÍÒÓÌ'
+        SINGER_NAME => '–ú–∞–π–∫–ª –î–∂–µ–∫—Å–æ–Ω'
     );
     GRUSHEVSKAYA_PACKAGE.PRINT_SINGER_STYLE(
-        SINGER_NAME => 'œÓÎ Ã‡ÍÍ‡ÚÌË'
+        SINGER_NAME => '–ü–æ–ª –ú–∞–∫–∫–∞—Ä—Ç–Ω–∏'
     );
     GRUSHEVSKAYA_PACKAGE.PRINT_SINGER_STYLE(
         SINGER_NAME => 'Backstreet Boys'
@@ -28,19 +28,19 @@ BEGIN
         SINGER_NAME => 'ABBA'
     );
     GRUSHEVSKAYA_PACKAGE.PRINT_SINGER_STYLE(
-        SINGER_NAME => '¬‡ÎÂÌÚËÌ‡ “ÓÎÍÛÌÓ‚‡'
+        SINGER_NAME => '–í–∞–ª–µ–Ω—Ç–∏–Ω–∞ –¢–æ–ª–∫—É–Ω–æ–≤–∞'
     );
     GRUSHEVSKAYA_PACKAGE.PRINT_SINGER_STYLE(
-        SINGER_NAME => 'ÀÂ‚ ÀÂ˘ÂÌÍÓ'
+        SINGER_NAME => '–õ–µ–≤ –õ–µ—â–µ–Ω–∫–æ'
     );
     GRUSHEVSKAYA_PACKAGE.PRINT_SINGER_STYLE(
-        SINGER_NAME => '»ÓÒËÙ  Ó·ÁÓÌ'
+        SINGER_NAME => '–ò–æ—Å–∏—Ñ –ö–æ–±–∑–æ–Ω'
     );
     GRUSHEVSKAYA_PACKAGE.PRINT_SINGER_STYLE(
-        SINGER_NAME => 'Ã‡Èˇ  ËÒÚ‡ÎËÌÒÍ‡ˇ'
+        SINGER_NAME => '–ú–∞–π—è –ö—Ä–∏—Å—Ç–∞–ª–∏–Ω—Å–∫–∞—è'
     );
     GRUSHEVSKAYA_PACKAGE.PRINT_SINGER_STYLE(
-        SINGER_NAME => '›‰Û‡‰ ’ËÎ¸'
+        SINGER_NAME => '–≠–¥—É–∞—Ä–¥ –•–∏–ª—å'
     );
     
     GRUSHEVSKAYA_PACKAGE.PRINT_ALBUM_AUTHOR;
